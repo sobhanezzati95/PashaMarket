@@ -10,5 +10,7 @@ namespace Application.Interfaces.ProductAggregate
         Task<OperationResult<EditProduct>> GetDetails(long id);
         Task<OperationResult<List<ProductViewModel>>> GetProducts();
         Task<OperationResult<List<ProductViewModel>>> Search(ProductSearchModel searchModel);
+        Task<OperationResult<bool>> InStock(long productId);
+        Task<OperationResult<bool>> NotInStock(long productId);
     }
 }
