@@ -25,15 +25,15 @@ namespace Presentation.Areas.Administration.Pages.Shop.Products
 
         public async Task OnGet(ProductSearchModel searchModel)
         {
-            ProductCategories = new SelectList((await _productCategoryApplication.GetProductCategories()).Data, "Id", "Name");
-            Products = (await _productApplication.Search(searchModel)).Data;
+            ProductCategories = new SelectList(await _productCategoryApplication.GetProductCategories(), "Id", "Name");
+            Products = await _productApplication.Search(searchModel);
         }
 
         public async Task<IActionResult> OnGetCreate()
         {
             var command = new CreateProduct
             {
-                Categories = (await _productCategoryApplication.GetProductCategories()).Data
+                Categories = await _productCategoryApplication.GetProductCategories()
             };
             return Partial("./Create", command);
         }
@@ -46,8 +46,8 @@ namespace Presentation.Areas.Administration.Pages.Shop.Products
 
         public async Task<IActionResult> OnGetEdit(long id)
         {
-            var product = (await _productApplication.GetDetails(id)).Data;
-            product.Categories = (await _productCategoryApplication.GetProductCategories()).Data;
+            var product = await _productApplication.GetDetails(id);
+            product.Categories = await _productCategoryApplication.GetProductCategories();
             return Partial("Edit", product);
         }
 
@@ -60,7 +60,7 @@ namespace Presentation.Areas.Administration.Pages.Shop.Products
         public async Task<IActionResult> OnGetNotInStock(long id)
         {
             var result = await _productApplication.NotInStock(id);
-            if (result.IsSuccedded)
+            if (result.IsSucceeded)
                 return RedirectToPage("./Index");
 
             Message = result.Message;
@@ -70,7 +70,7 @@ namespace Presentation.Areas.Administration.Pages.Shop.Products
         public async Task<IActionResult> OnGetIsInStock(long id)
         {
             var result = await _productApplication.InStock(id);
-            if (result.IsSuccedded)
+            if (result.IsSucceeded)
                 return RedirectToPage("./Index");
 
             Message = result.Message;

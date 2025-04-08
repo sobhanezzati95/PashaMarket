@@ -5,12 +5,12 @@ namespace Application.Interfaces.ProductAggregate
 {
     public interface IProductApplication
     {
-        Task<OperationResult<long>> Create(CreateProduct command);
-        Task<OperationResult<bool>> Edit(EditProduct command);
-        Task<OperationResult<EditProduct>> GetDetails(long id);
-        Task<OperationResult<List<ProductViewModel>>> GetProducts();
-        Task<OperationResult<List<ProductViewModel>>> Search(ProductSearchModel searchModel);
-        Task<OperationResult<bool>> InStock(long productId);
-        Task<OperationResult<bool>> NotInStock(long productId);
+        Task<OperationResult> Create(CreateProduct command);
+        Task<OperationResult> Edit(EditProduct command);
+        Task<EditProduct> GetDetails(long id);
+        Task<List<ProductViewModel>> GetProducts();
+        Task<List<ProductViewModel>> Search(ProductSearchModel searchModel);
+        Task<OperationResult> InStock(long productId);
+        Task<OperationResult> NotInStock(long productId);
     }
 }

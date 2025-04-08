@@ -20,65 +20,63 @@ namespace Application.Services.ProductAggregate
             _logger = logger;
         }
 
-        public async Task<OperationResult<long>> Create(CreateProductCategory command)
+        public async Task<OperationResult> Create(CreateProductCategory command)
         {
             try
             {
                 if (await _unitOfWork.ProductCategoryRepository.Exists(x => x.Name == command.Name))
-                    return OperationResult<long>.Failed(ApplicationMessages.DuplicatedRecord);
+                    return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
 
                 var slug = command.Slug.Slugify();
                 var productCategory = ProductCategory.Create(command.Name, command.Description, command.Keywords, command.MetaDescription, slug);
 
                 await _unitOfWork.ProductCategoryRepository.Add(productCategory);
                 await _unitOfWork.CommitAsync();
-                return OperationResult<long>.Succedded(productCategory.Id);
+                return OperationResult.Succeeded();
             }
             catch (Exception e)
             {
                 _logger.LogError(e,
                         "#ProductCategoryApplication.Create.CatchException() >> Exception: " + e.Message +
                         (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                return OperationResult<long>.Failed(e.Message);
+                return OperationResult.Failed(e.Message);
             }
         }
 
-        public async Task<OperationResult<bool>> Edit(EditProductCategory command)
+        public async Task<OperationResult> Edit(EditProductCategory command)
         {
             try
             {
                 var productCategory = await _unitOfWork.ProductCategoryRepository.GetById(command.Id);
                 if (productCategory == null)
-                    return OperationResult<bool>.Failed(ApplicationMessages.RecordNotFound);
+                    return OperationResult.Failed(ApplicationMessages.RecordNotFound);
 
                 if (await _unitOfWork.ProductCategoryRepository.Exists(x => x.Name == command.Name && x.Id != command.Id))
-                    return OperationResult<bool>.Failed(ApplicationMessages.DuplicatedRecord);
+                    return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
 
                 var slug = command.Slug.Slugify();
                 productCategory.Edit(command.Name, command.Description, command.Keywords, command.MetaDescription, slug);
 
                 await _unitOfWork.ProductCategoryRepository.Update(productCategory);
                 await _unitOfWork.CommitAsync();
-                return OperationResult<bool>.Succedded();
+                return OperationResult.Succeeded();
             }
             catch (Exception e)
             {
                 _logger.LogError(e,
                "#ProductCategoryApplication.Edit.CatchException() >> Exception: " + e.Message +
                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                return OperationResult<bool>.Failed(e.Message);
+                return OperationResult.Failed(e.Message);
             }
         }
 
-        public async Task<OperationResult<EditProductCategory>> GetDetails(long id)
+        public async Task<EditProductCategory> GetDetails(long id)
         {
             try
             {
                 var productCategory = await _unitOfWork.ProductCategoryRepository.GetById(id);
-                if (productCategory == null)
-                    return OperationResult<EditProductCategory>.Failed(ApplicationMessages.RecordNotFound);
 
-                return OperationResult<EditProductCategory>.Succedded(new EditProductCategory
+                return new EditProductCategory
                 {
                     Id = productCategory.Id,
                     Description = productCategory.Description,
@@ -86,65 +84,60 @@ namespace Application.Services.ProductAggregate
                     Keywords = productCategory.Keywords,
                     MetaDescription = productCategory.MetaDescription,
                     Slug = productCategory.Slug
-                });
+                };
             }
             catch (Exception e)
             {
                 _logger.LogError(e,
                "#ProductCategoryApplication.GetDetails.CatchException() >> Exception: " + e.Message +
                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                return OperationResult<EditProductCategory>.Failed(e.Message);
+                throw;
             }
         }
 
-        public async Task<OperationResult<List<ProductCategoryViewModel>>> GetProductCategories()
+        public async Task<List<ProductCategoryViewModel>> GetProductCategories()
         {
             try
             {
                 var productCategories = await _unitOfWork.ProductCategoryRepository.GetAllAsQueryable();
-                if (productCategories.Any() == false)
-                    return OperationResult<List<ProductCategoryViewModel>>.Failed(ApplicationMessages.RecordNotFound);
 
-                return OperationResult<List<ProductCategoryViewModel>>.Succedded(productCategories.Select(x => new ProductCategoryViewModel
+                return productCategories.Select(x => new ProductCategoryViewModel
                 {
                     Id = x.Id,
                     Name = x.Name
-                }).ToList());
+                }).ToList();
             }
             catch (Exception e)
             {
                 _logger.LogError(e,
                "#ProductCategoryApplication.GetProductCategories.CatchException() >> Exception: " + e.Message +
                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                return OperationResult<List<ProductCategoryViewModel>>.Failed(e.Message);
+                throw;
             }
         }
 
-        public async Task<OperationResult<List<ProductCategoryViewModel>>> Search(ProductCategorySearchModel searchModel)
+        public async Task<List<ProductCategoryViewModel>> Search(ProductCategorySearchModel searchModel)
         {
             try
             {
                 var query = await _unitOfWork.ProductCategoryRepository.GetAllAsQueryable();
 
-                if (query.Any() == false)
-                    return OperationResult<List<ProductCategoryViewModel>>.Failed(ApplicationMessages.RecordNotFound);
-
                 if (!string.IsNullOrWhiteSpace(searchModel.Name))
                     query = query.Where(x => x.Name.Contains(searchModel.Name));
 
-                return OperationResult<List<ProductCategoryViewModel>>.Succedded(query.Select(x => new ProductCategoryViewModel
+                return query.Select(x => new ProductCategoryViewModel
                 {
                     Id = x.Id,
                     Name = x.Name,
                     CreationDate = x.CreateDateTime.ToFarsi()
-                }).ToList());
+                }).ToList();
             }
             catch (Exception e)
             {
                 _logger.LogError(e,
                "#ProductCategoryApplication.Search.CatchException() >> Exception: " + e.Message +
                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                return OperationResult<List<ProductCategoryViewModel>>.Failed(e.Message);
+                throw;
             }
         }
     }

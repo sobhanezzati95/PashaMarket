@@ -19,7 +19,7 @@ namespace Presentation.Areas.Administration.Pages.Shop.ProductCategories
 
         public async Task OnGet(ProductCategorySearchModel searchModel)
         {
-            ProductCategories = (await _productCategoryApplication.Search(searchModel)).Data;
+            ProductCategories = await _productCategoryApplication.Search(searchModel);
         }
 
         public IActionResult OnGetCreate()
@@ -36,7 +36,7 @@ namespace Presentation.Areas.Administration.Pages.Shop.ProductCategories
         public async Task<IActionResult> OnGetEdit(long id)
         {
             var productCategory = await _productCategoryApplication.GetDetails(id);
-            return Partial("Edit", productCategory.Data);
+            return Partial("Edit", productCategory);
         }
 
         public async Task<JsonResult> OnPostEdit(EditProductCategory command)

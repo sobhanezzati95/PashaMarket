@@ -1,40 +1,29 @@
 ﻿namespace Framework.Application
 {
-    public class OperationResult<T>
+    public class OperationResult
     {
-        public T? Data { get; set; }
-        public bool IsSuccedded { get; set; } = false;
+        public bool IsSucceeded { get; set; } = false;
         public string? Message { get; set; }
 
-        public static OperationResult<T> Succedded(T? data, string message = "عملیات با موفقیت انجام شد")
+        public static OperationResult Succeeded(string message = "عملیات با موفقیت انجام شد")
         {
-            return new OperationResult<T>()
+            return new OperationResult()
             {
-                Data = data,
-                IsSuccedded = true,
+                IsSucceeded = true,
                 Message = message,
             };
         }
 
-        public static OperationResult<T> Succedded(string message = "عملیات با موفقیت انجام شد")
+        public static OperationResult Failed(string message)
         {
-            return new OperationResult<T>()
+            return new OperationResult()
             {
-                IsSuccedded = true,
+                IsSucceeded = false,
                 Message = message,
             };
         }
 
-        public static OperationResult<T> Failed(string message)
-        {
-            return new OperationResult<T>()
-            {
-                IsSuccedded = false,
-                Message = message,
-            };
-        }
-
-        public static OperationResult<T> Failed(object passwordsNotMatch)
+        public static OperationResult Failed(object passwordsNotMatch)
         {
             throw new NotImplementedException();
         }
