@@ -53,7 +53,7 @@ namespace Application.Services.ProductAggregate
         {
             try
             {
-                var product = await _unitOfWork.ProductRepository.GetById(command.Id);
+                var product = await _unitOfWork.ProductRepository.GetProductWithCategory(command.Id);
                 if (product == null)
                     return OperationResult<bool>.Failed(ApplicationMessages.RecordNotFound);
 
@@ -214,6 +214,8 @@ namespace Application.Services.ProductAggregate
                     CategoryId = x.CategoryId,
                     Code = x.Code,
                     Picture = x.Picture,
+                    UnitPrice = x.UnitPrice,
+                    IsInStock = x.IsInStock,
                     CreationDate = x.CreateDateTime.ToFarsi()
                 }).ToList());
             }

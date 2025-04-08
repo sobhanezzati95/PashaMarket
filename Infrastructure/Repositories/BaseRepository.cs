@@ -188,6 +188,8 @@ public class BaseRepository<T> : IRepository<T> where T : BaseEntity<long>
 
     public async Task<T> Update(T entity)
     {
+        entity.ModifyDateTime = DateTime.UtcNow;
+        entity.IsModified = true;
         DbSet.Update(entity);
         return await Task.FromResult(entity);
     }
