@@ -3,7 +3,7 @@ using Application.Interfaces.ProductAggregate;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Presentation.Areas.Administration.Pages.Shop.ProductCategories
+namespace Presentation.Areas.Admin.Pages.ProductCategories
 {
     public class IndexModel : PageModel
     {

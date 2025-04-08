@@ -21,6 +21,7 @@ namespace Domain.Entities.ProductAggregate
             Slug = slug;
             Keywords = keywords;
             MetaDescription = metaDescription;
+            IsInStock = true;
         }
 
         #endregion

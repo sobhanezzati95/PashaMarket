@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Presentation.Areas.Administration.Pages.Shop.Products
+namespace Presentation.Areas.Admin.Pages.Products
 {
     public class IndexModel : PageModel
     {
