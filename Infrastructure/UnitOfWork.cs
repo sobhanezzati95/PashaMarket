@@ -14,6 +14,7 @@ public class UnitOfWork : IUnitOfWork
         ProductRepository = new ProductRepository(_dbContext);
         ProductPictureRepository = new ProductPictureRepository(_dbContext);
         ProductCategoryRepository = new ProductCategoryRepository(_dbContext);
+        SlideRepository = new SlideRepository(_dbContext);
     }
 
     #region ProductAggRepo
@@ -21,6 +22,7 @@ public class UnitOfWork : IUnitOfWork
     public IProductRepository ProductRepository { get; private set; }
     public IProductCategoryRepository ProductCategoryRepository { get; private set; }
     public IProductPictureRepository ProductPictureRepository { get; private set; }
+    public ISlideRepository SlideRepository { get; private set; }
 
     #endregion
 

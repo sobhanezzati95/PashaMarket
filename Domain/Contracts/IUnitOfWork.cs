@@ -9,6 +9,7 @@ public interface IUnitOfWork : IDisposable
     IProductRepository ProductRepository { get; }
     IProductCategoryRepository ProductCategoryRepository { get; }
     IProductPictureRepository ProductPictureRepository { get; }
+    ISlideRepository SlideRepository { get; }
 
     #endregion
 

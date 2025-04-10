@@ -12,7 +12,6 @@ namespace Domain.Entities.ProductAggregate
             Picture = picture;
             PictureAlt = pictureAlt;
             PictureTitle = pictureTitle;
-            IsRemoved = false;
         }
 
         #endregion
@@ -23,7 +22,6 @@ namespace Domain.Entities.ProductAggregate
         public string Picture { get; private set; }
         public string PictureAlt { get; private set; }
         public string PictureTitle { get; private set; }
-        public bool IsRemoved { get; private set; }
         public Product Product { get; private set; }
 
         #endregion
