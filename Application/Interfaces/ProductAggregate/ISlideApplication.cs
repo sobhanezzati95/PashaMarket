@@ -11,5 +11,6 @@ namespace Application.Interfaces.ProductAggregate
         Task<OperationResult> Restore(long id);
         Task<EditSlide> GetDetails(long id);
         Task<List<SlideViewModel>> GetList();
+        Task<List<SlideQueryModel>> GetSlides();
     }
 }

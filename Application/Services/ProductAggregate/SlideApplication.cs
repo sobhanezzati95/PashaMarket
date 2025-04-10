@@ -120,6 +120,36 @@ namespace Application.Services.ProductAggregate
             }
         }
 
+        public async Task<List<SlideQueryModel>> GetSlides()
+        {
+            try
+            {
+
+                var slides = await _unitOfWork.SlideRepository.GetAllAsQueryable();
+
+                return slides
+                        .Where(x => x.IsRemoved == false)
+                        .Select(x => new SlideQueryModel
+                        {
+                            Picture = x.Picture,
+                            PictureAlt = x.PictureAlt,
+                            PictureTitle = x.PictureTitle,
+                            BtnText = x.BtnText,
+                            Heading = x.Heading,
+                            Link = x.Link,
+                            Text = x.Text,
+                            Title = x.Title
+                        }).ToList();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e,
+                "#SlideApplication.GetSlides.CatchException() >> Exception: " + e.Message +
+                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+                throw;
+            }
+        }
+
         public async Task<OperationResult> Remove(long id)
         {
             try

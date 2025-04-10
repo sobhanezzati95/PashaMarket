@@ -1,0 +1,50 @@
+﻿@model List<Application.Dtos.ProductAggregate.Slide.SlideQueryModel>
+
+<!-- SLIDER -->
+<div>
+    <div class="swiper mySwiper w-full h-48 md:h-72 lg:h-[450px] mt-4 lg:mt-6">
+        <div class="swiper-wrapper">
+            <!-- SLIDER ITEM -->
+            @foreach (var item in Model)
+            {
+                <div class="swiper-slide absolute">
+                    <img class="w-full h-full object-cover" src="@item.Picture" alt="">
+                    <div class="flex items-start  flex-col absolute  right-5 top-5 md:right-10 md:top-10 lg:top-20 lg:right-40 xl:right-48  text-white">
+                        <h2 class="font-MorabbaMedium text-xl lg:text-5xl mb-2 lg:mb-4">
+                            @item.Heading
+                        </h2>
+                        <p class="text-base lg:text-2xl font-MorabbaLight border-b border-gray-300 pb-2 lg:pb-4 mb-2 lg:mb-4">
+                            @item.Title
+                        </p>
+                        <p class="w-[60%] text-sm lg:text-base lg:leading-8 mb-2 lg:mb-4 line-clamp-2">
+                            @item.Text
+                        </p>
+                        <a href="@item.Link"
+                           class="flex items-center bg-green-500 hover:bg-green-600 transition-all rounded-lg px-1  lg:px-2 py-1 lg:py-1.5 text-sm lg:text-base">
+                            <p class="hidden lg:flex ml-1"> @item.BtnText </p> 
+                            <svg class="w-4 h-4">
+                                <use href="#chevron-left"></use>
+                            </svg>
+                        </a>
+                    </div>
+
+                </div>
+            }
+        </div>
+        <!-- NEXT & PREV BTN -->
+        <div class="container absolute  flex items-center justify-end gap-x-3 left-4 lg:left-0 bottom-5 z-30 child:cursor-pointenr
+                child:bg-white
+                child:dark:bg-zinc-700 child:shadow child:rounded-full child:p-1 child:lg:p-1.5 ">
+            <button class="button-prev ">
+                <svg class="w-5 h-5">
+                    <use href="#arrow-long-right"></use>
+                </svg>
+            </button>
+            <button class="button-next dark:bg-zinc-700 shadow rounded-full p-1 lg:p-1.5">
+                <svg class="w-5 h-5">
+                    <use href="#arrow-long-left"></use>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
