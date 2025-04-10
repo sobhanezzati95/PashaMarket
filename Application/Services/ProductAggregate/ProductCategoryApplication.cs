@@ -28,7 +28,10 @@ namespace Application.Services.ProductAggregate
                     return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
 
                 var slug = command.Slug.Slugify();
-                var productCategory = ProductCategory.Create(command.Name, command.Description, command.Keywords, command.MetaDescription, slug);
+                var picturePath = $"{command.Slug}";
+                var pictureName = _fileUploader.Upload(command.Picture, picturePath);
+
+                var productCategory = ProductCategory.Create(command.Name, command.Description, pictureName, command.PictureAlt, command.PictureTitle, command.Keywords, command.MetaDescription, slug);
 
                 await _unitOfWork.ProductCategoryRepository.Add(productCategory);
                 await _unitOfWork.CommitAsync();
@@ -55,7 +58,11 @@ namespace Application.Services.ProductAggregate
                     return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
 
                 var slug = command.Slug.Slugify();
-                productCategory.Edit(command.Name, command.Description, command.Keywords, command.MetaDescription, slug);
+
+                var picturePath = $"{command.Slug}";
+                var fileName = _fileUploader.Upload(command.Picture, picturePath);
+
+                productCategory.Edit(command.Name, command.Description, fileName, command.PictureAlt, command.PictureTitle, command.Keywords, command.MetaDescription, slug);
 
                 await _unitOfWork.ProductCategoryRepository.Update(productCategory);
                 await _unitOfWork.CommitAsync();
