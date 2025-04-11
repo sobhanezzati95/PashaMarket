@@ -1,4 +1,5 @@
 ﻿using Domain;
+using Domain.Contracts.Repositories.DiscountAggregate;
 using Domain.Contracts.Repositories.ProductAggregate;
 using Infrastructure.DbContexts;
 using Infrastructure.Repositories.ProductAggregate;
@@ -15,6 +16,8 @@ public class UnitOfWork : IUnitOfWork
         ProductPictureRepository = new ProductPictureRepository(_dbContext);
         ProductCategoryRepository = new ProductCategoryRepository(_dbContext);
         SlideRepository = new SlideRepository(_dbContext);
+        DiscountRepository = new DiscountRepository(_dbContext);
+
     }
 
     #region ProductAggRepo
@@ -23,6 +26,12 @@ public class UnitOfWork : IUnitOfWork
     public IProductCategoryRepository ProductCategoryRepository { get; private set; }
     public IProductPictureRepository ProductPictureRepository { get; private set; }
     public ISlideRepository SlideRepository { get; private set; }
+
+    #endregion
+
+    #region DiscountAggRepo
+
+    public IDiscountRepository DiscountRepository { get; private set; }
 
     #endregion
 

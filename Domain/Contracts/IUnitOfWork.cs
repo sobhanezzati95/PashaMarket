@@ -1,4 +1,5 @@
-﻿using Domain.Contracts.Repositories.ProductAggregate;
+﻿using Domain.Contracts.Repositories.DiscountAggregate;
+using Domain.Contracts.Repositories.ProductAggregate;
 
 namespace Domain;
 public interface IUnitOfWork : IDisposable
@@ -10,6 +11,12 @@ public interface IUnitOfWork : IDisposable
     IProductCategoryRepository ProductCategoryRepository { get; }
     IProductPictureRepository ProductPictureRepository { get; }
     ISlideRepository SlideRepository { get; }
+
+    #endregion
+
+    #region DiscountAggRepo
+
+    IDiscountRepository DiscountRepository { get; }
 
     #endregion
 

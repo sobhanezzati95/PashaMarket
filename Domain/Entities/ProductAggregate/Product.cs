@@ -1,4 +1,5 @@
-﻿using Framework.Domain;
+﻿using Domain.Entities.DiscountAggregate;
+using Framework.Domain;
 
 namespace Domain.Entities.ProductAggregate
 {
@@ -41,13 +42,15 @@ namespace Domain.Entities.ProductAggregate
         public string Slug { get; private set; }
         public string Keywords { get; private set; }
         public string MetaDescription { get; private set; }
-        public ProductCategory Category { get; private set; }
 
         #endregion
 
         #region Relations
 
+        public ProductCategory Category { get; private set; }
         public List<ProductPicture> ProductPictures { get; private set; }
+        public List<Discount> Discounts { get; private set; }
+
 
         #endregion
 

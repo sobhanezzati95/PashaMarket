@@ -1,4 +1,5 @@
-﻿using Domain.Entities.ProductAggregate;
+﻿using Domain.Entities.DiscountAggregate;
+using Domain.Entities.ProductAggregate;
 using Infrastructure.Configurations.ProductAggregate;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +17,11 @@ namespace Infrastructure.DbContexts
         public DbSet<ProductCategory> ProductCategories { get; set; }
         public DbSet<ProductPicture> ProductPictures { get; set; }
         public DbSet<Slide> Slides { get; set; }
+
+        #endregion
+
+        #region DiscountAggregate
+        public DbSet<Discount> Discounts { get; set; }
 
         #endregion
 
