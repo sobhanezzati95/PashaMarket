@@ -7,58 +7,8 @@
 @await Component.InvokeAsync("Slide")
 
 <main class="child:mt-14">
-    <!-- CATEGORIES -->
-    <section class="container">
-        <!-- TITLE -->
-        <a href="shop.html" class="flex items-center justify-center">
-            <span class="cursor-pointer transition-colors gap-x-2 flex items-center justify-center">
-                <h2 class="text-xl lg:text-3xl font-MorabbaMedium">
-                    محبوب ترین دسته ها
-                </h2>
-                <svg class="w-8 h-8">
-                    <use href="#arrow-down-circle"></use>
-                </svg>
-            </span>
-        </a>
-        <!-- ITEMS -->
-        <div class="flex items-center justify-evenly lg:justify-between flex-wrap mt-10 child:mb-8 gap-x-8 child:flex child:items-center child:flex-col child-hover:-translate-y-5 child:duration-300 child:cursor-pointer child:gap-y-2.5">
-            <a href="shop.html">
-                <img src="~/Theme/Assets/Images/categories/category1.png"
-                     class="w-[100px] h-[100px] lg:w-[200px] lg:h-[200px] object-cover" alt="category1" />
-                <p class="font-DanaMedium text-sm lg:text-lg line-clamp-1">
-                    قهوه دمی و اسپرسو
-                </p>
-            </a>
-            <a href="shop.html">
-                <img src="~/Theme/Assets/Images/categories/category2.png"
-                     class="w-[100px] h-[100px] lg:w-[200px] lg:h-[200px] object-cover" alt="category1" />
-                <p class="font-DanaMedium text-sm lg:text-lg line-clamp-1">
-                    لوازم جانبی و تجهیزات
-                </p>
-            </a>
-            <a href="shop.html">
-                <img src="~/Theme/Assets/Images/categories/category3.png"
-                     class="w-[100px] h-[100px] lg:w-[200px] lg:h-[200px] object-cover" alt="category1" />
-                <p class="font-DanaMedium text-sm lg:text-lg line-clamp-1">
-                    اسپرسو ساز
-                </p>
-            </a>
-            <a href="shop.html">
-                <img src="~/Theme/Assets/Images/categories/category4.png"
-                     class="w-[100px] h-[100px] lg:w-[200px] lg:h-[200px] object-cover" alt="category1" />
-                <p class="font-DanaMedium text-sm lg:text-lg line-clamp-1">
-                    پک تستر قهوه
-                </p>
-            </a>
-            <a href="shop.html">
-                <img src="~/Theme/Assets/Images/categories/category5.png"
-                     class="w-[100px] h-[100px] lg:w-[200px] lg:h-[200px] object-cover" alt="category1" />
-                <p class="font-DanaMedium text-sm lg:text-lg line-clamp-1">
-                    قهوه ترک
-                </p>
-            </a>
-        </div>
-    </section>
+
+    @await Component.InvokeAsync("MostPopularProductCategories")
 
     <!-- Latest Products -->
     <section class="container">

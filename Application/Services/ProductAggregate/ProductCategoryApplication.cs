@@ -3,6 +3,7 @@ using Application.Interfaces.ProductAggregate;
 using Domain;
 using Domain.Entities.ProductAggregate;
 using Framework.Application;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services.ProductAggregate
@@ -146,6 +147,21 @@ namespace Application.Services.ProductAggregate
                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
                 throw;
             }
+        }
+
+        public async Task<List<MostPopularProductCategoriesQueryModel>> GetMostPopularProductCategoriesQuery()
+        {
+            var productCategories = await _unitOfWork.ProductCategoryRepository.GetAllAsQueryable();
+
+            return productCategories.Select(x => new MostPopularProductCategoriesQueryModel
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Picture = x.Picture,
+                PictureAlt = x.PictureAlt,
+                PictureTitle = x.PictureTitle,
+                Slug = x.Slug
+            }).AsNoTracking().ToList();
         }
     }
 }

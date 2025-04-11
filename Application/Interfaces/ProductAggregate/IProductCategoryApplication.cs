@@ -10,5 +10,7 @@ namespace Application.Interfaces.ProductAggregate
         Task<EditProductCategory> GetDetails(long id);
         Task<List<ProductCategoryViewModel>> GetProductCategories();
         Task<List<ProductCategoryViewModel>> Search(ProductCategorySearchModel searchModel);
+        Task<List<MostPopularProductCategoriesQueryModel>> GetMostPopularProductCategoriesQuery();
+
     }
 }
