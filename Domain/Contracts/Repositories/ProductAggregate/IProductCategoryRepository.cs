@@ -6,5 +6,6 @@ namespace Domain.Contracts.Repositories.ProductAggregate
     public interface IProductCategoryRepository : IRepository<ProductCategory>
     {
         Task<string> GetSlugById(long id);
+        Task<ProductCategory> GetBySlug(string slug);
     }
 }

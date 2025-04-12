@@ -151,17 +151,28 @@ namespace Application.Services.ProductAggregate
 
         public async Task<List<MostPopularProductCategoriesQueryModel>> GetMostPopularProductCategoriesQuery()
         {
-            var productCategories = await _unitOfWork.ProductCategoryRepository.GetAllAsQueryable();
-
-            return productCategories.Select(x => new MostPopularProductCategoriesQueryModel
+            try
             {
-                Id = x.Id,
-                Name = x.Name,
-                Picture = x.Picture,
-                PictureAlt = x.PictureAlt,
-                PictureTitle = x.PictureTitle,
-                Slug = x.Slug
-            }).AsNoTracking().ToList();
+                var productCategories = await _unitOfWork.ProductCategoryRepository.GetAllAsQueryable();
+
+                return productCategories.Select(x => new MostPopularProductCategoriesQueryModel
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Picture = x.Picture,
+                    PictureAlt = x.PictureAlt,
+                    PictureTitle = x.PictureTitle,
+                    Slug = x.Slug
+                }).AsNoTracking().ToList();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e,
+               "#ProductCategoryApplication.GetMostPopularProductCategoriesQuery.CatchException() >> Exception: " + e.Message +
+               (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+                throw;
+            }
         }
+
     }
 }

@@ -263,5 +263,59 @@ namespace Application.Services.ProductAggregate
                 throw;
             }
         }
+
+        public async Task<ProductCategoryQueryModel> GetProductCategoriesBy(string slug)
+        {
+            try
+            {
+                var category = await _unitOfWork.ProductCategoryRepository.GetBySlug(slug);
+
+                var products = await _unitOfWork.ProductRepository.GetAllWithIncludesAndThenInCludes(
+                                        predicate: x => x.CategoryId == category.Id,
+                                        orderBy: x => x.OrderByDescending(p => p.CreateDateTime),
+                                        isTracking: false,
+                                        ignoreQueryFilters: false,
+                                        includeProperties: null,
+                                        thenInclude: x => x.Include(z => z.Discounts));
+
+                if (products.Any() == false)
+                    return new();
+
+                var result = new ProductCategoryQueryModel
+                {
+                    Name = category.Name,
+                    Picture = category.Picture,
+                    PictureAlt = category.PictureAlt,
+                    PictureTitle = category.PictureTitle,
+                    Slug = category.Slug,
+                    ProductQueryModels = products.Select(x => new ProductQueryModel
+                    {
+                        Name = x.Name,
+                        Slug = x.Slug,
+                        PictureAlt = x.PictureAlt,
+                        UnitPriceAfterDiscount = x.Discounts.FirstOrDefault() != null &&
+                                         x.Discounts.FirstOrDefault().StartDate <= DateTime.Now &&
+                                         x.Discounts.FirstOrDefault().EndDate >= DateTime.Now ?
+                                         (x.UnitPrice - (x.UnitPrice * x.Discounts.FirstOrDefault().DiscountRate) / 100) : null,
+                        Picture = x.Picture,
+                        UnitPrice = x.UnitPrice,
+                        DiscountPercentage = x.Discounts.FirstOrDefault() != null &&
+                                         x.Discounts.FirstOrDefault().StartDate <= DateTime.Now &&
+                                         x.Discounts.FirstOrDefault().EndDate >= DateTime.Now ?
+                                         x.Discounts.FirstOrDefault().DiscountRate : null
+                    }).ToList()
+                };
+
+                return result;
+
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e,
+               "#ProductCategoryApplication.GetProductCategoriesBy.CatchException() >> Exception: " + e.Message +
+               (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+                throw;
+            }
+        }
     }
 }

@@ -14,6 +14,11 @@ namespace Infrastructure.Repositories.ProductAggregate
             _context = context;
         }
 
+        public async Task<ProductCategory> GetBySlug(string slug)
+        {
+            return await _context.ProductCategories.FirstOrDefaultAsync(x => x.Slug == slug);
+        }
+
         public async Task<string> GetSlugById(long id)
         {
             return (await _context.ProductCategories.Select(x => new { x.Id, x.Slug }).FirstOrDefaultAsync(x => x.Id == id)).Slug;
