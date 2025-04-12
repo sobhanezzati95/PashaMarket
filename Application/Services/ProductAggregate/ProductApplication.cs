@@ -110,6 +110,45 @@ namespace Application.Services.ProductAggregate
             }
         }
 
+        public async Task<List<LatestProductsQueryModel>> GetLatestProductsQuery()
+        {
+            try
+            {
+                var query = await _unitOfWork.ProductRepository.GetAllWithIncludesAndThenInCludes(
+                                        predicate: null,
+                                        orderBy: x => x.OrderByDescending(p => p.CreateDateTime),
+                                        isTracking: false,
+                                        ignoreQueryFilters: false,
+                                        includeProperties: null,
+                                        thenInclude: x => x.Include(z => z.Discounts));
+
+                if (query.Any() == false)
+                    return new();
+
+                var result = query.Select(x => new LatestProductsQueryModel
+                {
+                    Name = x.Name,
+                    Picture = x.Picture,
+                    UnitPrice = x.UnitPrice,
+                    DiscountPercentage = x.Discounts.FirstOrDefault() != null &&
+                                         x.Discounts.FirstOrDefault().StartDate < DateTime.Now &&
+                                         x.Discounts.FirstOrDefault().EndDate > DateTime.Now ?
+                                         x.Discounts.FirstOrDefault().DiscountRate : null
+                })
+                    .Take(6)
+                    .ToList();
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e,
+               "#ProductApplication.GetLatestProductsQuery.CatchException() >> Exception: " + e.Message +
+               (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+                throw;
+            }
+        }
+
         public async Task<List<ProductViewModel>> GetProducts()
         {
             try

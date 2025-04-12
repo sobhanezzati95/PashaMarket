@@ -12,5 +12,6 @@ namespace Application.Interfaces.ProductAggregate
         Task<List<ProductViewModel>> Search(ProductSearchModel searchModel);
         Task<OperationResult> InStock(long productId);
         Task<OperationResult> NotInStock(long productId);
+        Task<List<LatestProductsQueryModel>> GetLatestProductsQuery();
     }
 }
