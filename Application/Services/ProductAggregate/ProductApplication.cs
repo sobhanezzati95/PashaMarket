@@ -128,11 +128,17 @@ namespace Application.Services.ProductAggregate
                 var result = query.Select(x => new LatestProductsQueryModel
                 {
                     Name = x.Name,
+                    Slug = x.Slug,
+                    PictureAlt = x.PictureAlt,
+                    UnitPriceAfterDiscount = x.Discounts.FirstOrDefault() != null &&
+                                         x.Discounts.FirstOrDefault().StartDate <= DateTime.Now &&
+                                         x.Discounts.FirstOrDefault().EndDate >= DateTime.Now ?
+                                         (x.UnitPrice - (x.UnitPrice * x.Discounts.FirstOrDefault().DiscountRate) / 100) : null,
                     Picture = x.Picture,
                     UnitPrice = x.UnitPrice,
                     DiscountPercentage = x.Discounts.FirstOrDefault() != null &&
-                                         x.Discounts.FirstOrDefault().StartDate < DateTime.Now &&
-                                         x.Discounts.FirstOrDefault().EndDate > DateTime.Now ?
+                                         x.Discounts.FirstOrDefault().StartDate <= DateTime.Now &&
+                                         x.Discounts.FirstOrDefault().EndDate >= DateTime.Now ?
                                          x.Discounts.FirstOrDefault().DiscountRate : null
                 })
                     .Take(6)

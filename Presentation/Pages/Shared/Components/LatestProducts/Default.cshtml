@@ -39,11 +39,11 @@
                     }
 
                     <!-- PRODUCT IMGAE -->
-                    <img src="@item.Picture" alt="product-1"
+                    <img src="@item.Picture" alt="@item.PictureAlt" title="@item.PictureTitle"
                          class="group-hover:scale-105 duration-300 w-32 h-32 lg:w-48 lg:h-48 mx-auto mb-3" />
                     <!-- PRODUCT MAIN -->
                     <div class="px-2 lg:px-4 mb-3">
-                        <a href="product-details.html"
+                        <a asp-page="/Product" asp-route-id="@item.Slug"
                            class="line-clamp-2 font-DanaMedium mb-2 text-sm lg:text-base">
                             @item.Name
                         </a>
@@ -51,7 +51,7 @@
                             @if(item.DiscountPercentage != null)
                             {
                                 <p class="font-DanaDemiBold text-green-600 dark:text-green-500">
-                                    @item.UnitPriceAfterDiscount.ToMoney()
+                                    @item.UnitPriceAfterDiscount.Value.ToMoney()
                                     <span class="font-Dana text-sm">تومان</span>
                                 </p>
                                 <del class="font-Dana text-xs lg:text-sm text-rose-300 hidden lg:inline">
