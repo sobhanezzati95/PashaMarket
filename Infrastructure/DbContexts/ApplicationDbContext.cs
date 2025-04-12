@@ -88,6 +88,7 @@ namespace Infrastructure.DbContexts
                           name :"زعفران",
                           code :"123",
                           unitPrice :120000,
+                          count:50,
                           shortDescription :"تست",
                           description :"تست",
                           picture :"https://hitasaffron.shop/wp-content/uploads/2024/02/1.jpg",

@@ -17,6 +17,9 @@ namespace Application.Dtos.ProductAggregate.Product
         public double UnitPrice { get; set; }
 
         [Required(ErrorMessage = ValidationMessages.IsRequired)]
+        public int Count { get; set; }
+
+        [Required(ErrorMessage = ValidationMessages.IsRequired)]
         public string ShortDescription { get; set; }
 
         public string Description { get; set; }
