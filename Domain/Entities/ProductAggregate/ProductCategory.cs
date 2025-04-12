@@ -10,7 +10,18 @@ namespace Domain.Entities.ProductAggregate
         {
             Products = new List<Product>();
         }
-
+        public ProductCategory(long id, string name, string description, string picture, string pictureAlt, string pictureTitle, string keywords, string metaDescription, string slug)
+        {
+            Id = id;
+            Name = name;
+            Description = description;
+            Picture = picture;
+            PictureAlt = pictureAlt;
+            PictureTitle = pictureTitle;
+            Keywords = keywords;
+            MetaDescription = metaDescription;
+            Slug = slug;
+        }
         protected ProductCategory(string name, string description, string picture, string pictureAlt, string pictureTitle, string keywords, string metaDescription, string slug)
         {
             Name = name;

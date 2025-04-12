@@ -6,7 +6,22 @@ namespace Domain.Entities.ProductAggregate
     {
         #region Constructor
 
-        public Slide(string picture, string pictureAlt, string pictureTitle, string heading,
+        public Slide(long id, string picture, string pictureAlt, string pictureTitle, string heading,
+             string title, string text, string link, string btnText)
+        {
+            Id = id;
+            Picture = picture;
+            PictureAlt = pictureAlt;
+            PictureTitle = pictureTitle;
+            Heading = heading;
+            Title = title;
+            Text = text;
+            BtnText = btnText;
+            Link = link;
+            IsRemoved = false;
+        }
+
+        protected Slide(string picture, string pictureAlt, string pictureTitle, string heading,
              string title, string text, string link, string btnText)
         {
             Picture = picture;

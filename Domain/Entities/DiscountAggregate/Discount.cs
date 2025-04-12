@@ -7,9 +7,18 @@ namespace Domain.Entities.DiscountAggregate
     {
 
         #region Constructor
-
-        public Discount(long productId, int discountRate, DateTime startDate,
-                  DateTime endDate, string reason)
+        public Discount(long id, long productId, int discountRate, DateTime startDate,
+            DateTime endDate, string reason)
+        {
+            Id = id;
+            ProductId = productId;
+            DiscountRate = discountRate;
+            StartDate = startDate;
+            EndDate = endDate;
+            Reason = reason;
+        }
+        protected Discount(long productId, int discountRate, DateTime startDate,
+            DateTime endDate, string reason)
         {
             ProductId = productId;
             DiscountRate = discountRate;

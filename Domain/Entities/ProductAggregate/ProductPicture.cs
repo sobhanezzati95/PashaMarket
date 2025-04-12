@@ -5,7 +5,14 @@ namespace Domain.Entities.ProductAggregate
     public class ProductPicture : BaseEntity<long>
     {
         #region Constructor
-
+        public ProductPicture(long id, long productId, string picture, string pictureAlt, string pictureTitle)
+        {
+            Id = id;
+            ProductId = productId;
+            Picture = picture;
+            PictureAlt = pictureAlt;
+            PictureTitle = pictureTitle;
+        }
         protected ProductPicture(long productId, string picture, string pictureAlt, string pictureTitle)
         {
             ProductId = productId;
