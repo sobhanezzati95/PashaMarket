@@ -174,5 +174,31 @@ namespace Application.Services.ProductAggregate
             }
         }
 
+        public async Task<List<ProductCategoryQueryModel>> GetCategoriesQuery()
+        {
+            try
+            {
+                var productCategories = await _unitOfWork.ProductCategoryRepository.GetAllAsQueryable();
+
+                return productCategories.Select(x => new ProductCategoryQueryModel
+                {
+                    Name = x.Name,
+                    Description = x.Description,
+                    Keywords = x.Keywords,
+                    MetaDescription = x.MetaDescription,
+                    Picture = x.Picture,
+                    PictureAlt = x.PictureAlt,
+                    PictureTitle = x.PictureTitle,
+                    Slug = x.Slug
+                }).ToList();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e,
+               "#ProductCategoryApplication.GetCategoriesQuery.CatchException() >> Exception: " + e.Message +
+               (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+                throw;
+            }
+        }
     }
 }

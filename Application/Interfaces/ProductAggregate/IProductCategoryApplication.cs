@@ -11,6 +11,7 @@ namespace Application.Interfaces.ProductAggregate
         Task<List<ProductCategoryViewModel>> GetProductCategories();
         Task<List<ProductCategoryViewModel>> Search(ProductCategorySearchModel searchModel);
         Task<List<MostPopularProductCategoriesQueryModel>> GetMostPopularProductCategoriesQuery();
+        Task<List<ProductCategoryQueryModel>> GetCategoriesQuery();
 
     }
 }
