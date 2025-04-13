@@ -7,12 +7,13 @@ namespace Domain.Entities.ProductAggregate
     {
         #region Constructor
 
-        public Product(long id, string name, string code, double unitPrice, int count, string shortDescription, string description, string picture,
+        public Product(long id, string name, string code, string? brand, double unitPrice, int count, string shortDescription, string description, string picture,
             string pictureAlt, string pictureTitle, long categoryId, string slug, string keywords, string metaDescription)
         {
             Id = id;
             Name = name;
             Code = code;
+            Brand = brand;
             UnitPrice = unitPrice;
             Count = count;
             ShortDescription = shortDescription;
@@ -25,12 +26,14 @@ namespace Domain.Entities.ProductAggregate
             Keywords = keywords;
             MetaDescription = metaDescription;
             IsInStock = true;
+            ViewCount = 0;
         }
-        protected Product(string name, string code, double unitPrice, int count, string shortDescription, string description, string picture,
+        protected Product(string name, string code, string? brand, double unitPrice, int count, string shortDescription, string description, string picture,
             string pictureAlt, string pictureTitle, long categoryId, string slug, string keywords, string metaDescription)
         {
             Name = name;
             Code = code;
+            Brand = brand;
             UnitPrice = unitPrice;
             Count = count;
             ShortDescription = shortDescription;
@@ -43,6 +46,7 @@ namespace Domain.Entities.ProductAggregate
             Keywords = keywords;
             MetaDescription = metaDescription;
             IsInStock = true;
+            ViewCount = 0;
         }
 
         #endregion
@@ -51,6 +55,7 @@ namespace Domain.Entities.ProductAggregate
 
         public string Name { get; private set; }
         public string Code { get; private set; }
+        public string? Brand { get; private set; }
         public double UnitPrice { get; private set; }
         public int Count { get; private set; }
         public bool IsInStock { get; private set; }
@@ -63,33 +68,36 @@ namespace Domain.Entities.ProductAggregate
         public string Slug { get; private set; }
         public string Keywords { get; private set; }
         public string MetaDescription { get; private set; }
+        public int ViewCount { get; private set; }
 
         #endregion
 
         #region Relations
 
         public ProductCategory Category { get; private set; }
-        public List<ProductPicture> ProductPictures { get; private set; }
-        public List<Discount> Discounts { get; private set; }
+        public ICollection<ProductPicture> ProductPictures { get; private set; }
+        public ICollection<Discount> Discounts { get; private set; }
+        public virtual ICollection<ProductFeatures> ProductFeatures { get; set; }
 
 
         #endregion
 
         #region Behaviors
 
-        public static Product Create(string name, string code, double unitPrice, int count, string shortDescription, string description, string picture,
+        public static Product Create(string name, string code, string? brand, double unitPrice, int count, string shortDescription, string description, string picture,
             string pictureAlt, string pictureTitle, long categoryId, string slug, string keywords, string metaDescription)
         {
-            return new Product(name, code, unitPrice, count, shortDescription, description, picture, pictureAlt, pictureTitle, categoryId, slug,
+            return new Product(name, code, brand, unitPrice, count, shortDescription, description, picture, pictureAlt, pictureTitle, categoryId, slug,
                 keywords, metaDescription);
         }
 
-        public void Edit(string name, string code, double unitPrice, int count, string shortDescription, string description, string picture,
+        public void Edit(string name, string code, string? brand, double unitPrice, int count, string shortDescription, string description, string picture,
             string pictureAlt, string pictureTitle, long categoryId, string slug, string keywords, string metaDescription)
         {
             Name = name;
             Code = code;
             UnitPrice = unitPrice;
+            Brand = brand;
             Count = count;
             ShortDescription = shortDescription;
             Description = description;

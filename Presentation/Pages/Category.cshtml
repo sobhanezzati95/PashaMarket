@@ -157,80 +157,83 @@
             <div class="mt-4 grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 xs:gap-6 sm:gap-7 child:cursor-pointer child:overflow-hidden child:rounded-lg child:bg-white child:dark:bg-zinc-700 child:shadow lg:child:w-56 child:relative">
                 
                 <!-- PRODUCT ITEM -->
-                @foreach (var item in Model.ProductCategories.ProductQueryModels)
+                @if (Model.ProductCategories.ProductQueryModels != null)
                 {
-                    <div class="swiper-slide group">
+                    @foreach (var item in Model.ProductCategories.ProductQueryModels)
+                    {
+                        <div class="swiper-slide group">
 
-                        <!-- OFF BADGE -->
-                        @if (item.DiscountPercentage != null)
-                        {
-                            <span class="absolute top-5 right-5 flex items-center justify-center w-8 h-8 text-xs bg-green-500  rounded-full text-white z-30">20%</span>
-                        }
+                            <!-- OFF BADGE -->
+                            @if (item.DiscountPercentage != null)
+                            {
+                                <span class="absolute top-5 right-5 flex items-center justify-center w-8 h-8 text-xs bg-green-500  rounded-full text-white z-30">20%</span>
+                            }
 
-                        <!-- PRODUCT IMGAE -->
-                        <img src="@item.Picture" alt="@item.PictureAlt" title="@item.PictureTitle"
-                             class="group-hover:scale-105 duration-300 w-32 h-32 lg:w-48 lg:h-48 mx-auto my-4 rounded-lg" />
-                        <!-- PRODUCT MAIN -->
-                        <div class="px-2 lg:px-4 mb-3">
-                            <a asp-page="/ProductDetails" asp-route-id="@item.Name"
-                               class="line-clamp-2 font-DanaMedium mb-2 text-sm lg:text-base">
-                                @item.Name
-                            </a>
-                            <div class="flex items-center gap-x-1 lg:gap-x-3">
-                                @if (item.DiscountPercentage != null)
-                                {
-                                    <p class="font-DanaDemiBold text-green-600 dark:text-green-500">
-                                        @item.UnitPriceAfterDiscount.Value.ToMoney()
-                                        <span class="font-Dana text-sm">تومان</span>
-                                    </p>
-                                    <del class="font-Dana text-xs lg:text-sm text-rose-300 hidden lg:inline">
-                                        @item.UnitPrice.ToMoney()
-                                        <span class="">تومان</span>
-                                    </del>
-                                }
-                                else
-                                {
-                                    <p class="font-DanaDemiBold text-green-600 dark:text-green-500">
-                                        @item.UnitPrice.ToMoney()
-                                        <span class="font-Dana text-sm">تومان</span>
-                                    </p>
-                                }
+                            <!-- PRODUCT IMGAE -->
+                            <img src="@item.Picture" alt="@item.PictureAlt" title="@item.PictureTitle"
+                                 class="group-hover:scale-105 duration-300 w-32 h-32 lg:w-48 lg:h-48 mx-auto my-4 rounded-lg" />
+                            <!-- PRODUCT MAIN -->
+                            <div class="px-2 lg:px-4 mb-3">
+                                <a asp-page="/ProductDetails" asp-route-id="@item.Name"
+                                   class="line-clamp-2 font-DanaMedium mb-2 text-sm lg:text-base">
+                                    @item.Name
+                                </a>
+                                <div class="flex items-center gap-x-1 lg:gap-x-3">
+                                    @if (item.DiscountPercentage != null)
+                                    {
+                                        <p class="font-DanaDemiBold text-green-600 dark:text-green-500">
+                                            @item.UnitPriceAfterDiscount.Value.ToMoney()
+                                            <span class="font-Dana text-sm">تومان</span>
+                                        </p>
+                                        <del class="font-Dana text-xs lg:text-sm text-rose-300 hidden lg:inline">
+                                            @item.UnitPrice.ToMoney()
+                                            <span class="">تومان</span>
+                                        </del>
+                                    }
+                                    else
+                                    {
+                                        <p class="font-DanaDemiBold text-green-600 dark:text-green-500">
+                                            @item.UnitPrice.ToMoney()
+                                            <span class="font-Dana text-sm">تومان</span>
+                                        </p>
+                                    }
+                                </div>
+                            </div>
+                            <!-- PRODUCT FOOTER -->
+                            <div class="flex items-center justify-between px-2 lg:px-4 mb-3">
+                                <div class="flex items-center gap-x-2 child:transition-all child:duration-300">
+                                    <span class="rounded-full p-2 dark:bg-zinc-800 dark:hover:bg-green-500 bg-gray-100 hover:bg-green-600 hover:text-white">
+                                        <svg class="w-4 h-4">
+                                            <use href="#shopping-cart"></use>
+                                        </svg>
+                                    </span>
+                                    <span class="hover:text-green-600">
+                                        <svg class="w-4 h-4">
+                                            <use href="#heart"></use>
+                                        </svg>
+                                    </span>
+                                </div>
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 text-gray-300">
+                                        <use href="#star"></use>
+                                    </svg>
+                                    <svg class="w-4 h-4 text-yellow-400">
+                                        <use href="#star"></use>
+                                    </svg>
+                                    <svg class="w-4 h-4 text-yellow-400">
+                                        <use href="#star"></use>
+                                    </svg>
+                                    <svg class="w-4 h-4 text-yellow-400">
+                                        <use href="#star"></use>
+                                    </svg>
+                                    <svg class="w-4 h-4 text-yellow-400">
+                                        <use href="#star"></use>
+                                    </svg>
+                                </div>
                             </div>
                         </div>
-                        <!-- PRODUCT FOOTER -->
-                        <div class="flex items-center justify-between px-2 lg:px-4 mb-3">
-                            <div class="flex items-center gap-x-2 child:transition-all child:duration-300">
-                                <span class="rounded-full p-2 dark:bg-zinc-800 dark:hover:bg-green-500 bg-gray-100 hover:bg-green-600 hover:text-white">
-                                    <svg class="w-4 h-4">
-                                        <use href="#shopping-cart"></use>
-                                    </svg>
-                                </span>
-                                <span class="hover:text-green-600">
-                                    <svg class="w-4 h-4">
-                                        <use href="#heart"></use>
-                                    </svg>
-                                </span>
-                            </div>
-                            <div class="flex items-center">
-                                <svg class="w-4 h-4 text-gray-300">
-                                    <use href="#star"></use>
-                                </svg>
-                                <svg class="w-4 h-4 text-yellow-400">
-                                    <use href="#star"></use>
-                                </svg>
-                                <svg class="w-4 h-4 text-yellow-400">
-                                    <use href="#star"></use>
-                                </svg>
-                                <svg class="w-4 h-4 text-yellow-400">
-                                    <use href="#star"></use>
-                                </svg>
-                                <svg class="w-4 h-4 text-yellow-400">
-                                    <use href="#star"></use>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                }
+                    }
+              }
 
             </div>
 

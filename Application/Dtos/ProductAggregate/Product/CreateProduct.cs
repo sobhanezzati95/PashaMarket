@@ -16,6 +16,8 @@ namespace Application.Dtos.ProductAggregate.Product
         [Required(ErrorMessage = ValidationMessages.IsRequired)]
         public double UnitPrice { get; set; }
 
+        public string? Brand { get; set; }
+
         [Required(ErrorMessage = ValidationMessages.IsRequired)]
         public int Count { get; set; }
 

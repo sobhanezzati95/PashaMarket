@@ -32,7 +32,7 @@ namespace Application.Services.ProductAggregate
                 var categorySlug = await _unitOfWork.ProductCategoryRepository.GetSlugById(command.CategoryId);
                 var path = $"{categorySlug}//{slug}";
                 var picturePath = _fileUploader.Upload(command.Picture, path);
-                var product = Product.Create(command.Name, command.Code, command.UnitPrice, command.Count,
+                var product = Product.Create(command.Name, command.Code, command.Brand, command.UnitPrice, command.Count,
                     command.ShortDescription, command.Description, picturePath,
                     command.PictureAlt, command.PictureTitle, command.CategoryId, slug,
                     command.Keywords, command.MetaDescription);
@@ -64,7 +64,7 @@ namespace Application.Services.ProductAggregate
                 var path = $"{product.Category.Slug}/{slug}";
 
                 var picturePath = _fileUploader.Upload(command.Picture, path);
-                product.Edit(command.Name, command.Code, command.UnitPrice, command.Count,
+                product.Edit(command.Name, command.Code, command.Brand, command.UnitPrice, command.Count,
                     command.ShortDescription, command.Description, picturePath,
                     command.PictureAlt, command.PictureTitle, command.CategoryId, slug,
                     command.Keywords, command.MetaDescription);
@@ -99,6 +99,7 @@ namespace Application.Services.ProductAggregate
                     PictureAlt = product.PictureAlt,
                     PictureTitle = product.PictureTitle,
                     ShortDescription = product.ShortDescription,
+                    Brand = product.Brand,
                 };
             }
             catch (Exception e)
@@ -252,6 +253,7 @@ namespace Application.Services.ProductAggregate
                     Picture = x.Picture,
                     UnitPrice = x.UnitPrice,
                     IsInStock = x.IsInStock,
+                    Brand = x.Brand,
                     CreationDate = x.CreateDateTime.ToFarsi()
                 }).ToList();
             }
@@ -299,6 +301,7 @@ namespace Application.Services.ProductAggregate
                                          (x.UnitPrice - (x.UnitPrice * x.Discounts.FirstOrDefault().DiscountRate) / 100) : null,
                         Picture = x.Picture,
                         UnitPrice = x.UnitPrice,
+                        Brand = x.Brand,
                         DiscountPercentage = x.Discounts.FirstOrDefault() != null &&
                                          x.Discounts.FirstOrDefault().StartDate <= DateTime.Now &&
                                          x.Discounts.FirstOrDefault().EndDate >= DateTime.Now ?

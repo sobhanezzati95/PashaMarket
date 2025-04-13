@@ -4,7 +4,7 @@
 <nav class="w-full hidden md:flex shadow py-5 bg-white dark:bg-zinc-700">
     <div class="container flex items-center justify-between">
         <!-- LOGO -->
-        <a href="index.html"
+        <a asp-page="/Index"
            class="flex items-center gap-x-1 dark:text-brown-300 text-brown-600 font-MorabbaMedium text-xl lg:text-3xl">
             <img src="~/Theme/Assets/Images/logo.png" alt="logo" class="w-6 h-6 " />
             <h1>پاشامارکت</h1>
@@ -12,7 +12,7 @@
         <!-- MENU -->
         <ul class="mt-2 flex items-center gap-x-4 lg:gap-x-10 font-DanaMedium lg:mr-30 xl:mr-32 child:z-30">
             <li class="nav-item text-green-500">
-                <a href="index.html">صفحه اصلی</a>
+                <a asp-page="/Index">صفحه اصلی</a>
             </li>
             <!-- ITEM HASE SUBMENU -->
             <li class="relative group">
@@ -28,11 +28,6 @@
                     {
                             <a asp-page="./Category" asp-route-id="@category.Slug">@category.Name</a>
                     }
-@*                     <a href="shop.html">اسپرسو</a>
-                    <a href="shop.html">قهوه ترک</a>
-                    <a href="shop.html">قهوه فرانسه</a>
-                    <a href="shop.html">کپسول اسپرسو</a>
-                    <a href="shop.html">لوازم و تجهیزات</a> *@
                 </div>
             </li>
             <!-- ITEM HASE SUBMENU -->

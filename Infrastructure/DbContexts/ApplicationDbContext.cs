@@ -17,6 +17,8 @@ namespace Infrastructure.DbContexts
         public DbSet<ProductCategory> ProductCategories { get; set; }
         public DbSet<ProductPicture> ProductPictures { get; set; }
         public DbSet<Slide> Slides { get; set; }
+        public DbSet<ProductFeatures> ProductFeatures { get; set; }
+
 
         #endregion
 
@@ -87,6 +89,7 @@ namespace Infrastructure.DbContexts
              new Product( id:1,
                           name :"زعفران",
                           code :"123",
+                          brand:"پاشا",
                           unitPrice :120000,
                           count:50,
                           shortDescription :"تست",

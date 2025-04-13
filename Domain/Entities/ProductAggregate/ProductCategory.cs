@@ -51,7 +51,7 @@ namespace Domain.Entities.ProductAggregate
 
         #region Relations
 
-        public List<Product> Products { get; private set; }
+        public ICollection<Product> Products { get; private set; }
 
         #endregion
 

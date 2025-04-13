@@ -14,6 +14,7 @@
         public string Name { get; set; }
         public string Slug { get; set; }
         public double UnitPrice { get; set; }
+        public string? Brand { get; set; }
         public double? UnitPriceAfterDiscount { get; set; }
         public int? DiscountPercentage { get; set; }
         public string Picture { get; set; }
