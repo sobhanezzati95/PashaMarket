@@ -8,7 +8,7 @@
             @foreach (var item in Model)
             {
                 <div class="swiper-slide absolute">
-                    <img class="w-full h-full object-cover rounded-lg" src="@item.Picture" alt="@item.PictureAlt" title="@item.PictureTitle">
+                    <img class="w-full h-full object-cover rounded-lg" src="/ProductPictures/@item.Picture" alt="@item.PictureAlt" title="@item.PictureTitle">
                     <div class="flex items-start  flex-col absolute  right-5 top-5 md:right-10 md:top-10 lg:top-20 lg:right-40 xl:right-48  text-white">
                         <h2 class="font-MorabbaMedium text-xl lg:text-5xl mb-2 lg:mb-4">
                             @item.Heading

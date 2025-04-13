@@ -100,6 +100,7 @@ namespace Application.Services.ProductAggregate
                     PictureTitle = product.PictureTitle,
                     ShortDescription = product.ShortDescription,
                     Brand = product.Brand,
+                    UnitPrice = product.UnitPrice
                 };
             }
             catch (Exception e)

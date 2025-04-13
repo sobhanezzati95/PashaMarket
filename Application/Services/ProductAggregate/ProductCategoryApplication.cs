@@ -137,6 +137,7 @@ namespace Application.Services.ProductAggregate
                 {
                     Id = x.Id,
                     Name = x.Name,
+                    Picture = x.Picture,
                     CreationDate = x.CreateDateTime.ToFarsi()
                 }).ToList();
             }
