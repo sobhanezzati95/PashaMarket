@@ -67,7 +67,10 @@ namespace Domain.Entities.ProductAggregate
         {
             Name = name;
             Description = description;
-            Picture = picture;
+
+            if (!string.IsNullOrWhiteSpace(picture))
+                Picture = picture;
+
             PictureAlt = pictureAlt;
             PictureTitle = pictureTitle;
             Keywords = keywords;

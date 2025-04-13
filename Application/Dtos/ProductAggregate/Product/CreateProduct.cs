@@ -25,7 +25,10 @@ namespace Application.Dtos.ProductAggregate.Product
         public string ShortDescription { get; set; }
 
         public string Description { get; set; }
+
+        [MaxFileSize(3 * 1024 * 1024, ErrorMessage = ValidationMessages.MaxFileSize)]
         public IFormFile Picture { get; set; }
+
         public string PictureAlt { get; set; }
         public string PictureTitle { get; set; }
 

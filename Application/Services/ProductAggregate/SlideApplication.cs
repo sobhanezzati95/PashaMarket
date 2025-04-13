@@ -25,7 +25,7 @@ namespace Application.Services.ProductAggregate
 
             try
             {
-                var pictureName = _fileUploader.Upload(command.Picture, "slides");
+                var pictureName = await _fileUploader.Upload(command.Picture, "slides");
 
                 var slide = Slide.Create(pictureName, command.PictureAlt, command.PictureTitle,
                     command.Heading, command.Title, command.Text, command.Link, command.BtnText);
@@ -51,7 +51,7 @@ namespace Application.Services.ProductAggregate
                 if (slide == null)
                     return OperationResult.Failed(ApplicationMessages.RecordNotFound);
 
-                var pictureName = _fileUploader.Upload(command.Picture, "slides");
+                var pictureName = await _fileUploader.Upload(command.Picture, "slides");
 
                 slide.Edit(pictureName, command.PictureAlt, command.PictureTitle,
                     command.Heading, command.Title, command.Text, command.Link, command.BtnText);

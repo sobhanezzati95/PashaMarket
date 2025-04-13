@@ -11,7 +11,7 @@ namespace Presentation.Helpers
             _webHostEnvironment = webHostEnvironment;
         }
 
-        public string Upload(IFormFile file, string path)
+        public async Task<string> Upload(IFormFile file, string path)
         {
             if (file == null)
                 return "";
@@ -24,7 +24,7 @@ namespace Presentation.Helpers
             var fileName = $"{DateTime.Now.ToFileName()}-{file.FileName}";
             var filePath = $"{directoryPath}//{fileName}";
             using var output = File.Create(filePath);
-            file.CopyTo(output);
+            await file.CopyToAsync(output);
             return $"{path}/{fileName}";
         }
     }

@@ -30,7 +30,7 @@ namespace Application.Services.ProductAggregate
                 var product = await _unitOfWork.ProductRepository.GetProductWithCategory(command.ProductId);
 
                 var path = $"{product.Category.Slug}//{product.Slug}";
-                var picturePath = _fileUploader.Upload(command.Picture, path);
+                var picturePath = await _fileUploader.Upload(command.Picture, path);
 
                 var productPicture = ProductPicture.Create(command.ProductId, picturePath, command.PictureAlt, command.PictureTitle);
                 await _unitOfWork.ProductPictureRepository.Add(productPicture);
@@ -55,7 +55,7 @@ namespace Application.Services.ProductAggregate
                     return OperationResult.Failed(ApplicationMessages.RecordNotFound);
 
                 var path = $"{productPicture.Product.Category.Slug}//{productPicture.Product.Slug}";
-                var picturePath = _fileUploader.Upload(command.Picture, path);
+                var picturePath = await _fileUploader.Upload(command.Picture, path);
 
                 productPicture.Edit(command.ProductId, picturePath, command.PictureAlt, command.PictureTitle);
                 await _unitOfWork.ProductPictureRepository.Update(productPicture);

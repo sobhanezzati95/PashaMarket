@@ -31,7 +31,7 @@ namespace Application.Services.ProductAggregate
                 var slug = command.Slug.Slugify();
                 var categorySlug = await _unitOfWork.ProductCategoryRepository.GetSlugById(command.CategoryId);
                 var path = $"{categorySlug}//{slug}";
-                var picturePath = _fileUploader.Upload(command.Picture, path);
+                var picturePath = await _fileUploader.Upload(command.Picture, path);
                 var product = Product.Create(command.Name, command.Code, command.Brand, command.UnitPrice, command.Count,
                     command.ShortDescription, command.Description, picturePath,
                     command.PictureAlt, command.PictureTitle, command.CategoryId, slug,
@@ -63,7 +63,7 @@ namespace Application.Services.ProductAggregate
                 var slug = command.Slug.Slugify();
                 var path = $"{product.Category.Slug}/{slug}";
 
-                var picturePath = _fileUploader.Upload(command.Picture, path);
+                var picturePath = await _fileUploader.Upload(command.Picture, path);
                 product.Edit(command.Name, command.Code, command.Brand, command.UnitPrice, command.Count,
                     command.ShortDescription, command.Description, picturePath,
                     command.PictureAlt, command.PictureTitle, command.CategoryId, slug,
