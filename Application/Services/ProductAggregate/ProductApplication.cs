@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.ProductAggregate.Product;
+using Application.Dtos.ProductAggregate.ProductFeature;
 using Application.Interfaces.ProductAggregate;
 using Domain;
 using Domain.Entities.ProductAggregate;
@@ -357,6 +358,70 @@ namespace Application.Services.ProductAggregate
             {
                 _logger.LogError(e,
                "#ProductCategoryApplication.SearchProduct.CatchException() >> Exception: " + e.Message +
+               (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+                throw;
+            }
+        }
+
+        public async Task<ProductDetailQueryModel> GetProductDetails(string slug)
+        {
+            try
+            {
+                var query = await _unitOfWork.ProductRepository.GetAllWithIncludesAndThenInCludes(
+                                        predicate: x => x.Slug == slug,
+                                        orderBy: null,
+                                        isTracking: false,
+                                        ignoreQueryFilters: false,
+                                        includeProperties: null,
+                                        thenInclude: x => x.Include(p => p.Category)
+                                                           .Include(p => p.ProductPictures)
+                                                           .Include(p => p.Discounts)
+                                                           .Include(p => p.ProductFeatures)
+                                        );
+
+                if (query.Any() == false)
+                    return new();
+
+                var product = query.FirstOrDefault();
+
+                return new ProductDetailQueryModel
+                {
+                    Id = product.Id,
+                    Brand = product.Brand,
+                    CategorySlug = product.Category.Slug,
+                    CategoryId = product.CategoryId,
+                    Category = product.Category.Name,
+                    Slug = product.Slug,
+                    Name = product.Name,
+                    UnitPrice = product.UnitPrice,
+                    IsInStock = product.IsInStock,
+                    Description = product.Description,
+                    Keywords = product.Keywords,
+                    MetaDescription = product.MetaDescription,
+                    ShortDescription = product.ShortDescription,
+                    ProductPictures = product.ProductPictures
+                                        .Select(x => new Dtos.ProductAggregate.ProductPicture.ProductPictureViewModel
+                                        {
+                                            Picture = x.Picture,
+                                            PictureTitle = x.PictureTitle,
+                                            PictureAlt = x.PictureAlt,
+                                        }).ToList(),
+                    ProductFeatures = product.ProductFeatures
+                                        .Select(x => new ProductFeatureViewModel
+                                        {
+                                            DisplayName = x.DisplayName,
+                                            Value = x.Value,
+                                        }).ToList(),
+
+
+
+                };
+
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e,
+               "#ProductCategoryApplication.GetProductDetails.CatchException() >> Exception: " + e.Message +
                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
                 throw;
             }
