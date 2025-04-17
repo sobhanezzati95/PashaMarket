@@ -73,15 +73,15 @@
                 <span class="absolute -top-2 -right-2 w-4 h-4 text-[10px] flex items-center justify-center bg-red-500 text-white rounded-full">2</span>
             </button>
             <!-- SEARCH BTN -->
-            <button class="group relative flex justify-end">
+            <div class="group relative flex justify-end">
                 <svg class="w-6 h-6">
                     <use href="#search" />
                 </svg>
-                <div class="absolute top-20 flex items-center w-[350px] bg-white dark:bg-zinc-600 rounded-full opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:top-10 transition-all delay-100 child:rounded-full px-2 border dark:border-none border-gray-100 shadow py-1">
-                    <input type="text" placeholder="نام محصول..." class="bg-transparent w-full p-2" />
-                    <a href="#" class="bg-green-500  text-white text-sm py-2 px-3">جستجو</a>
-                </div>
-            </button>
+                <form method="get" asp-page="/Search" class="absolute top-20 flex items-center w-[350px] bg-white dark:bg-zinc-600 rounded-full opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:top-10 transition-all delay-100 child:rounded-full px-2 border dark:border-none border-gray-100 shadow py-1">
+                    <input type="search" placeholder="نام محصول..." name="value" id="value" class="bg-transparent w-full p-2" />
+                    <button type="submit" class="bg-green-500  text-white text-sm py-2 px-3">جستجو</button>
+                </form>
+            </div>
             <!-- USER ACCOUNE BOX  -->
             <button class="group relative px-2 lg:px-3 py-2 flex items-center justify-end gap-x-1 text-white transition-colors bg-green-500 hover:bg-green-600 rounded-lg">
                 <svg class="h-5 w-5 hidden lg:flex">

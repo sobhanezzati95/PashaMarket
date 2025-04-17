@@ -321,5 +321,45 @@ namespace Application.Services.ProductAggregate
                 throw;
             }
         }
+
+        public async Task<List<SearchProductsQueryModel>> SearchProduct(string value)
+        {
+            try
+            {
+                var products = await _unitOfWork.ProductRepository.GetAllWithIncludesAndThenInCludes(
+                                        predicate: x => x.Name.Contains(value) || x.Brand.Contains(value),
+                                        orderBy: x => x.OrderByDescending(p => p.CreateDateTime),
+                                        isTracking: false,
+                                        ignoreQueryFilters: false,
+                                        includeProperties: null,
+                                        thenInclude: null);
+
+                return products.Select(x => new SearchProductsQueryModel
+                {
+                    Name = x.Name,
+                    Slug = x.Slug,
+                    PictureAlt = x.PictureAlt,
+                    UnitPriceAfterDiscount = x.Discounts.FirstOrDefault() != null &&
+                                         x.Discounts.FirstOrDefault().StartDate <= DateTime.Now &&
+                                         x.Discounts.FirstOrDefault().EndDate >= DateTime.Now ?
+                                         (x.UnitPrice - (x.UnitPrice * x.Discounts.FirstOrDefault().DiscountRate) / 100) : null,
+                    Picture = x.Picture,
+                    UnitPrice = x.UnitPrice,
+                    DiscountPercentage = x.Discounts.FirstOrDefault() != null &&
+                                         x.Discounts.FirstOrDefault().StartDate <= DateTime.Now &&
+                                         x.Discounts.FirstOrDefault().EndDate >= DateTime.Now ?
+                                         x.Discounts.FirstOrDefault().DiscountRate : null,
+                    PictureTitle = x.PictureTitle
+                })
+                .ToList();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e,
+               "#ProductCategoryApplication.SearchProduct.CatchException() >> Exception: " + e.Message +
+               (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+                throw;
+            }
+        }
     }
 }
