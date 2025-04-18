@@ -18,7 +18,7 @@ namespace Infrastructure.DbContexts
         public DbSet<ProductCategory> ProductCategories { get; set; }
         public DbSet<ProductPicture> ProductPictures { get; set; }
         public DbSet<Slide> Slides { get; set; }
-        public DbSet<ProductFeatures> ProductFeatures { get; set; }
+        public DbSet<ProductFeature> ProductFeatures { get; set; }
 
 
         #endregion
@@ -122,7 +122,7 @@ namespace Infrastructure.DbContexts
                           pictureAlt :"تست",
                           pictureTitle :"تست",
                           categoryId :1,
-                          slug :"زعفران",
+                          slug :"پسته",
                           keywords :"تست",
                           metaDescription :"تست"),
 
@@ -138,7 +138,7 @@ namespace Infrastructure.DbContexts
                           pictureAlt :"تست",
                           pictureTitle :"تست",
                           categoryId :1,
-                          slug :"زعفران",
+                          slug :"چای ماسالا",
                           keywords :"تست",
                           metaDescription :"تست"),
 
@@ -154,7 +154,7 @@ namespace Infrastructure.DbContexts
                           pictureAlt :"تست",
                           pictureTitle :"تست",
                           categoryId :1,
-                          slug :"زعفران",
+                          slug :"قهوه",
                           keywords :"تست",
                           metaDescription :"تست"),
 
@@ -166,11 +166,11 @@ namespace Infrastructure.DbContexts
                           count:50,
                           shortDescription :"تست",
                           description :"تست",
-                          picture :"خشکبار/اسپرسوساز/2025-04-17-21-31-53-2025-04-13-22-59-38-1724224224_78676.jpg",
+                          picture :"لوازم خانگی/اسپرسوساز/2025-04-19-01-21-22-2025-04-13-22-59-38-1724224224_78676.jpg",
                           pictureAlt :"تست",
                           pictureTitle :"تست",
-                          categoryId :1,
-                          slug :"زعفران",
+                          categoryId :2,
+                          slug :"اسپرسوساز",
                           keywords :"تست",
                           metaDescription :"تست"),
 
@@ -186,7 +186,7 @@ namespace Infrastructure.DbContexts
                           pictureAlt :"تست",
                           pictureTitle :"تست",
                           categoryId :1,
-                          slug :"زعفران",
+                          slug :"ادویه کاری",
                           keywords :"تست",
                           metaDescription :"تست"),
 
@@ -216,6 +216,60 @@ namespace Infrastructure.DbContexts
 
         });
 
+            modelBuilder.Entity<ProductPicture>().HasData(new List<ProductPicture>()
+            {
+                new ProductPicture(id:1,
+                                   productId:1,
+                                   picture: "خشکبار//زعفران/2025-04-17-20-17-37-2025-04-17-18-40-35-220590f810820bce5d224bec3fbe1bf7c0c73b2d_1597927042.webp",
+                                   pictureAlt:"تست",
+                                   pictureTitle:  "تست"),
+
+                new ProductPicture(id:2,
+                                   productId:1,
+                                   picture: "خشکبار//زعفران/2025-04-17-20-17-43-2025-04-17-18-40-48-d7430fdc7ec9a61ae3cd2b98e168249a93d05d19_1597926894.webp",
+                                   pictureAlt:"تست",
+                                   pictureTitle:  "تست"),
+
+                new ProductPicture(id:3,
+                                   productId:1,
+                                   picture: "خشکبار//زعفران/2025-04-17-20-17-47-2025-04-17-18-41-00-bdb4bbe6644db924fa87941c2655af23a618f9c6_1597926969.webp",
+                                   pictureAlt:"تست",
+                                   pictureTitle:  "تست"),
+
+            });
+
+            modelBuilder.Entity<ProductFeature>().HasData(new List<ProductFeature>()
+            {
+
+                new ProductFeature(id:1,
+                                   displayName:"وزن بسته‌بندی",
+                                   value:"۱ گرم",
+                                   productId:1),
+
+
+                new ProductFeature(id:2,
+                                   displayName:"ابعاد بسته‌بندی",
+                                   value:"۴x۳x۸ سانتی‌متر",
+                                   productId:1),
+
+
+                new ProductFeature(id:3,
+                                   displayName:"شماره پروانه بهداشت",
+                                   value:"۵۰/۱۶۲۶-۱",
+                                   productId:1),
+
+                new ProductFeature(id:4,
+                                   displayName:"نوع زعفران",
+                                   value:"سرگل",
+                                   productId:1),
+
+            });
+
+            modelBuilder.Entity<Role>().HasData(new List<Role>()
+            {
+                new Role(id:1,name:"Admin"),
+                new Role(id:2,name:"SystemUser"),
+            });
             #endregion
 
             var assembly = typeof(ProductCategoryConfiguration).Assembly;

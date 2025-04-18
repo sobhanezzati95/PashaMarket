@@ -2,11 +2,11 @@
 
 namespace Domain.Entities.ProductAggregate
 {
-    public class ProductFeatures : BaseEntity<long>
+    public class ProductFeature : BaseEntity<long>
     {
         #region Constructor
 
-        public ProductFeatures(long id, string displayName, string value, long productId)
+        public ProductFeature(long id, string displayName, string value, long productId)
         {
             Id = id;
             DisplayName = displayName;
@@ -14,7 +14,7 @@ namespace Domain.Entities.ProductAggregate
             ProductId = productId;
         }
 
-        protected ProductFeatures(string displayName, string value, long productId)
+        protected ProductFeature(string displayName, string value, long productId)
         {
             DisplayName = displayName;
             Value = value;
@@ -40,9 +40,9 @@ namespace Domain.Entities.ProductAggregate
 
         #region Behaviors
 
-        public static ProductFeatures Define(string displayName, string value, long productId)
+        public static ProductFeature Define(string displayName, string value, long productId)
         {
-            return new ProductFeatures(displayName, value, productId);
+            return new ProductFeature(displayName, value, productId);
         }
 
         public void Edit(string displayName, string value, long productId)

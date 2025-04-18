@@ -15,6 +15,11 @@ namespace Domain.Entities.UserAggregate
             Users = new List<User>();
         }
 
+        public Role(long id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
         #endregion
 
         #region Properties

@@ -77,7 +77,7 @@ namespace Domain.Entities.ProductAggregate
         public ProductCategory Category { get; private set; }
         public ICollection<ProductPicture> ProductPictures { get; private set; }
         public ICollection<Discount> Discounts { get; private set; }
-        public virtual ICollection<ProductFeatures> ProductFeatures { get; set; }
+        public virtual ICollection<ProductFeature> ProductFeatures { get; set; }
 
 
         #endregion
