@@ -1,8 +1,10 @@
 ﻿using Domain;
 using Domain.Contracts.Repositories.DiscountAggregate;
 using Domain.Contracts.Repositories.ProductAggregate;
+using Domain.Contracts.Repositories.UserAggregate;
 using Infrastructure.DbContexts;
 using Infrastructure.Repositories.ProductAggregate;
+using Infrastructure.Repositories.UserAggregate;
 
 namespace Infrastructure;
 public class UnitOfWork : IUnitOfWork
@@ -17,6 +19,8 @@ public class UnitOfWork : IUnitOfWork
         ProductCategoryRepository = new ProductCategoryRepository(_dbContext);
         SlideRepository = new SlideRepository(_dbContext);
         DiscountRepository = new DiscountRepository(_dbContext);
+        UserRepository = new UserRepository(_dbContext);
+        RoleRepository = new RoleRepository(dbContext);
 
     }
 
@@ -32,6 +36,13 @@ public class UnitOfWork : IUnitOfWork
     #region DiscountAggRepo
 
     public IDiscountRepository DiscountRepository { get; private set; }
+
+    #endregion
+
+    #region UserAggRepo
+
+    public IUserRepository UserRepository { get; private set; }
+    public IRoleRepository RoleRepository { get; private set; }
 
     #endregion
 

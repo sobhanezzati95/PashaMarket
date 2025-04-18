@@ -1,5 +1,6 @@
 ﻿using Domain.Entities.DiscountAggregate;
 using Domain.Entities.ProductAggregate;
+using Domain.Entities.UserAggregate;
 using Infrastructure.Configurations.ProductAggregate;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,6 +28,13 @@ namespace Infrastructure.DbContexts
 
         #endregion
 
+        #region UserAggregate
+
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
+
+        #endregion
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             #region SeedData
@@ -36,7 +44,7 @@ namespace Infrastructure.DbContexts
              new ProductCategory( id:1,
                                   name:"خشکبار",
                                   description:"تست",
-                                  picture:"خشکبار/2025-04-13-22-38-49-AJ70.jpg",
+                                  picture:"خشکبار/2025-04-17-20-18-35-2025-04-13-22-38-49-AJ70.jpg",
                                   pictureAlt:"تست",
                                   pictureTitle:"تست",
                                   keywords:"تست",
@@ -46,7 +54,7 @@ namespace Infrastructure.DbContexts
              new ProductCategory( id:2,
                                   name:"لوازم خانگی",
                                   description:"تست",
-                                  picture:"لوازم خانگی/2025-04-13-22-52-35-Luxury-brand-of-home-appliances.jpg",
+                                  picture:"لوازم خانگی/2025-04-17-20-18-50-2025-04-13-22-52-35-Luxury-brand-of-home-appliances.jpg",
                                   pictureAlt:"تست",
                                   pictureTitle:"تست",
                                   keywords:"تست",
@@ -56,7 +64,7 @@ namespace Infrastructure.DbContexts
              new ProductCategory( id:3,
                                   name:"پوشاک",
                                   description:"تست",
-                                  picture:"پوشاک/2025-04-13-22-52-56-WSZV3569-min.jpg",
+                                  picture:"پوشاک/2025-04-17-20-19-05-2025-04-13-22-52-56-WSZV3569-min.jpg",
                                   pictureAlt:"تست",
                                   pictureTitle:"تست",
                                   keywords:"تست",
@@ -66,7 +74,7 @@ namespace Infrastructure.DbContexts
              new ProductCategory( id:4,
                                   name:"کالای دیجیتال",
                                   description:"تست",
-                                  picture:"کالای دیجیتال/2025-04-13-22-53-06-کالای-دیجیتال.jpg",
+                                  picture:"کالای دیجیتال/2025-04-17-20-19-15-2025-04-13-22-53-06-کالای-دیجیتال.jpg",
                                   pictureAlt:"تست",
                                   pictureTitle:"تست",
                                   keywords:"تست",
@@ -76,7 +84,7 @@ namespace Infrastructure.DbContexts
              new ProductCategory( id:5,
                                   name:"آرایشی بهداشتی",
                                   description:"تست",
-                                  picture:"آرایشی بهداشتی/2025-04-13-22-54-28-cosmetic-formula-2.jpg",
+                                  picture:"آرایشی بهداشتی/2025-04-17-20-19-24-2025-04-13-22-54-28-cosmetic-formula-2.jpg",
                                   pictureAlt:"تست",
                                   pictureTitle:"تست",
                                   keywords:"تست",
@@ -94,7 +102,7 @@ namespace Infrastructure.DbContexts
                           count:50,
                           shortDescription :"تست",
                           description :"تست",
-                          picture :"خشکبار/زعفران/2025-04-13-22-57-04-1.jpg",
+                          picture :"خشکبار/زعفران/2025-04-17-20-13-47-2025-04-13-22-57-04-1.jpg",
                           pictureAlt :"تست",
                           pictureTitle :"تست",
                           categoryId :1,
@@ -110,7 +118,7 @@ namespace Infrastructure.DbContexts
                           count:50,
                           shortDescription :"تست",
                           description :"تست",
-                          picture :"خشکبار/زعفران/2025-04-13-22-58-26-پسته-اکبری-زعفرانی-فوق-لوکس-دستچین.jpg",
+                          picture :"خشکبار/پسته/2025-04-17-20-16-31-2025-04-13-22-58-26-پسته-اکبری-زعفرانی-فوق-لوکس-دستچین.jpg",
                           pictureAlt :"تست",
                           pictureTitle :"تست",
                           categoryId :1,
@@ -126,7 +134,7 @@ namespace Infrastructure.DbContexts
                           count:50,
                           shortDescription :"تست",
                           description :"تست",
-                          picture :"خشکبار/زعفران/2025-04-13-22-58-45-Photoroom-20240718_141333_5.webp",
+                          picture :"خشکبار/چای-ماسالا/2025-04-17-20-16-47-2025-04-13-22-58-45-Photoroom-20240718_141333_5.webp",
                           pictureAlt :"تست",
                           pictureTitle :"تست",
                           categoryId :1,
@@ -142,7 +150,7 @@ namespace Infrastructure.DbContexts
                           count:50,
                           shortDescription :"تست",
                           description :"تست",
-                          picture :"خشکبار/زعفران/2025-04-13-22-59-21-image1-31.jpg",
+                          picture :"خشکبار/قهوه/2025-04-17-20-16-53-2025-04-13-22-59-21-image1-31.jpg",
                           pictureAlt :"تست",
                           pictureTitle :"تست",
                           categoryId :1,
@@ -158,7 +166,7 @@ namespace Infrastructure.DbContexts
                           count:50,
                           shortDescription :"تست",
                           description :"تست",
-                          picture :"خشکبار/زعفران/لوازم-خانگی/زعفران/2025-04-13-22-59-38-1724224224_78676.jpg",
+                          picture :"خشکبار/اسپرسوساز/2025-04-17-21-31-53-2025-04-13-22-59-38-1724224224_78676.jpg",
                           pictureAlt :"تست",
                           pictureTitle :"تست",
                           categoryId :1,
@@ -174,7 +182,7 @@ namespace Infrastructure.DbContexts
                           count:50,
                           shortDescription :"تست",
                           description :"تست",
-                          picture :"خشکبار//ادویه-کاری/2025-04-13-23-07-02-karii.jpg",
+                          picture :"خشکبار/ادویه-کاری/2025-04-17-20-17-16-2025-04-13-23-07-02-karii.jpg",
                           pictureAlt :"تست",
                           pictureTitle :"تست",
                           categoryId :1,

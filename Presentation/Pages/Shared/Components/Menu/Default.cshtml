@@ -1,4 +1,6 @@
-﻿@model Application.Dtos.MenuModel
+﻿@using Framework.Application
+@model Application.Dtos.MenuModel
+@inject IAuthenticationHelper AuthenticationHelper;
 
 <!-- NAV BAR  -->
 <nav class="w-full hidden md:flex shadow py-5 bg-white dark:bg-zinc-700">
@@ -83,53 +85,59 @@
                 </form>
             </div>
             <!-- USER ACCOUNE BOX  -->
-            <button class="group relative px-2 lg:px-3 py-2 flex items-center justify-end gap-x-1 text-white transition-colors bg-green-500 hover:bg-green-600 rounded-lg">
-                <svg class="h-5 w-5 hidden lg:flex">
-                    <use href="#user"></use>
-                </svg>
-                <a href="dashboard.html"> حساب کاربری</a>
-                <!-- SUB MENU  -->
-                <div class="absolute dark:border-none border border-gray-100 w-52 p-4 bg-white text-zinc-900 dark:text-white flex flex-col gap-y-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:top-12 transition-all delay-100 dark:bg-zinc-800 top-20 rounded text-base shadow child:transition-all child:py-1 child:px-2">
-                    <a href="dashboard-orders.html"
-                       class="flex items-center gap-x-3 w-full hover:bg-green-500/20 hover:text-green-500 rounded">
-                        <svg class="h-5 w-5">
-                            <use href="#user"></use>
-                        </svg>
-                        سفارشات من
-                    </a>
-                    <a href="dashboard-messages.html"
-                       class="flex items-center gap-x-3 w-full hover:bg-green-500/20 hover:text-green-500 rounded">
-                        <svg class="h-5 w-5">
-                            <use href="#envelope"></use>
-                        </svg>
-                        لیست پیام ها
-                    </a>
-                    <a href="dashboard-account.html"
-                       class="flex items-center gap-x-3 w-full hover:bg-green-500/20 hover:text-green-500 rounded">
-                        <svg class="h-5 w-5">
-                            <use href="#cog"></use>
-                        </svg>
-                        اطلاعات کاربری
-                    </a>
-                    <!--BORDER  -->
-                    <span class="border-t dark:border-gray-100/20 border-gray-100-gray-100"></span>
-                    <a href="#"
-                       class="flex items-center gap-x-3 w-full hover:bg-red-400/20 dark:hover:bg-rose-500/20 rounded hover:text-rose-400">
-                        <svg class="h-5 w-5">
-                            <use href="#arrow-left-start-on-rectangle"></use>
-                        </svg>
-                        خروج از حساب
-                    </a>
-                </div>
-            </button>
-            <!-- LOGIN BTN -->
-            <a href="login.html"
-               class="hidden relative px-2 lg:px-3 py-2 items-center justify-end gap-x-1 text-white transition-colors bg-green-500 hover:bg-green-600 rounded-lg">
-                <svg class="h-5 w-5 flex rotate-180">
-                    <use href="#arrow-left-start-on-rectangle"></use>
-                </svg>
-                ورود | ثبت نام
-            </a>
+            @if (!AuthenticationHelper.IsAuthenticated())
+            {
+                <!-- LOGIN BTN -->
+                <a asp-page="/Login"
+                   class=" relative px-2 lg:px-3 py-2 items-center justify-end gap-x-1 text-white transition-colors bg-green-500 hover:bg-green-600 rounded-lg">
+                    <svg class="h-5 w-5 flex rotate-180">
+                        <use href="#arrow-left-start-on-rectangle"></use>
+                    </svg>
+                    ورود | ثبت نام
+                </a>
+            }
+            else
+            {
+                <button class="group relative px-2 lg:px-3 py-2 flex items-center justify-end gap-x-1 text-white transition-colors bg-green-500 hover:bg-green-600 rounded-lg">
+                    <svg class="h-5 w-5 hidden lg:flex">
+                        <use href="#user"></use>
+                    </svg>
+                    <a href="dashboard.html"> حساب کاربری</a>
+                    <!-- SUB MENU  -->
+                    <div class="absolute dark:border-none border border-gray-100 w-52 p-4 bg-white text-zinc-900 dark:text-white flex flex-col gap-y-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:top-12 transition-all delay-100 dark:bg-zinc-800 top-20 rounded text-base shadow child:transition-all child:py-1 child:px-2">
+                        <a href="dashboard-orders.html"
+                           class="flex items-center gap-x-3 w-full hover:bg-green-500/20 hover:text-green-500 rounded">
+                            <svg class="h-5 w-5">
+                                <use href="#user"></use>
+                            </svg>
+                            سفارشات من
+                        </a>
+                        <a href="dashboard-messages.html"
+                           class="flex items-center gap-x-3 w-full hover:bg-green-500/20 hover:text-green-500 rounded">
+                            <svg class="h-5 w-5">
+                                <use href="#envelope"></use>
+                            </svg>
+                            لیست پیام ها
+                        </a>
+                        <a href="dashboard-account.html"
+                           class="flex items-center gap-x-3 w-full hover:bg-green-500/20 hover:text-green-500 rounded">
+                            <svg class="h-5 w-5">
+                                <use href="#cog"></use>
+                            </svg>
+                            اطلاعات کاربری
+                        </a>
+                        <!--BORDER  -->
+                        <span class="border-t dark:border-gray-100/20 border-gray-100-gray-100"></span>
+                        <a asp-page="/Logout"
+                           class="flex items-center gap-x-3 w-full hover:bg-red-400/20 dark:hover:bg-rose-500/20 rounded hover:text-rose-400">
+                            <svg class="h-5 w-5">
+                                <use href="#arrow-left-start-on-rectangle"></use>
+                            </svg>
+                            خروج از حساب
+                        </a>
+                    </div>
+                </button>
+            }
         </div>
     </div>
 </nav>
