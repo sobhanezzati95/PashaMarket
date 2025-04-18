@@ -6,7 +6,7 @@ using System.Security.Claims;
 
 namespace Application.Services.UserAggregate
 {
-    internal class AuthenticationHelper : IAuthenticationHelper
+    public class AuthenticationHelper : IAuthenticationHelper
     {
         private readonly IHttpContextAccessor _contextAccessor;
 
@@ -30,15 +30,6 @@ namespace Application.Services.UserAggregate
         //    return result;
         //}
 
-        //public List<int> GetPermissions()
-        //{
-        //    if (!IsAuthenticated())
-        //        return new List<int>();
-
-        //    var permissions = _contextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "permissions")
-        //        ?.Value;
-        //    return JsonConvert.DeserializeObject<List<int>>(permissions);
-        //}
 
         //public long CurrentAccountId()
         //{
@@ -54,12 +45,12 @@ namespace Application.Services.UserAggregate
         //        : "";
         //}
 
-        //public string CurrentAccountRole()
-        //{
-        //    if (IsAuthenticated())
-        //        return _contextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Role)?.Value;
-        //    return null;
-        //}
+        public string CurrentAccountRole()
+        {
+            if (IsAuthenticated())
+                return _contextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Role)?.Value;
+            return null;
+        }
 
         public bool IsAuthenticated()
         {

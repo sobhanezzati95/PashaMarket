@@ -1,5 +1,6 @@
 using Application.Configurations;
 using Framework.Application;
+using Framework.Infrastructure;
 using Infrastructure.Configurations;
 using Infrastructure.DbContexts;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -32,9 +33,21 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         o.LoginPath = new PathString("/Login");
         o.LogoutPath = new PathString("/Logout");
-        o.AccessDeniedPath = new PathString("/AccessDenied");
+        o.AccessDeniedPath = new PathString("/NotFound");
     });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminArea",
+        builder => builder.RequireRole(new List<string> { Roles.Admin }));
+
+});
+
+builder.Services.AddRazorPages()
+    .AddRazorPagesOptions(options =>
+    {
+        options.Conventions.AuthorizeAreaFolder("Admin", "/", "AdminArea");
+    });
 
 var app = builder.Build();
 

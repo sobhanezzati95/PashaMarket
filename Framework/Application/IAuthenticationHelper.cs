@@ -5,9 +5,8 @@
         Task SignOut();
         bool IsAuthenticated();
         Task Signin(AuthenticationViewModel account);
-        //string CurrentAccountRole();
+        string CurrentAccountRole();
         //AuthenticationViewModel CurrentAccountInfo();
-        //List<int> GetPermissions();
         //long CurrentAccountId();
         //string CurrentAccountMobile();
     }
