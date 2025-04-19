@@ -16,5 +16,6 @@ namespace Application.Interfaces.ProductAggregate
         Task<ProductCategoryQueryModel> GetProductCategoriesBy(string slug);
         Task<List<SearchProductsQueryModel>> SearchProduct(string value);
         Task<ProductDetailQueryModel> GetProductDetails(string slug);
+        Task<List<RelatedProductsQueryModel>> GetRelatedProductsQuery(string categorySlug, long currentProductId);
     }
 }

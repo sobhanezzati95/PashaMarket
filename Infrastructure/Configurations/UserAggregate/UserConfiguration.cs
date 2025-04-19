@@ -14,7 +14,7 @@ namespace Infrastructure.Configurations.UserAggregate
             builder.Property(x => x.Fullname).HasMaxLength(100);
             builder.Property(x => x.Username).HasMaxLength(100).IsRequired();
             builder.Property(x => x.Password).HasMaxLength(1000).IsRequired();
-            builder.Property(x => x.Email).HasMaxLength(20).IsRequired();
+            builder.Property(x => x.Email).HasMaxLength(50).IsRequired();
             builder.Property(x => x.Mobile).HasMaxLength(15);
 
             builder.HasOne(x => x.Role)

@@ -426,5 +426,52 @@ namespace Application.Services.ProductAggregate
                 throw;
             }
         }
+
+        public async Task<List<RelatedProductsQueryModel>> GetRelatedProductsQuery(string categorySlug, long currentProductId)
+        {
+            try
+            {
+                var category = await _unitOfWork.ProductCategoryRepository.GetBySlug(categorySlug);
+
+                var products = await _unitOfWork.ProductRepository.GetAllWithIncludesAndThenInCludes(
+                                        predicate: x => x.CategoryId == category.Id && x.Id != currentProductId,
+                                        orderBy: x => x.OrderByDescending(p => p.CreateDateTime),
+                                        isTracking: false,
+                                        ignoreQueryFilters: false,
+                                        includeProperties: null,
+                                        thenInclude: x => x.Include(z => z.Discounts));
+
+                if (products.Any() == false)
+                    return new();
+
+                var result = await products.Select(x => new RelatedProductsQueryModel
+                {
+                    Name = x.Name,
+                    Slug = x.Slug,
+                    PictureAlt = x.PictureAlt,
+                    UnitPriceAfterDiscount = x.Discounts.FirstOrDefault() != null &&
+                                         x.Discounts.FirstOrDefault().StartDate <= DateTime.Now &&
+                                         x.Discounts.FirstOrDefault().EndDate >= DateTime.Now ?
+                                         (x.UnitPrice - (x.UnitPrice * x.Discounts.FirstOrDefault().DiscountRate) / 100) : null,
+                    Picture = x.Picture,
+                    UnitPrice = x.UnitPrice,
+                    DiscountPercentage = x.Discounts.FirstOrDefault() != null &&
+                                         x.Discounts.FirstOrDefault().StartDate <= DateTime.Now &&
+                                         x.Discounts.FirstOrDefault().EndDate >= DateTime.Now ?
+                                         x.Discounts.FirstOrDefault().DiscountRate : null,
+                    PictureTitle = x.PictureTitle
+                }).ToListAsync();
+
+                return result;
+
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e,
+               "#ProductCategoryApplication.GetRelatedProductsQuery.CatchException() >> Exception: " + e.Message +
+               (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+                throw;
+            }
+        }
     }
 }
