@@ -412,9 +412,7 @@ namespace Application.Services.ProductAggregate
                                             DisplayName = x.DisplayName,
                                             Value = x.Value,
                                         }).ToList(),
-
-
-
+                    Picture = product.Picture
                 };
 
             }

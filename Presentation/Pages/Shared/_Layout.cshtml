@@ -326,6 +326,8 @@
     <div class="overlay hidden fixed w-full h-full top-0 left-0 right-0 bg-black/40 z-40 transition-all duration-300">
     </div>
 
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <!-- ==========================  APP JS ============================= -->
     <script src="~/Theme/Assets/scripts/App.js"></script>
     <script src="~/Theme/Assets/scripts/Timer.js"></script>
@@ -333,6 +335,15 @@
     <script src="~/Theme/Assets/scripts/swiper.js"></script>
     <!-- ==========================  SLIDER APP ============================= -->
     <script src="~/Theme/Assets/scripts/Slider.js"></script>
+    <script src="~/Theme/Assets/scripts/plugins.js"></script>
+    <script src="~/Theme/Assets/scripts/custom.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            updateCart();
+        });
+    </script>
+
 </body>
 
 </html>

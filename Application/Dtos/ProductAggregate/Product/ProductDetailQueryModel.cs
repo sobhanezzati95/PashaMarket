@@ -18,6 +18,7 @@ namespace Application.Dtos.ProductAggregate.Product
         public string MetaDescription { get; set; }
         public string ShortDescription { get; set; }
         public string Description { get; set; }
+        public string Picture { get; set; }
         public List<ProductPictureViewModel> ProductPictures { get; set; }
         public List<ProductFeatureViewModel> ProductFeatures { get; set; }
     }
