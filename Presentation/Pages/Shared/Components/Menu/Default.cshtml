@@ -2,6 +2,12 @@
 @model Application.Dtos.MenuModel
 @inject IAuthenticationHelper AuthenticationHelper;
 
+<svg class="hidden">
+    <symbol id="minus" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="size-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
+    </symbol>
+</svg>
 <!-- NAV BAR  -->
 <nav class="w-full hidden md:flex shadow py-5 bg-white dark:bg-zinc-700">
     <div class="container flex items-center justify-between">

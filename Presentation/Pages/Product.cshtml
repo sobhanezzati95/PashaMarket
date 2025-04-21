@@ -314,7 +314,7 @@
                 </svg>
             </button>
 
-            <button onclick="addToCart('@Model.Product.Id','@Model.Product.Name','@Model.Product.UnitPrice','@Model.Product.Picture')" class="w-full flex items-center gap-x-1 justify-center bg-green-500 text-white hover:bg-green-600 transition-all rounded-lg shadow py-2">
+            <button  onclick="addToCart('@Model.Product.Id','@Model.Product.Name','@Model.Product.UnitPrice','@Model.Product.Picture');addToCartAlert();" class="w-full flex items-center gap-x-1 justify-center bg-green-500 text-white hover:bg-green-600 transition-all rounded-lg shadow py-2">
                 افزودن به سبد خرید
                 <svg class="w-5 h-5">
                     <use href="#shopping-bag"></use>

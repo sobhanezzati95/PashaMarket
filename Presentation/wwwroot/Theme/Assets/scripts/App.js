@@ -130,7 +130,7 @@ accordionHeaders.forEach(header => {
 
 // Customizes an input field to use SVG icons for incrementing/decrementing its value between 1 and 20.
 document.addEventListener('DOMContentLoaded', () => {
-  const input = document.getElementById('customInput');
+    const input = document.getElementById('productCount');
   const incrementButton = document.querySelector('.increment');
   const decrementButton = document.querySelector('.decrement');
 

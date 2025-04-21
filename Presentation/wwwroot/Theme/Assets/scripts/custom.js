@@ -11,7 +11,7 @@ function addToCart(id, name, price, picture) {
     const count = $("#productCount").val();
     const currentProduct = products.find(x => x.id === id);
     if (currentProduct !== undefined) {
-        products.find(x => x.id === id).count = parseInt(currentProduct.count) + parseInt(count);
+        products.find(x => x.id === id).count = count;
     } else {
         const product = {
             id,
@@ -52,11 +52,15 @@ function updateCart() {
                                          ${x.unitPrice}
                                          <span class="font-Dana">تومان</span>
                                      </p>
-                                     <a href="javascript:void(0)" class="remove-icon" onclick="removeFromCart('${x.id}')">
-                                        <svg class="w-5 h-5">
-                                           <use href="#close"></use>
-                                        </svg>
-                                     </a>
+                                     <div class="w-full flex items-center justify-between gap-x-1 rounded-lg border border-gray-200 dark:border-white/20 py-2 px-3" >
+                                         <input disabled type="number" name="product_Count" id="product_Count" min="1" max="20" value="${x.count}"
+                                                class="custom-input mr-4 text-lg bg-transparent">
+                                     <button> 
+                                         <svg onclick="removeFromCart('${x.id}')" class="w-6 h-6 decrement text-red-500">
+                                             <use href="#close"></use>
+                                         </svg>
+                                     </button>
+                                     </div>
                                  </div>
                              </div>`;
             cartItemsWrapper.append(product);
@@ -149,5 +153,14 @@ function changeCartItemCount(id, totalId, count) {
                 $(`#${id}`).remove();
             }
         }
+    });
+}
+
+function addToCartAlert() {
+    Swal.fire({
+        text: "این کالا به سبد خرید اضافه شد!",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500
     });
 }
