@@ -1,4 +1,5 @@
-﻿using Application.Dtos.ProductAggregate.Product;
+﻿using Application.Dtos.OrderAggregate;
+using Application.Dtos.ProductAggregate.Product;
 using Application.Dtos.ProductAggregate.ProductFeature;
 using Application.Interfaces.ProductAggregate;
 using Domain;
@@ -384,6 +385,10 @@ namespace Application.Services.ProductAggregate
 
                 var product = query.FirstOrDefault();
 
+                bool hasDiscount = product.Discounts.FirstOrDefault() != null &&
+                                   product.Discounts.FirstOrDefault().StartDate <= DateTime.Now &&
+                                   product.Discounts.FirstOrDefault().EndDate >= DateTime.Now;
+
                 return new ProductDetailQueryModel
                 {
                     Id = product.Id,
@@ -412,7 +417,13 @@ namespace Application.Services.ProductAggregate
                                             DisplayName = x.DisplayName,
                                             Value = x.Value,
                                         }).ToList(),
-                    Picture = product.Picture
+                    Picture = product.Picture,
+                    DiscountPercentage = hasDiscount ?
+                                         product.Discounts.FirstOrDefault().DiscountRate : null,
+                    UnitPriceAfterDiscount = hasDiscount ?
+                                         (product.UnitPrice - (product.UnitPrice * product.Discounts.FirstOrDefault().DiscountRate) / 100) : product.UnitPrice,
+                    DiscountAmount = hasDiscount ?
+                                     (product.UnitPrice * product.Discounts.FirstOrDefault().DiscountRate) / 100 : 0,
                 };
 
             }
@@ -450,7 +461,7 @@ namespace Application.Services.ProductAggregate
                     UnitPriceAfterDiscount = x.Discounts.FirstOrDefault() != null &&
                                          x.Discounts.FirstOrDefault().StartDate <= DateTime.Now &&
                                          x.Discounts.FirstOrDefault().EndDate >= DateTime.Now ?
-                                         (x.UnitPrice - (x.UnitPrice * x.Discounts.FirstOrDefault().DiscountRate) / 100) : null,
+                                         (x.UnitPrice - (x.UnitPrice * x.Discounts.FirstOrDefault().DiscountRate) / 100) : x.UnitPrice,
                     Picture = x.Picture,
                     UnitPrice = x.UnitPrice,
                     DiscountPercentage = x.Discounts.FirstOrDefault() != null &&
@@ -470,6 +481,21 @@ namespace Application.Services.ProductAggregate
                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
                 throw;
             }
+        }
+
+        public async Task<List<CartItem>> CheckInventoryStatus(List<CartItem> cartItems)
+        {
+            var products = (await _unitOfWork.ProductRepository.GetAllAsQueryable()).ToList();
+
+            foreach (var item in cartItems)
+            {
+                if (products.Any(x => x.Id == item.Id && x.IsInStock && x.Count >= item.Count))
+                {
+                    item.IsInStock = true;
+                }
+
+            }
+            return cartItems;
         }
     }
 }

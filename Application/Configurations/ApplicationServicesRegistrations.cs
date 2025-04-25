@@ -1,7 +1,9 @@
 ﻿using Application.Interfaces.DiscountAggregate;
+using Application.Interfaces.OrderAggregate;
 using Application.Interfaces.ProductAggregate;
 using Application.Interfaces.UserAggregate;
 using Application.Services.DiscountAggregate;
+using Application.Services.OrderAggregate;
 using Application.Services.ProductAggregate;
 using Application.Services.UserAggregate;
 using Framework.Application;
@@ -23,6 +25,8 @@ namespace Application.Configurations
 
             services.AddScoped<IAuthenticationHelper, AuthenticationHelper>();
             services.AddScoped<IUserApplication, UserApplication>();
+
+            services.AddScoped<ICartCalculatorService, CartCalculatorService>();
 
         }
     }

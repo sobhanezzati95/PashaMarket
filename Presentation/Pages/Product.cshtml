@@ -299,8 +299,24 @@
         <div class="w-full lg:w-1/4 lg:sticky top-5 flex flex-col gap-y-6">
             <!-- PRICE -->
             <div class="flex items-center gap-x-1">
-                <p class="text-2xl font-DanaDemiBold">@Model.Product.UnitPrice.ToMoney()</p>
-                <p class="">تومان</p>
+                @if (Model.Product.DiscountPercentage != null)
+                {
+                    <p class="text-2xl font-DanaDemiBold text-green-600 dark:text-green-500">
+                        @Model.Product.UnitPriceAfterDiscount.ToMoney()
+                        <span class="font-Dana text-sm">تومان</span>
+                    </p>
+                    <del class="text-2xl font-DanaDemiBold text-rose-300 lg:inline">
+                        @Model.Product.UnitPrice.ToMoney()
+                        <span class="">تومان</span>
+                    </del>
+                }
+                else
+                {
+                    <p class="text-2xl font-DanaDemiBold text-green-600 dark:text-green-500">
+                        @Model.Product.UnitPriceAfterDiscount.ToMoney()
+                        <span class="font-Dana text-sm">تومان</span>
+                    </p>
+                }
             </div>
 
             <button class="w-full flex items-center justify-between gap-x-1 rounded-lg border border-gray-200 dark:border-white/20 py-2 px-3">
@@ -314,7 +330,7 @@
                 </svg>
             </button>
 
-            <button  onclick="addToCart('@Model.Product.Id','@Model.Product.Name','@Model.Product.UnitPrice','@Model.Product.Picture');addToCartAlert();" class="w-full flex items-center gap-x-1 justify-center bg-green-500 text-white hover:bg-green-600 transition-all rounded-lg shadow py-2">
+            <button onclick="addToCart('@Model.Product.Id','@Model.Product.Name','@Model.Product.UnitPrice','@Model.Product.UnitPriceAfterDiscount','@Model.Product.Picture','@Model.Product.DiscountAmount');addToCartAlert();" class="w-full flex items-center gap-x-1 justify-center bg-green-500 text-white hover:bg-green-600 transition-all rounded-lg shadow py-2">
                 افزودن به سبد خرید
                 <svg class="w-5 h-5">
                     <use href="#shopping-bag"></use>

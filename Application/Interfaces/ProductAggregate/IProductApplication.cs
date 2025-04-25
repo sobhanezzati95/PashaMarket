@@ -1,4 +1,5 @@
-﻿using Application.Dtos.ProductAggregate.Product;
+﻿using Application.Dtos.OrderAggregate;
+using Application.Dtos.ProductAggregate.Product;
 using Framework.Application;
 
 namespace Application.Interfaces.ProductAggregate
@@ -17,5 +18,6 @@ namespace Application.Interfaces.ProductAggregate
         Task<List<SearchProductsQueryModel>> SearchProduct(string value);
         Task<ProductDetailQueryModel> GetProductDetails(string slug);
         Task<List<RelatedProductsQueryModel>> GetRelatedProductsQuery(string categorySlug, long currentProductId);
+        Task<List<CartItem>> CheckInventoryStatus(List<CartItem> cartItems);
     }
 }

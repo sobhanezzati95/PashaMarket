@@ -1,6 +1,6 @@
 ﻿const cookieName = "cart-items";
 
-function addToCart(id, name, price, picture) {
+function addToCart(id, name, unitPrice, unitPriceAfterDiscount, picture,discount) {
     let products = $.cookie(cookieName);
     if (products === undefined) {
         products = [];
@@ -12,13 +12,19 @@ function addToCart(id, name, price, picture) {
     const currentProduct = products.find(x => x.id === id);
     if (currentProduct !== undefined) {
         products.find(x => x.id === id).count = count;
+        products.find(x => x.id === id).discount = +discount * +count;
+        products.find(x => x.id === id).totalPrice = +unitPriceAfterDiscount * +count;
+
     } else {
         const product = {
             id,
             name,
-            unitPrice: price,
+            unitPrice,
+            unitPriceAfterDiscount,
+            totalPrice: +unitPriceAfterDiscount * +count,
             picture,
-            count
+            count,
+            discount
         }
 
         products.push(product);
@@ -46,10 +52,10 @@ function updateCart() {
                                          ${x.name}
                                      </h2>
                                      <p class="text-xs text-green-600 dark:text-green-500">
-                                         14.500 تومان تخفیف
+                                         ${x.discount * x.count} تومان تخفیف
                                      </p>
                                      <p class="font-DanaDemiBold text-sm">
-                                         ${x.unitPrice}
+                                         ${x.totalPrice}
                                          <span class="font-Dana">تومان</span>
                                      </p>
                                      <div class="w-full flex items-center justify-between gap-x-1 rounded-lg border border-gray-200 dark:border-white/20 py-2 px-3" >
@@ -64,6 +70,19 @@ function updateCart() {
                                  </div>
                              </div>`;
             cartItemsWrapper.append(product);
+
+            const total = products.reduce((partialSum, a) => partialSum + +a.totalPrice , 0)
+            $("#totalPayAmount").text(total);
+
+
+            //var totalItemPrice = $("#TotalItemPrice");
+            //totalItemPrice.text();
+            //
+            //var cartTotalamount = $("#TotalDiscountPrice");
+            //cartTotalamount.text();
+            //
+            //var totalPayPrice = $("#TotalPayPrice");
+            //totalPayPrice.text(total);
         })
     }
 }
@@ -77,17 +96,46 @@ function removeFromCart(id) {
     updateCart();
 }
 
+function removeFromMainCart(id) {
+    let products = $.cookie(cookieName);
+    products = JSON.parse(products);
+    const itemToRemove = products.findIndex(x => x.id === id);
+    products.splice(itemToRemove, 1);
+    $.cookie(cookieName, JSON.stringify(products), { expires: 2, path: "/" });
+    updateCart();
+    location.reload();
+}
+
 function changeCartItemCount(id, totalId, count) {
     var products = $.cookie(cookieName);
     products = JSON.parse(products);
     const productIndex = products.findIndex(x => x.id == id);
-    products[productIndex].count = count;
     const product = products[productIndex];
-    const newPrice = parseInt(product.unitPrice) * parseInt(count);
-    $(`#${totalId}`).text(newPrice);
-    //products[productIndex].totalPrice = newPrice;
+
+    products[productIndex].count = count;
+    const newPrice = parseInt(product.unitPriceAfterDiscount) * parseInt(count);
+    products[productIndex].totalPrice = newPrice;
+
+    const TotalUnitPrice = products.reduce((partialSum, a) => partialSum + (+a.unitPrice * a.count), 0)
+    $("#TotalUnitPrice").text(TotalUnitPrice + " تومان");
+
+    const TotalDiscountPrice = products.reduce((partialSum, a) => partialSum + (+a.discount * a.count), 0)
+    $("#TotalDiscountPrice").text(TotalDiscountPrice + " تومان");
+
+    const TotalPayPrice = products.reduce((partialSum, a) => partialSum + (+a.unitPriceAfterDiscount * a.count), 0)
+    $("#TotalPayPrice").text(TotalPayPrice + " تومان");
+
+    $("#unitPriceAfterDiscount_" + id).text(product.unitPriceAfterDiscount * product.count);
+    var UnitPrice_ = $("#UnitPrice_" + id);
+    if (UnitPrice_) {
+
+        UnitPrice_.text(+product.unitPrice * +product.count);
+    }
+
     $.cookie(cookieName, JSON.stringify(products), { expires: 2, path: "/" });
     updateCart();
+
+
 
     //const data = {
     //    'productId': parseInt(id),
