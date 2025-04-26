@@ -269,12 +269,12 @@
                                 <img src="~/ProductPictures/@item.Picture" class="w-36" alt="">
                                 <button
                                     class="flex items-center justify-between gap-x-1 rounded-lg border border-gray-200 dark:border-white/20 py-1 px-2">
-                                    <svg class="w-4 h-4 increment text-green-600">
+                                    <svg class="w-4 h-4 text-green-600" onclick="increment(customInput_@item.Id)">
                                         <use href="#plus"></use>
                                     </svg>
-                                    <input type="number" name="customInput" id="customInput" onchange="changeCartItemCount('@item.Id', 'totalItemPrice-@item.Id', this.value)" min="1" max="20" value="@item.Count"
+                                    <input disabled type="number" name="customInput_@item.Id" id="customInput_@item.Id" onchange="changeCartItemCount('@item.Id', 'totalItemPrice-@item.Id', this.value)" min="1" max="20" value="@item.Count"
                                         class="custom-input mr-8 text-lg bg-transparent">
-                                    <svg class="w-4 h-4 decrement text-red-500">
+                                    <svg class="w-4 h-4 text-red-500" onclick="decrement(customInput_@item.Id)">
                                         <use href="#minus"></use>
                                     </svg>
                                 </button>

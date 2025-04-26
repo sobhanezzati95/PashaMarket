@@ -51,12 +51,12 @@ function updateCart() {
                                      <h2 class="font-DanaMedium line-clamp-2 text-sm">
                                          ${x.name}
                                      </h2>
-                                     <p class="text-xs text-green-600 dark:text-green-500">
-                                         ${x.discount * x.count} تومان تخفیف
+                                     <p class="text-xs text-green-600 dark:text-green-500">`+
+                                         formatPrice(x.discount * x.count) +`  تومان تخفیف
                                      </p>
-                                     <p class="font-DanaDemiBold text-sm">
-                                         ${x.totalPrice}
-                                         <span class="font-Dana">تومان</span>
+                                     <p class="font-DanaDemiBold text-sm">`+
+                                         formatPrice(x.totalPrice)+
+                                         `<span class="font-Dana"> تومان </span>
                                      </p>
                                      <div class="w-full flex items-center justify-between gap-x-1 rounded-lg border border-gray-200 dark:border-white/20 py-2 px-3" >
                                          <input disabled type="number" name="product_Count" id="product_Count" min="1" max="20" value="${x.count}"
@@ -72,7 +72,7 @@ function updateCart() {
             cartItemsWrapper.append(product);
 
             const total = products.reduce((partialSum, a) => partialSum + +a.totalPrice , 0)
-            $("#totalPayAmount").text(total);
+            $("#totalPayAmount").text(formatPrice(total)+' تومان ' );
 
 
             //var totalItemPrice = $("#TotalItemPrice");
@@ -117,19 +117,19 @@ function changeCartItemCount(id, totalId, count) {
     products[productIndex].totalPrice = newPrice;
 
     const TotalUnitPrice = products.reduce((partialSum, a) => partialSum + (+a.unitPrice * a.count), 0)
-    $("#TotalUnitPrice").text(TotalUnitPrice + " تومان");
+    $("#TotalUnitPrice").text(formatPrice(TotalUnitPrice) + " تومان");
 
     const TotalDiscountPrice = products.reduce((partialSum, a) => partialSum + (+a.discount * a.count), 0)
-    $("#TotalDiscountPrice").text(TotalDiscountPrice + " تومان");
+    $("#TotalDiscountPrice").text(formatPrice(TotalDiscountPrice) + " تومان");
 
     const TotalPayPrice = products.reduce((partialSum, a) => partialSum + (+a.unitPriceAfterDiscount * a.count), 0)
     $("#TotalPayPrice").text(TotalPayPrice + " تومان");
 
-    $("#unitPriceAfterDiscount_" + id).text(product.unitPriceAfterDiscount * product.count);
+    $("#unitPriceAfterDiscount_" + id).text(formatPrice(product.unitPriceAfterDiscount * product.count) + " تومان");
     var UnitPrice_ = $("#UnitPrice_" + id);
     if (UnitPrice_) {
 
-        UnitPrice_.text(+product.unitPrice * +product.count);
+        UnitPrice_.text(formatPrice(+product.unitPrice * +product.count) + " تومان");
     }
 
     $.cookie(cookieName, JSON.stringify(products), { expires: 2, path: "/" });
@@ -211,4 +211,19 @@ function addToCartAlert() {
         showConfirmButton: false,
         timer: 1500
     });
+}
+
+function formatPrice(price) {
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function increment(id) {
+    id.value = +id.value+1;
+    $(id).change();
+}
+function decrement(id) {
+    if (+id.value - 1 < 1) return;
+    id.value = +id.value - 1;
+
+    $(id).change();
 }
