@@ -1,4 +1,5 @@
 ﻿using Domain.Entities.DiscountAggregate;
+using Domain.Entities.OrderAggregate;
 using Framework.Domain;
 
 namespace Domain.Entities.ProductAggregate
@@ -77,8 +78,8 @@ namespace Domain.Entities.ProductAggregate
         public ProductCategory Category { get; private set; }
         public ICollection<ProductPicture> ProductPictures { get; private set; }
         public ICollection<Discount> Discounts { get; private set; }
-        public virtual ICollection<ProductFeature> ProductFeatures { get; set; }
-
+        public ICollection<ProductFeature> ProductFeatures { get; set; }
+        public ICollection<OrderItem> OrderItems { get; set; }
 
         #endregion
 
@@ -122,6 +123,7 @@ namespace Domain.Entities.ProductAggregate
         {
             IsInStock = false;
         }
+
         #endregion
 
     }

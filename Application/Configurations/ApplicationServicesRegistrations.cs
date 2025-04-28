@@ -23,11 +23,14 @@ namespace Application.Configurations
 
             services.AddScoped<ISlideApplication, SlideApplication>();
 
+            services.AddScoped<IOrderApplication, OrderApplication>();
+
             services.AddScoped<IAuthenticationHelper, AuthenticationHelper>();
             services.AddScoped<IUserApplication, UserApplication>();
 
             services.AddScoped<ICartCalculatorService, CartCalculatorService>();
 
+            services.AddSingleton<ICartService, CartService>();
         }
     }
 }

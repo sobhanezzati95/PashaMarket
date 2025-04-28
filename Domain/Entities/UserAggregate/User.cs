@@ -1,4 +1,5 @@
-﻿using Framework.Domain;
+﻿using Domain.Entities.OrderAggregate;
+using Framework.Domain;
 
 namespace Domain.Entities.UserAggregate
 {
@@ -43,6 +44,7 @@ namespace Domain.Entities.UserAggregate
 
         #region Relations
 
+        public ICollection<Order> Orders { get; private set; }
         public Role Role { get; private set; }
 
         #endregion

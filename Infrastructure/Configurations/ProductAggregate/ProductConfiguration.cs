@@ -33,6 +33,10 @@ namespace Infrastructure.Configurations.ProductAggregate
             builder.HasMany(x => x.Discounts)
                 .WithOne(x => x.Product)
                 .HasForeignKey(x => x.ProductId);
+
+            builder.HasMany(x => x.OrderItems)
+                .WithOne(x => x.Product)
+                .HasForeignKey(x => x.ProductId);
         }
     }
 }

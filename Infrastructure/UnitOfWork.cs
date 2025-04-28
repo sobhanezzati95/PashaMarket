@@ -1,8 +1,10 @@
 ﻿using Domain;
 using Domain.Contracts.Repositories.DiscountAggregate;
+using Domain.Contracts.Repositories.OrderAggregate;
 using Domain.Contracts.Repositories.ProductAggregate;
 using Domain.Contracts.Repositories.UserAggregate;
 using Infrastructure.DbContexts;
+using Infrastructure.Repositories.OrderAggregate;
 using Infrastructure.Repositories.ProductAggregate;
 using Infrastructure.Repositories.UserAggregate;
 
@@ -20,7 +22,9 @@ public class UnitOfWork : IUnitOfWork
         SlideRepository = new SlideRepository(_dbContext);
         DiscountRepository = new DiscountRepository(_dbContext);
         UserRepository = new UserRepository(_dbContext);
-        RoleRepository = new RoleRepository(dbContext);
+        RoleRepository = new RoleRepository(_dbContext);
+        OrderRepository = new OrderRepository(_dbContext);
+        OrderItemRepository = new OrderItemRepository(_dbContext);
 
     }
 
@@ -45,6 +49,14 @@ public class UnitOfWork : IUnitOfWork
     public IRoleRepository RoleRepository { get; private set; }
 
     #endregion
+
+    #region OrderAggRepo
+
+    public IOrderRepository OrderRepository { get; private set; }
+    public IOrderItemRepository OrderItemRepository { get; private set; }
+
+    #endregion
+
 
     public Task<int> CommitAsync()
     {

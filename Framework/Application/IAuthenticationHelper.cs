@@ -7,7 +7,7 @@
         Task Signin(AuthenticationViewModel account);
         string CurrentAccountRole();
         //AuthenticationViewModel CurrentAccountInfo();
-        //long CurrentAccountId();
+        long CurrentUserId();
         //string CurrentAccountMobile();
     }
     public class AuthenticationViewModel

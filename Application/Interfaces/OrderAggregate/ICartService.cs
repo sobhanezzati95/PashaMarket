@@ -2,8 +2,9 @@
 
 namespace Application.Interfaces.OrderAggregate
 {
-    public interface ICartCalculatorService
+    public interface ICartService
     {
-        Task<Cart> ComputeCart(List<CartItem> cartItems);
+        Cart Get();
+        void Set(Cart cart);
     }
 }

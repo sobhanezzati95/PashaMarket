@@ -1,6 +1,7 @@
 using Application.Dtos.OrderAggregate;
 using Application.Interfaces.OrderAggregate;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Nancy.Json;
 
@@ -12,10 +13,11 @@ namespace Presentation.Pages
         public Cart Cart;
         public const string CookieName = "cart-items";
         private readonly ICartCalculatorService _cartCalculatorService;
-
-        public CheckoutModel(ICartCalculatorService cartCalculatorService)
+        private readonly ICartService _cartService;
+        public CheckoutModel(ICartCalculatorService cartCalculatorService, ICartService cartService)
         {
             _cartCalculatorService = cartCalculatorService;
+            _cartService = cartService;
         }
 
         public async Task OnGet()
@@ -27,7 +29,15 @@ namespace Presentation.Pages
                 item.CalculateTotalItemPrice();
 
             Cart = await _cartCalculatorService.ComputeCart(cartItems);
-            //_cartService.Set(Cart);
+            _cartService.Set(Cart);
+        }
+
+
+        public IActionResult OnPostPay(int paymentMethod)
+        {
+            var cart = _cartService.Get();
+            //check inventory and price , ...
+            return RedirectToPage("/Checkout");
         }
     }
 }

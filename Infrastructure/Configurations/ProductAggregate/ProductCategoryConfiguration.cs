@@ -22,4 +22,5 @@ namespace Infrastructure.Configurations.ProductAggregate
                 .HasForeignKey(x => x.CategoryId);
         }
     }
+
 }

@@ -1,4 +1,5 @@
 ﻿using Domain.Contracts.Repositories.DiscountAggregate;
+using Domain.Contracts.Repositories.OrderAggregate;
 using Domain.Contracts.Repositories.ProductAggregate;
 using Domain.Contracts.Repositories.UserAggregate;
 
@@ -22,8 +23,16 @@ public interface IUnitOfWork : IDisposable
     #endregion
 
     #region UserAggRepo
+
     IUserRepository UserRepository { get; }
     IRoleRepository RoleRepository { get; }
+
+    #endregion
+
+    #region OrderAggRepo
+
+    IOrderRepository OrderRepository { get; }
+    IOrderItemRepository OrderItemRepository { get; }
 
     #endregion
 

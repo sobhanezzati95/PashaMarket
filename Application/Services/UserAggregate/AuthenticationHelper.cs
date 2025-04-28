@@ -31,12 +31,12 @@ namespace Application.Services.UserAggregate
         //}
 
 
-        //public long CurrentAccountId()
-        //{
-        //    return IsAuthenticated()
-        //        ? long.Parse(_contextAccessor.HttpContext.User.Claims.First(x => x.Type == "AccountId")?.Value)
-        //        : 0;
-        //}
+        public long CurrentUserId()
+        {
+            return IsAuthenticated()
+                ? long.Parse(_contextAccessor.HttpContext.User.Claims.First(x => x.Type == "UserId")?.Value)
+                : 0;
+        }
 
         //public string CurrentAccountMobile()
         //{
