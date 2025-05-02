@@ -77,16 +77,6 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="form-group no-margin">
-                    <label asp-for="ShortDescription" class="control-label"> توضیحات کوتاه</label>
-                    <textarea class="form-control autogrow" asp-for="ShortDescription" onchange="fillField('ShortDescription', 'MetaDescription')"
-                              style="overflow: hidden; word-wrap: break-word; resize: horizontal; height: 104px;"></textarea>
-                    <span asp-validation-for="ShortDescription" class="error"></span>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="form-group no-margin">
                     <label asp-for="Description" class="control-label">توضیحات</label>
                     <textarea class="form-control autogrow" asp-for="Description"
                               style="overflow: hidden; word-wrap: break-word; resize: horizontal; height: 104px;"></textarea>

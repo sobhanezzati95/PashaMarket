@@ -35,7 +35,7 @@ namespace Application.Services.ProductAggregate
                 var path = $"{categorySlug}//{slug}";
                 var picturePath = await _fileUploader.Upload(command.Picture, path);
                 var product = Product.Create(command.Name, command.Code, command.Brand, command.UnitPrice, command.Count,
-                    command.ShortDescription, command.Description, picturePath,
+                    command.Description, picturePath,
                     command.PictureAlt, command.PictureTitle, command.CategoryId, slug,
                     command.Keywords, command.MetaDescription);
                 await _unitOfWork.ProductRepository.Add(product);
@@ -67,7 +67,7 @@ namespace Application.Services.ProductAggregate
 
                 var picturePath = await _fileUploader.Upload(command.Picture, path);
                 product.Edit(command.Name, command.Code, command.Brand, command.UnitPrice, command.Count,
-                    command.ShortDescription, command.Description, picturePath,
+                    command.Description, picturePath,
                     command.PictureAlt, command.PictureTitle, command.CategoryId, slug,
                     command.Keywords, command.MetaDescription);
                 await _unitOfWork.ProductRepository.Update(product);
@@ -100,7 +100,6 @@ namespace Application.Services.ProductAggregate
                     MetaDescription = product.MetaDescription,
                     PictureAlt = product.PictureAlt,
                     PictureTitle = product.PictureTitle,
-                    ShortDescription = product.ShortDescription,
                     Brand = product.Brand,
                     UnitPrice = product.UnitPrice
                 };
@@ -143,7 +142,8 @@ namespace Application.Services.ProductAggregate
                     DiscountPercentage = x.Discounts.FirstOrDefault() != null &&
                                          x.Discounts.FirstOrDefault().StartDate <= DateTime.Now &&
                                          x.Discounts.FirstOrDefault().EndDate >= DateTime.Now ?
-                                         x.Discounts.FirstOrDefault().DiscountRate : null
+                                         x.Discounts.FirstOrDefault().DiscountRate : null,
+                    IsInStock = x.IsInStock
                 })
                     .Take(6)
                     .ToList();
@@ -403,7 +403,6 @@ namespace Application.Services.ProductAggregate
                     Description = product.Description,
                     Keywords = product.Keywords,
                     MetaDescription = product.MetaDescription,
-                    ShortDescription = product.ShortDescription,
                     ProductPictures = product.ProductPictures
                                         .Select(x => new Dtos.ProductAggregate.ProductPicture.ProductPictureViewModel
                                         {

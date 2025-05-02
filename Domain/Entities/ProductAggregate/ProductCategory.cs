@@ -21,6 +21,7 @@ namespace Domain.Entities.ProductAggregate
             Keywords = keywords;
             MetaDescription = metaDescription;
             Slug = slug;
+            IsPopular = true;
         }
         protected ProductCategory(string name, string description, string picture, string pictureAlt, string pictureTitle, string keywords, string metaDescription, string slug)
         {
@@ -32,6 +33,7 @@ namespace Domain.Entities.ProductAggregate
             Keywords = keywords;
             MetaDescription = metaDescription;
             Slug = slug;
+            IsPopular = false;
         }
 
         #endregion
@@ -46,6 +48,7 @@ namespace Domain.Entities.ProductAggregate
         public string Keywords { get; private set; }
         public string MetaDescription { get; private set; }
         public string Slug { get; private set; }
+        public bool IsPopular { get; private set; }
 
         #endregion
 
@@ -78,6 +81,16 @@ namespace Domain.Entities.ProductAggregate
             Slug = slug;
         }
 
+        public void MakeItPopular()
+        {
+            IsPopular = true;
+        }
+
+
+        public void MakeItUnpopular()
+        {
+            IsPopular = false;
+        }
         #endregion
 
     }

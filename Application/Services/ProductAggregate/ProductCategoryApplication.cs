@@ -156,15 +156,17 @@ namespace Application.Services.ProductAggregate
             {
                 var productCategories = await _unitOfWork.ProductCategoryRepository.GetAllAsQueryable();
 
-                return productCategories.Select(x => new MostPopularProductCategoriesQueryModel
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Picture = x.Picture,
-                    PictureAlt = x.PictureAlt,
-                    PictureTitle = x.PictureTitle,
-                    Slug = x.Slug
-                }).AsNoTracking().ToList();
+                return productCategories
+                    .Where(x => x.IsPopular)
+                    .Select(x => new MostPopularProductCategoriesQueryModel
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Picture = x.Picture,
+                        PictureAlt = x.PictureAlt,
+                        PictureTitle = x.PictureTitle,
+                        Slug = x.Slug,
+                    }).AsNoTracking().ToList();
             }
             catch (Exception e)
             {

@@ -22,8 +22,6 @@ namespace Application.Dtos.ProductAggregate.Product
         public int Count { get; set; }
 
         [Required(ErrorMessage = ValidationMessages.IsRequired)]
-        public string ShortDescription { get; set; }
-
         public string Description { get; set; }
 
         [MaxFileSize(3 * 1024 * 1024, ErrorMessage = ValidationMessages.MaxFileSize)]

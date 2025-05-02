@@ -48,7 +48,12 @@
                             @item.Name
                         </a>
                         <div class="flex items-center gap-x-1 lg:gap-x-3">
-                            @if(item.DiscountPercentage != null)
+                            @if(!item.IsInStock){
+                                <div class="flex items-center gap-x-1 lg:gap-x-3">
+                                    <p class="font-Dana text-red-400">فعلا موجود نیست</p>
+                                </div>
+                            }
+                            else if  (item.DiscountPercentage != null)
                             {
                                 <p class="font-DanaDemiBold text-green-600 dark:text-green-500">
                                     @item.UnitPriceAfterDiscount.Value.ToMoney()
