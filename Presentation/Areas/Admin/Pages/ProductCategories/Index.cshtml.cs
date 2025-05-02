@@ -7,6 +7,8 @@ namespace Presentation.Areas.Admin.Pages.ProductCategories
 {
     public class IndexModel : PageModel
     {
+        [TempData]
+        public string Message { get; set; }
         public ProductCategorySearchModel SearchModel;
         public List<ProductCategoryViewModel> ProductCategories;
 
@@ -43,6 +45,26 @@ namespace Presentation.Areas.Admin.Pages.ProductCategories
         {
             var result = await _productCategoryApplication.Edit(command);
             return new JsonResult(result);
+        }
+
+        public async Task<IActionResult> OnGetMakeItUnpopular(long id)
+        {
+            var result = await _productCategoryApplication.NotInStock(id);
+            if (result.IsSucceeded)
+                return RedirectToPage("./Index");
+
+            Message = result.Message;
+            return RedirectToPage("./Index");
+        }
+
+        public async Task<IActionResult> OnGetMakeItPopular(long id)
+        {
+            var result = await _productCategoryApplication.InStock(id);
+            if (result.IsSucceeded)
+                return RedirectToPage("./Index");
+
+            Message = result.Message;
+            return RedirectToPage("./Index");
         }
     }
 }

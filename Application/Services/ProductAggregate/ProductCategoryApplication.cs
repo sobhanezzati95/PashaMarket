@@ -138,7 +138,8 @@ namespace Application.Services.ProductAggregate
                     Id = x.Id,
                     Name = x.Name,
                     Picture = x.Picture,
-                    CreationDate = x.CreateDateTime.ToFarsi()
+                    CreationDate = x.CreateDateTime.ToFarsi(),
+                    Ispopular = x.IsPopular
                 }).ToList();
             }
             catch (Exception e)
@@ -199,6 +200,56 @@ namespace Application.Services.ProductAggregate
             {
                 _logger.LogError(e,
                "#ProductCategoryApplication.GetCategoriesQuery.CatchException() >> Exception: " + e.Message +
+               (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+                throw;
+            }
+        }
+
+        public async Task<OperationResult> NotInStock(long id)
+        {
+            try
+            {
+                var productCategory = await _unitOfWork.ProductCategoryRepository.GetById(id);
+                if (productCategory == null)
+                    return OperationResult.Failed(ApplicationMessages.RecordNotFound);
+
+                productCategory.MakeItUnpopular();
+
+                await _unitOfWork.ProductCategoryRepository.Update(productCategory);
+                await _unitOfWork.CommitAsync();
+                return OperationResult.Succeeded();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e,
+                "#ProductCategoryApplication.NotInStock.CatchException() >> Exception: " + e.Message +
+                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+                throw;
+            }
+        }
+        public async Task<OperationResult> InStock(long id)
+        {
+            try
+            {
+                var productCategory = await _unitOfWork.ProductCategoryRepository.GetById(id);
+                if (productCategory == null)
+                    return OperationResult.Failed(ApplicationMessages.RecordNotFound);
+
+                var query = await _unitOfWork.ProductCategoryRepository.GetAllAsQueryable();
+                var count = query.Where(x => x.IsPopular).Count();
+                if (count >= 5)
+                    return OperationResult.Failed(ApplicationMessages.InvalidOperation);
+
+                productCategory.MakeItPopular();
+
+                await _unitOfWork.ProductCategoryRepository.Update(productCategory);
+                await _unitOfWork.CommitAsync();
+                return OperationResult.Succeeded();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e,
+               "#ProductCategoryApplication.InStock.CatchException() >> Exception: " + e.Message +
                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
                 throw;
             }

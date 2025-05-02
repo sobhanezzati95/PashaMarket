@@ -185,7 +185,6 @@ namespace Application.Services.ProductAggregate
             try
             {
                 var product = await _unitOfWork.ProductRepository.GetById(productId);
-
                 product.InStock();
                 await _unitOfWork.ProductRepository.Update(product);
                 await _unitOfWork.CommitAsync();
@@ -205,9 +204,7 @@ namespace Application.Services.ProductAggregate
             try
             {
                 var product = await _unitOfWork.ProductRepository.GetById(productId);
-                if (product == null)
-
-                    product.NotInStock();
+                product.NotInStock();
                 await _unitOfWork.ProductRepository.Update(product);
                 await _unitOfWork.CommitAsync();
                 return OperationResult.Succeeded();
