@@ -7,7 +7,7 @@ namespace Application.Dtos.ProductAggregate.ProductPicture
 {
     public class CreateProductPicture
     {
-        [Range(1, 100000, ErrorMessage = ValidationMessages.IsRequired)]
+        [Required(ErrorMessage = ValidationMessages.IsRequired)]
         public long ProductId { get; set; }
 
         [FileExtentionLimitation(new string[] { ".jpeg", ".jpg", ".png" }, ErrorMessage = ValidationMessages.InvalidFileFormat)]

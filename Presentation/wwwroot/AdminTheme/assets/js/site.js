@@ -208,3 +208,30 @@ jQuery.validator.unobtrusive.adapters.addBool("maxFileSize");
 //        }
 //    });
 //jQuery.validator.unobtrusive.adapters.addBool("maxFileSize");
+
+function removeLine(element) {
+    element.parentElement.parentElement.parentElement.remove()
+}
+function shit() {
+    newRow = `<div class="row">
+                <div class="col-md-5">
+                    <div class="form-group">
+                        <label class="control-label">نام ویژگی</label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="form-group">
+                        <label class="control-label">مقدار</label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label  class="control-label">عملیات</label>
+                        <button class="btn btn-danger waves-effect waves-light" type="button" onclick="removeLine(this)">حذف</button>
+                    </div>
+                </div>
+            </div>`
+    $(".rowsList").append(newRow)
+}

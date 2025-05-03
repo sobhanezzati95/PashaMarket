@@ -98,6 +98,10 @@
                                                href="#showmodal=@Url.Page("./Index", "Edit", new { id = item.Id})">
                                                 <i class="fa fa-edit"></i> ویرایش
                                             </a>
+                                            <a class="btn btn-info btn-custom waves-effect waves-light m-b-5"
+                                               href="#showmodal=@Url.Page("./Index", "Features", new { id = item.Id})">
+                                                <i class="fa fa-edit"></i> ویژگی ها
+                                            </a>
                                             @if (item.IsInStock)
                                             {
                                                 <a asp-page="./Index" asp-page-handler="NotInStock" asp-route-id="@item.Id"

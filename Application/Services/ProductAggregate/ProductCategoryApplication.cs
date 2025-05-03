@@ -227,6 +227,7 @@ namespace Application.Services.ProductAggregate
                 throw;
             }
         }
+
         public async Task<OperationResult> InStock(long id)
         {
             try

@@ -6,7 +6,7 @@ namespace Application.Dtos.DiscountAggregate
 {
     public class DefineDiscount
     {
-        [Range(1, 100000, ErrorMessage = ValidationMessages.IsRequired)]
+        [Required(ErrorMessage = ValidationMessages.IsRequired)]
         public long ProductId { get; set; }
 
         [Range(1, 99, ErrorMessage = ValidationMessages.IsRequired)]

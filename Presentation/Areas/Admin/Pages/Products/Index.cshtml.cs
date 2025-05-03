@@ -1,4 +1,5 @@
 using Application.Dtos.ProductAggregate.Product;
+using Application.Dtos.ProductAggregate.ProductFeature;
 using Application.Interfaces.ProductAggregate;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -16,11 +17,13 @@ namespace Presentation.Areas.Admin.Pages.Products
 
         private readonly IProductApplication _productApplication;
         private readonly IProductCategoryApplication _productCategoryApplication;
+        private readonly IProductFeatureApplication _productFeatureApplication;
 
-        public IndexModel(IProductApplication ProductApplication, IProductCategoryApplication productCategoryApplication)
+        public IndexModel(IProductApplication ProductApplication, IProductCategoryApplication productCategoryApplication, IProductFeatureApplication productFeatureApplication)
         {
             _productApplication = ProductApplication;
             _productCategoryApplication = productCategoryApplication;
+            _productFeatureApplication = productFeatureApplication;
         }
 
         public async Task OnGet(ProductSearchModel searchModel)
@@ -75,6 +78,18 @@ namespace Presentation.Areas.Admin.Pages.Products
 
             Message = result.Message;
             return RedirectToPage("./Index");
+        }
+
+        public async Task<IActionResult> OnGetFeatures(long id)
+        {
+            var productFeatures = await _productFeatureApplication.GetDetails(id);
+            return Partial("Features", productFeatures);
+        }
+
+        public async Task<JsonResult> OnPostFeatures(CreateProductFeature command)
+        {
+            var result = await _productFeatureApplication.Create(command);
+            return new JsonResult(result);
         }
     }
 }

@@ -25,6 +25,7 @@ public class UnitOfWork : IUnitOfWork
         RoleRepository = new RoleRepository(_dbContext);
         OrderRepository = new OrderRepository(_dbContext);
         OrderItemRepository = new OrderItemRepository(_dbContext);
+        ProductFeatureRepository = new ProductFeatureRepository(_dbContext);
 
     }
 
@@ -34,6 +35,7 @@ public class UnitOfWork : IUnitOfWork
     public IProductCategoryRepository ProductCategoryRepository { get; private set; }
     public IProductPictureRepository ProductPictureRepository { get; private set; }
     public ISlideRepository SlideRepository { get; private set; }
+    public IProductFeatureRepository ProductFeatureRepository { get; private set; }
 
     #endregion
 

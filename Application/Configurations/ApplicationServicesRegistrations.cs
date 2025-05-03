@@ -18,6 +18,7 @@ namespace Application.Configurations
             services.AddScoped<IProductApplication, ProductApplication>();
             services.AddScoped<IProductCategoryApplication, ProductCategoryApplication>();
             services.AddScoped<IProductPictureApplication, ProductPictureApplication>();
+            services.AddScoped<IProductFeatureApplication, ProductFeatureApplication>();
 
             services.AddScoped<IDiscountApplication, DiscountApplication>();
 
