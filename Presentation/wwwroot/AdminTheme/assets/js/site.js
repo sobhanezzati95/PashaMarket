@@ -212,7 +212,7 @@ jQuery.validator.unobtrusive.adapters.addBool("maxFileSize");
 function removeLine(element) {
     element.parentElement.parentElement.parentElement.remove()
 }
-function shit() {
+function addfeatureRow() {
     newRow = `<div class="row">
                 <div class="col-md-5">
                     <div class="form-group">
@@ -234,4 +234,39 @@ function shit() {
                 </div>
             </div>`
     $(".rowsList").append(newRow)
+}
+function postFeatures(pId) {
+    keyValPair = [];
+    rowsList = $(".rowsList .row");
+    for (let row of rowsList) {
+        inputs = row.getElementsByTagName("input");
+        val1 = inputs[0].value
+        val2 = inputs[1].value
+        keyValPair.push({ displayname: val1, value: val2 })
+    }
+    request = {
+        productId: pId,
+        items: keyValPair
+    };
+    let url = "/Admin/Products?handler=Features";
+    $.ajax({
+        url: url,
+        type: "post",
+        data: JSON.stringify(request),
+        dataType: "json",
+        contentType: "application/json",
+        headers: {
+            "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
+        },
+        success: function (data) {
+            if (data.isSucceeded) {
+                window.location.reload();
+            } else {
+                alert(data.message);
+            };
+        },
+        error: function (data) {
+            alert("خطایی رخ داده است. لطفا با مدیر سیستم تماس بگیرید.");
+        }
+    });
 }

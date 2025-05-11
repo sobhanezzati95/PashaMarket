@@ -86,7 +86,7 @@ namespace Presentation.Areas.Admin.Pages.Products
             return Partial("Features", productFeatures);
         }
 
-        public async Task<JsonResult> OnPostFeatures(CreateProductFeature command)
+        public async Task<JsonResult> OnPostFeatures([FromBody] CreateProductFeature command)
         {
             var result = await _productFeatureApplication.Create(command);
             return new JsonResult(result);

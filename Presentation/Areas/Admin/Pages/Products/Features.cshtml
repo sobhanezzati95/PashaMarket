@@ -14,7 +14,7 @@
       data-action="Refresh"
       enctype="multipart/form-data">
     <div class="modal-body rowsList">
-        <button type="button" class="btn btn-success btn-md" onclick="shit()">افزودن ویژگی</button>
+        <button type="button" class="btn btn-success btn-md" onclick="addfeatureRow()">افزودن ویژگی</button>
         @foreach (var item in Model)
         {
             <div class="row">
@@ -45,6 +45,6 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">بستن</button>
-        <button type="submit" class="btn btn-info waves-effect waves-light">ثبت</button>
+        <button type="button" onclick="postFeatures(@Model.FirstOrDefault().ProductId)" class="btn btn-info waves-effect waves-light">ثبت</button>
     </div>
 </form>
