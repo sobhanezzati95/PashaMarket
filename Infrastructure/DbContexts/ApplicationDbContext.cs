@@ -1,4 +1,5 @@
 ﻿using Domain.Entities.DiscountAggregate;
+using Domain.Entities.OrderAggregate;
 using Domain.Entities.ProductAggregate;
 using Domain.Entities.UserAggregate;
 using Infrastructure.Configurations.ProductAggregate;
@@ -265,6 +266,16 @@ namespace Infrastructure.DbContexts
                 new Role(id:2,name:"SystemUser"),
             });
             #endregion
+
+            modelBuilder.Entity<Product>().HasQueryFilter(x => x.IsActive);
+            modelBuilder.Entity<Slide>().HasQueryFilter(x => x.IsActive);
+            modelBuilder.Entity<ProductCategory>().HasQueryFilter(x => x.IsActive);
+            modelBuilder.Entity<ProductPicture>().HasQueryFilter(x => x.IsActive);
+            modelBuilder.Entity<ProductFeature>().HasQueryFilter(x => x.IsActive);
+            modelBuilder.Entity<Role>().HasQueryFilter(x => x.IsActive);
+            modelBuilder.Entity<Order>().HasQueryFilter(x => x.IsActive);
+            modelBuilder.Entity<OrderItem>().HasQueryFilter(x => x.IsActive);
+            modelBuilder.Entity<Discount>().HasQueryFilter(x => x.IsActive);
 
             var assembly = typeof(ProductCategoryConfiguration).Assembly;
             modelBuilder.ApplyConfigurationsFromAssembly(assembly);

@@ -26,7 +26,7 @@ namespace Presentation.Pages
                 return RedirectToPage("/Index");
 
             Message = result.Message;
-            return RedirectToPage("/Login");
+            return Page();
         }
     }
 }

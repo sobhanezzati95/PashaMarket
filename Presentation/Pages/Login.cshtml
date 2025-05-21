@@ -128,7 +128,14 @@
             <div class="p-3 lg:p-8">
                 @if (Model.Message != null)
                 {
-                    <div class="alert alert-danger">@Model.Message</div>
+                    <div class="relative flex items-center justify-between gap-x-6 overflow-hidden rounded-lg bg-red-500 px-6 py-4 sm:flex sm:flex-nowrap sm:px-3 sm:py-3">
+                        <div class="flex-1 items-center justify-center">
+                            <p class="text-sm leading-6 text-white text-center">
+                                <strong class="font-semibold">خطا:</strong>
+                                <span class="ml-3">@Model.Message</span>
+                            </p>
+                        </div>
+                    </div>
                 }
                 <h2 class="text-center text-xl lg:text-3xl font-DanaMedium">
                     خوش آمدید

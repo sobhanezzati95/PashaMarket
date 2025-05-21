@@ -399,6 +399,7 @@ namespace Application.Services.ProductAggregate
                     IsInStock = product.IsInStock,
                     Description = product.Description,
                     Keywords = product.Keywords,
+                    Count = product.Count,
                     MetaDescription = product.MetaDescription,
                     ProductPictures = product.ProductPictures
                                         .Select(x => new Dtos.ProductAggregate.ProductPicture.ProductPictureViewModel

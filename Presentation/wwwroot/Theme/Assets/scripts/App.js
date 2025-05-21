@@ -55,10 +55,6 @@ const toggleSubmenu = () => {
 };
 
 
-// Function to close alert
-const closeAlert = () => {
-  alertElem.classList.add('hidden');
-};
 
 // Function to toggle theme
 const toggleTheme = () => {
@@ -98,8 +94,6 @@ overlay.addEventListener('click', () => {
 // Event listener for submenu toggle
 openSubmenuBtn.addEventListener('click', toggleSubmenu);
 
-// Event listener for closing alert
-alertBtnElem.addEventListener('click', closeAlert);
 
 // Event listeners for theme toggle
 toggleThemeBtns.forEach(btn => {

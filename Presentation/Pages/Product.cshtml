@@ -229,7 +229,6 @@
                     <!-- NAME -->
                     <div class="flex items-start justify-between border-b border-b-gray-200 py-2">
                         <div class="flex flex-col gap-y-1">
-                            <p class="text-sm text-gray-400">ESPRESSO BEANS GIORNO </p>
                             <h3 class="text-2xl font-MorabbaMedium"> @Model.Product.Name </h3>
                         </div>
                         <div class="flex gap-x-1">
@@ -319,23 +318,34 @@
                 }
             </div>
 
-            <button class="w-full flex items-center justify-between gap-x-1 rounded-lg border border-gray-200 dark:border-white/20 py-2 px-3">
-                <svg class="w-6 h-6 increment text-green-600">
-                    <use href="#plus"></use>
-                </svg>
-                <input type="number" name="productCount" id="productCount" min="1" max="20" value="1"
-                       class="custom-input mr-4 text-lg bg-transparent">
-                <svg class="w-6 h-6 decrement text-red-500">
-                    <use href="#minus"></use>
-                </svg>
-            </button>
-
+            @if (Model.Product.IsInStock == false || Model.Product.Count == 0)
+            {
+                <button class="w-full flex items-center gap-x-1 justify-center bg-red-500 text-white hover:bg-red-600 transition-all rounded-lg shadow py-2">
+                    ناموجود
+                    <svg class="w-5 h-5">
+                        <use href="#shopping-bag"></use>
+                    </svg>
+                </button>
+            }
+            else
+            {
+                <button class="w-full flex items-center justify-between gap-x-1 rounded-lg border border-gray-200 dark:border-white/20 py-2 px-3">
+                    <svg class="w-6 h-6 increment text-green-600">
+                        <use href="#plus"></use>
+                    </svg>
+                    <input type="number" name="productCount" id="productCount" min="1" max="20" value="1"
+                           class="custom-input mr-4 text-lg bg-transparent">
+                    <svg class="w-6 h-6 decrement text-red-500">
+                        <use href="#minus"></use>
+                    </svg>
+                </button>
             <button onclick="addToCart('@Model.Product.Id','@Model.Product.Name','@Model.Product.UnitPrice','@Model.Product.UnitPriceAfterDiscount','@Model.Product.Picture','@Model.Product.DiscountAmount');addToCartAlert();" class="w-full flex items-center gap-x-1 justify-center bg-green-500 text-white hover:bg-green-600 transition-all rounded-lg shadow py-2">
                 افزودن به سبد خرید
                 <svg class="w-5 h-5">
                     <use href="#shopping-bag"></use>
                 </svg>
             </button>
+            }
 
             <div class="text-sm  text-gray-400 flex xl:items-center gap-x-1">
                 <svg class="w-5 h-5">
@@ -506,3 +516,27 @@
     }
 
 </main>
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        updateProductCount('@Model.Product.Id');
+    });
+
+    function updateProductCount(productId) {
+        let products = $.cookie(cookieName);
+        if (products === undefined) {
+            // Cookie doesn't exist or is empty
+            $("#productCount").val(1); // Set default value to 1
+        }
+        else {
+            products = JSON.parse(products);
+            const productIndex = products.findIndex(x => x.id == productId);
+            if (productIndex !== -1) {
+                const product = products[productIndex];
+                var count = product.count;
+                $("#productCount").val(count); // Use .val() for input elements
+            }
+        }
+    }
+</script>

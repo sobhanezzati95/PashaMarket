@@ -13,6 +13,7 @@ namespace Application.Dtos.ProductAggregate.Product
         public string CategorySlug { get; set; }
         public long CategoryId { get; set; }
         public double UnitPrice { get; set; }
+        public int Count { get; set; }
         public int? DiscountPercentage { get; set; }
         public double? DiscountAmount { get; set; }
         public double UnitPriceAfterDiscount { get; set; }
