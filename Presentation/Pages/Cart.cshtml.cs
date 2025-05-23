@@ -22,18 +22,17 @@ namespace Presentation.Pages
         {
             var serializer = new JavaScriptSerializer();
             var value = Request.Cookies[CookieName];
-            var cartItems = serializer.Deserialize<List<CartItem>>(value);
+            var cartItems = serializer.Deserialize<List<CartItem>>(value) ?? new();
+            CartItems = await _productApplication.CheckInventoryStatus(cartItems);
             //foreach (var item in cartItems)
             //    item.CalculateTotalItemPrice();
-
-            CartItems = await _productApplication.CheckInventoryStatus(cartItems);
         }
 
         public async Task<IActionResult> OnGetGoToCheckout()
         {
             var serializer = new JavaScriptSerializer();
             var value = Request.Cookies[CookieName];
-            var cartItems = serializer.Deserialize<List<CartItem>>(value);
+            var cartItems = serializer.Deserialize<List<CartItem>>(value) ?? new();
             foreach (var item in cartItems)
             {
                 item.TotalPrice = item.UnitPrice * item.Count;

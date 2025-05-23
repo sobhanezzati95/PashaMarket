@@ -1,11 +1,9 @@
 ﻿@page "{id}"
 @using Framework.Application
 @model  Presentation.Pages.CategoryModel
-@* @{
-    ViewData["Title"] = Model.ProductCategories.Name;
-    ViewData["keywords"] = Model.ProductCategories.Keywords;
-    ViewData["metaDescription"] = Model.ProductCategories.MetaDescription;
-} *@
+@{
+    ViewData["Title"] = "گروه محصولات "+ Model.ProductCategories.Name;
+}
 
 
 <main class="container child:mt-8">

@@ -52,10 +52,13 @@
                 </div>
             </li>
             <li class="nav-item">
-                <a href="contact-us.html">تماس با ما</a>
+                <a asp-page="./Faq">سوالات متداول</a>
             </li>
             <li class="nav-item">
-                <a href="aboute-us.html">درباره ما</a>
+                <a asp-page="./ContactUs">تماس با ما</a>
+            </li>
+            <li class="nav-item">
+                <a asp-page="./AboutUs">درباره ما</a>
             </li>
         </ul>
         <!-- ACTION BTN -->
@@ -115,13 +118,6 @@
                             </svg>
                             سفارشات من
                         </a>
-                        <a href="dashboard-messages.html"
-                           class="flex items-center gap-x-3 w-full hover:bg-green-500/20 hover:text-green-500 rounded">
-                            <svg class="h-5 w-5">
-                                <use href="#envelope"></use>
-                            </svg>
-                            لیست پیام ها
-                        </a>
                         <a href="dashboard-account.html"
                            class="flex items-center gap-x-3 w-full hover:bg-green-500/20 hover:text-green-500 rounded">
                             <svg class="h-5 w-5">
@@ -179,7 +175,7 @@
         <div class="flex flex-col">
             <span class="text-gray-400 text-sm">مبلغ قابل پرداخت</span>
             <h2 class="font-DanaDemiBold" id="totalPayAmount">
-                350,000
+                0
                 <span class="text-sm font-Dana">تومان</span>
             </h2>
         </div>
@@ -246,6 +242,14 @@
                         <use href="#document"></use>
                     </svg>
                     مقالات
+                </a>
+            </li>
+            <li>
+                <a href="contact-us.html" class="flex items-center gap-x-2">
+                    <svg class="w-5 h-5">
+                        <use href="#phone"></use>
+                    </svg>
+                    سوالات متداول
                 </a>
             </li>
             <li>

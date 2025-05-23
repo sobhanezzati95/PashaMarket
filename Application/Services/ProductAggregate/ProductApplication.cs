@@ -482,6 +482,9 @@ namespace Application.Services.ProductAggregate
 
         public async Task<List<CartItem>> CheckInventoryStatus(List<CartItem> cartItems)
         {
+            if (!cartItems.Any())
+                return new();
+
             var products = (await _unitOfWork.ProductRepository.GetAllAsQueryable()).ToList();
 
             foreach (var item in cartItems)

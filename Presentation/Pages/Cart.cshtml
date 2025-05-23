@@ -2,6 +2,7 @@
 @using Framework.Application
 @model Presentation.Pages.CartModel
 @{
+    ViewData["Title"] = "سبد خرید";
 }
     <!-- ALL ICONS  -->
     <svg class="hidden">
@@ -333,7 +334,7 @@
                             </div>
                         </div>
                         <div class="hidden sm:flex items-end justify-between flex-col">
-                            <a onclick="removeFromMainCart(@item.Id)">
+                            <a onclick="alertRemoveFromMainCart(@item.Id)">
                             <svg class="w-5 h-5 cursor-pointer">
                                 <use href="#close"></use>
                             </svg>

@@ -1,0 +1,78 @@
+﻿@page
+@model Presentation.Pages.ContactUsModel
+@{
+    ViewData["Title"] = "ارتباط با ما";
+}
+<main class="container child:mt-8">
+    <!-- Breadcrumbs -->
+    <section>
+        <ul class="flex items-center gap-x-2 text-gray-400 text-sm lg:text-base">
+            <li class="flex items-center gap-x-2">
+                <a asp-page="/Index">صفحه اصلی</a>
+                <svg class="w-4 h-4">
+                    <use href="#chevron-left"></use>
+                </svg>
+            </li>
+            <li class="flex items-center gap-x-2">
+                <a > تماس با ما</a>
+            </li>
+        </ul>
+    </section>
+    <!-- CONTACT US -->
+    <section class="w-full p-5 rounded-lg shadow bg-white dark:bg-zinc-700">
+        <h2 class="font-MorabbaMedium text-xl flex w-fit border-b-2 border-green-500 pb-1">تماس با ما</h2>
+        <p class="text-gray-500 dark:text-gray-200 font-DanaMedium mt-4 mb-8 text-sm lg:text-base">
+            قبل از مطرح کردن هر گونه سوال بخش <a class="text-green-500" asp-page="./Faq">سوالات متداول</a>
+            را مطالعه نمایید
+        </p>
+
+        <div class="flex flex-col lg:flex-row items-start gap-x-8">
+            <div class="w-full lg:w-3/4">
+                <form class="w-full grid grid-cols-12 gap-4">
+                    <input type="text" placeholder="شماره موبایل" class="tailwind-input col-span-6">
+                    <input type="text" placeholder="عنوان" class="tailwind-input col-span-6">
+                    <input type="text" placeholder="ایمیل" class="tailwind-input col-span-12 ">
+                    <textarea class="tailwind-input col-span-12 h-24" placeholder="متن دیدگاه"></textarea>
+                    <button class="mx-auto rounded-lg col-span-12 w-32 p-2 bg-green-500 hover:bg-green-600 text-white transition-all">
+                        ارسال پیام
+                    </button>
+                </form>
+            </div>
+            <ul class="w-full lg:w-2/4 space-y-4 lg:space-y-8 mt-5 lg:mt-0">
+                <li>
+                    <span class="flex items-center gap-x-2 font-DanaMedium dark:text-gray-200 text-gray-500">
+                        <svg class="w-4 h-4 mb-1">
+                            <use href="#envelope"></use>
+                        </svg>
+                        آدرس ایمیل :
+                    </span>
+                    <p class="text-lg  text-green-500 mt-1.5">
+                        coffein@info.com
+                    </p>
+                </li>
+                <li>
+                    <span class="flex items-center gap-x-2 font-DanaMedium dark:text-gray-200 text-gray-500">
+                        <svg class="w-5 h-5 mb-1">
+                            <use href="#phone"></use>
+                        </svg>
+                        تلفن :
+                    </span>
+                    <p class="text-lg  text-green-500 mt-1.5">
+                        0926-002-2737
+                    </p>
+                </li>
+                <li>
+                    <span class="flex items-center gap-x-2 font-DanaMedium dark:text-gray-200 text-gray-500">
+                        <svg class="w-5 h-5 mb-1">
+                            <use href="#map"></use>
+                        </svg>
+                        آدرس :
+                    </span>
+                    <p class="text-green-500 mt-1.5">
+                        بلوار آزادی، خیابان استاد معین، کوچه گلستان، پلاک ۱۰
+                    </p>
+                </li>
+            </ul>
+        </div>
+    </section>
+</main>

@@ -1,4 +1,13 @@
 ﻿const cookieName = "cart-items";
+dconst isDarkMode = document.documentElement.classList.contains('dark');
+
+// تنظیمات پیش‌فرض برای حالت دارک و لایت
+const alertOptions = {
+    background: isDarkMode ? '#333' : '#fff',
+    color: isDarkMode ? '#fff' : '#000',
+    confirmButtonColor: isDarkMode ? '#4caf50' : '#3085d6',
+    cancelButtonColor: isDarkMode ? '#f44336' : '#d33',
+};
 
 function addToCart(id, name, unitPrice, unitPriceAfterDiscount, picture,discount) {
     let products = $.cookie(cookieName);
@@ -42,6 +51,10 @@ function updateCart() {
         $("#cart_items_count").text(products.length);
         const cartItemsWrapper = $("#cart_items_wrapper");
         cartItemsWrapper.html('');
+
+        if (products.length == 0) {
+            $("#totalPayAmount").text('0 تومان ');
+        }
         products.forEach(x => {
             const product = `<div class="flex items-center gap-x-3 border-b border-gray-200 pb-4 dark:border-white/10">
                                  <!-- IMAGE -->
@@ -62,7 +75,7 @@ function updateCart() {
                                          <input disabled type="number" name="product_Count" id="product_Count" min="1" max="20" value="${x.count}"
                                                 class="custom-input mr-4 text-lg bg-transparent">
                                      <button> 
-                                         <svg onclick="removeFromCart('${x.id}')" class="w-6 h-6 decrement text-red-500">
+                                         <svg onclick="alertRemoveFromCart('${x.id}')" class="w-6 h-6 decrement text-red-500">
                                              <use href="#close"></use>
                                          </svg>
                                      </button>
@@ -226,4 +239,34 @@ function decrement(id) {
     id.value = +id.value - 1;
 
     $(id).change();
+}
+function alertRemoveFromCart(id) {
+    Swal.fire({
+        title: 'حذف محصول',
+        text: 'آیا از حذف این محصول از سبد خرید مطمئن هستید؟',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'بله، حذف کن',
+        cancelButtonText: 'لغو',
+        ...alertOptions,
+    }).then((result) => {
+        if (result.isConfirmed) {
+            removeFromCart(id);
+        }
+    });
+}
+function alertRemoveFromMainCart(id) {
+    Swal.fire({
+        title: 'حذف محصول',
+        text: 'آیا از حذف این محصول از سبد خرید مطمئن هستید؟',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'بله، حذف کن',
+        cancelButtonText: 'لغو',
+        ...alertOptions,
+    }).then((result) => {
+        if (result.isConfirmed) {
+            removeFromMainCart(id);
+        }
+    });
 }

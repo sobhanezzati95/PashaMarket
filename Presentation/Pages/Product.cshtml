@@ -2,6 +2,7 @@
 @using Framework.Application
 @model Presentation.Pages.ProductModel
 @{
+    ViewData["Title"] = "قیمت و خرید محصول " + Model.Product.Name;
 }
 <svg class="hidden">
     <symbol id="arrow-down-circle" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -339,7 +340,7 @@
                         <use href="#minus"></use>
                     </svg>
                 </button>
-            <button onclick="addToCart('@Model.Product.Id','@Model.Product.Name','@Model.Product.UnitPrice','@Model.Product.UnitPriceAfterDiscount','@Model.Product.Picture','@Model.Product.DiscountAmount');addToCartAlert();" class="w-full flex items-center gap-x-1 justify-center bg-green-500 text-white hover:bg-green-600 transition-all rounded-lg shadow py-2">
+                <button onclick="addToCart('@Model.Product.Id','@Model.Product.Name','@Model.Product.UnitPrice','@Model.Product.UnitPriceAfterDiscount','@Model.Product.Picture','@Model.Product.DiscountAmount');showAlert('add-product');" class="w-full flex items-center gap-x-1 justify-center bg-green-500 text-white hover:bg-green-600 transition-all rounded-lg shadow py-2">
                 افزودن به سبد خرید
                 <svg class="w-5 h-5">
                     <use href="#shopping-bag"></use>

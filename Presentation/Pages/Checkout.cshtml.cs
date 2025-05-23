@@ -24,18 +24,18 @@ namespace Presentation.Pages
         {
             var serializer = new JavaScriptSerializer();
             var value = Request.Cookies[CookieName];
-            var cartItems = serializer.Deserialize<List<CartItem>>(value);
+            var cartItems = serializer.Deserialize<List<CartItem>>(value) ?? new();
             foreach (var item in cartItems)
                 item.CalculateTotalItemPrice();
 
             Cart = await _cartCalculatorService.ComputeCart(cartItems);
-            _cartService.Set(Cart);
+            //_cartService.Set(Cart);
         }
 
 
         public IActionResult OnPostPay(int paymentMethod)
         {
-            var cart = _cartService.Get();
+            //var cart = _cartService.Get();
             //check inventory and price , ...
             return RedirectToPage("/Checkout");
         }

@@ -1,7 +1,9 @@
 ﻿@page 
 @using Framework.Application
 @model Presentation.Pages.SearchModel
-
+@{
+    ViewData["Title"] = "جستجو محصول " + Model.Value;
+}
 
 <main class="container child:mt-8">
     <!-- Breadcrumbs -->

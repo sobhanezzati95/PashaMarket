@@ -220,7 +220,17 @@ function showAlert(type) {
         ...alertOptions,
 
       });
-      break;
+          break;
+    case 'success-payment':
+        Swal.fire({
+            icon: 'success',
+            title: 'ثبت‌نام موفق!',
+            text: 'سفارش شما با موفقیت ایجاد شد.',
+            confirmButtonText: 'باشه',
+            ...alertOptions,
+
+        });
+        break;
     case 'error-login':
       Swal.fire({
         icon: 'error',

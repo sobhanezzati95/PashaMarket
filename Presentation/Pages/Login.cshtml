@@ -1,6 +1,7 @@
 ﻿@page
 @model Presentation.Pages.LoginModel
 @{
+    ViewData["Title"] = "ورود";
 }
 <!-- ALL ICONS  -->
 <svg class="hidden">
@@ -126,17 +127,6 @@
     <div class="max-w-lg w-full shadow">
         <div class="bg-white dark:bg-zinc-700 rounded-lg overflow-hidden">
             <div class="p-3 lg:p-8">
-                @if (Model.Message != null)
-                {
-                    <div class="relative flex items-center justify-between gap-x-6 overflow-hidden rounded-lg bg-red-500 px-6 py-4 sm:flex sm:flex-nowrap sm:px-3 sm:py-3">
-                        <div class="flex-1 items-center justify-center">
-                            <p class="text-sm leading-6 text-white text-center">
-                                <strong class="font-semibold">خطا:</strong>
-                                <span class="ml-3">@Model.Message</span>
-                            </p>
-                        </div>
-                    </div>
-                }
                 <h2 class="text-center text-xl lg:text-3xl font-DanaMedium">
                     خوش آمدید
                 </h2>
@@ -146,14 +136,14 @@
                 <form method="post" asp-page-handler="Login" class="mt-8 space-y-6">
 
                     <div class="flex w-full items-center bg-gray-100 dark:bg-zinc-500/30 rounded-lg  px-3">
-                        <input placeholder="نام کاربری" name="username" id="username"  class="appearance-none bg-transparent w-full py-3 "
-                                type="text" />
+                        <input placeholder="نام کاربری" name="username" id="username" class="appearance-none bg-transparent w-full py-3 "
+                               type="text" />
                         <svg class="h-5 w-5 text-gray-500 dark:text-gray-200">
                             <use href="#envelope"></use>
                         </svg>
                     </div>
                     <div class="flex w-full items-center bg-gray-100 dark:bg-zinc-500/30 rounded-lg  px-3">
-                        <input placeholder="رمز عبور" class="appearance-none bg-transparent w-full py-3" 
+                        <input placeholder="رمز عبور" class="appearance-none bg-transparent w-full py-3"
                                name="password" id="password" type="password" />
                         <svg class="h-5 w-5 text-gray-500 dark:text-gray-200">
                             <use href="#lock"></use>
@@ -184,3 +174,12 @@
     </div>
 
 </main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const errorMessage = '@Html.Raw(Model.Message)';
+        if (errorMessage && errorMessage.trim() !== '') {
+            showAlert('error-login');
+        }
+    });
+</script>

@@ -1,8 +1,9 @@
 ﻿@page
+@using Framework.Application
 @model Presentation.Pages.CheckoutModel
 @{
+    ViewData["Title"] = "پرداخت";
 }
-
 <!-- ALL ICONS  -->
 <svg class="hidden">
     <symbol id="arrow-down-circle" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -134,7 +135,7 @@
                 </svg>
             </li>
             <li class="flex items-center gap-x-2">
-                 پرداخت
+                پرداخت
             </li>
         </ul>
     </section>
@@ -158,6 +159,26 @@
                     <input type="text" placeholder="کد پستی*" class="tailwind-input col-span-6 ">
                     <textarea class="tailwind-input col-span-12 h-24" placeholder="توضیحات اضافه"></textarea>
                 </form>
+            </div>
+
+            <div class="mt-8">
+                <h2 class="font-MorabbaMedium text-2xl flex w-fit border-b-2 border-blue-500 pb-1"> سبد خرید شما </h2>
+                <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @if (Model.Cart != null)
+                    {
+                        @foreach (var product in Model.Cart.Items)
+                        {
+                            <div class="flex items-center gap-4 p-4 rounded-lg shadow bg-gray-50 dark:bg-zinc-800">
+                                <img src="~/ProductPictures/@product.Picture" alt="@product.Name Image" class="w-20 h-20 object-cover rounded-md">
+                                <div class="flex flex-col">
+                                    <h3 class="font-DanaMedium text-lg">@product.Name</h3>
+                                    <p class="text-gray-500 dark:text-gray-400 text-sm">تعداد: @product.Count </p>
+                                    <p class="font-DanaMedium text-green-500">قیمت: @product.TotalPrice.ToString("N0") تومان</p>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
             </div>
         </div>
 
@@ -189,15 +210,15 @@
                 <ul class="child:flex child:items-center space-y-6">
                     <li class="justify-between">
                         <p>جمع مبلغ سفارش :</p>
-                        <p class="font-DanaMedium text-green-500">2,400,000 تومان</p>
+                        <p class="font-DanaMedium text-green-500">@Model.Cart.Items.Sum(x => x.UnitPrice * x.Count).ToMoney() </p>
                     </li>
                     <li class="justify-between">
                         <p>تخفیف :</p>
-                        <p class="font-DanaMedium text-red-600 dark:text-gray-200">220,000 تومان </p>
+                        <p class="font-DanaMedium text-red-600 dark:text-gray-200">@Model.Cart.Items.Sum(x => x.Discount * x.Count).ToMoney() تومان </p>
                     </li>
                     <li class="border-t-2 border-dashed border-gray-400 pt-6 justify-between">
                         <p> مبلغ قابل پرداخت :</p>
-                        <p>2,200,000 تومان</p>
+                        <p>@Model.Cart.Items.Sum(x => x.TotalPrice).ToMoney() تومان</p>
                     </li>
                     <li class="gap-x-2">
                         <p>پرداخت با :</p>
@@ -212,7 +233,7 @@
                     </li>
                 </ul>
 
-                <button class="w-full mt-4 flex items-center justify-center bg-green-500 text-white hover:bg-green-600 transition-all rounded-lg shadow py-2">
+                <button onclick="showAlert('success-payment')" class="w-full mt-4 flex items-center justify-center bg-green-500 text-white hover:bg-green-600 transition-all rounded-lg shadow py-2">
                     تایید و پرداخت
                 </button>
 
