@@ -1,5 +1,5 @@
 ﻿const cookieName = "cart-items";
-dconst isDarkMode = document.documentElement.classList.contains('dark');
+const isDarkMode = document.documentElement.classList.contains('dark');
 
 // تنظیمات پیش‌فرض برای حالت دارک و لایت
 const alertOptions = {
