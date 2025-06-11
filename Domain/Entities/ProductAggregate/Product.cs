@@ -89,7 +89,7 @@ namespace Domain.Entities.ProductAggregate
                 keywords, metaDescription);
         }
 
-        public void Edit(string name, string code, string? brand, double unitPrice, int count, string description, string picture,
+        public void Edit(string name, string code, string? brand, double unitPrice, int count, string description, string? picture,
             string pictureAlt, string pictureTitle, long categoryId, string slug, string keywords, string metaDescription)
         {
             Name = name;

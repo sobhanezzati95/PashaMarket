@@ -1,7 +1,9 @@
-﻿using Application.Interfaces.DiscountAggregate;
+﻿using Application.Interfaces.ContactUsAggregate;
+using Application.Interfaces.DiscountAggregate;
 using Application.Interfaces.OrderAggregate;
 using Application.Interfaces.ProductAggregate;
 using Application.Interfaces.UserAggregate;
+using Application.Services.ContactUsAggregate;
 using Application.Services.DiscountAggregate;
 using Application.Services.OrderAggregate;
 using Application.Services.ProductAggregate;
@@ -32,6 +34,8 @@ namespace Application.Configurations
             services.AddScoped<ICartCalculatorService, CartCalculatorService>();
 
             services.AddSingleton<ICartService, CartService>();
+
+            services.AddScoped<IContactUsApplication, ContactUsApplication>();
         }
     }
 }

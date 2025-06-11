@@ -1,9 +1,11 @@
 ﻿using Domain;
+using Domain.Contracts.Repositories.ContactUsAggregate;
 using Domain.Contracts.Repositories.DiscountAggregate;
 using Domain.Contracts.Repositories.OrderAggregate;
 using Domain.Contracts.Repositories.ProductAggregate;
 using Domain.Contracts.Repositories.UserAggregate;
 using Infrastructure.DbContexts;
+using Infrastructure.Repositories.ContactUsAggregate;
 using Infrastructure.Repositories.OrderAggregate;
 using Infrastructure.Repositories.ProductAggregate;
 using Infrastructure.Repositories.UserAggregate;
@@ -26,7 +28,7 @@ public class UnitOfWork : IUnitOfWork
         OrderRepository = new OrderRepository(_dbContext);
         OrderItemRepository = new OrderItemRepository(_dbContext);
         ProductFeatureRepository = new ProductFeatureRepository(_dbContext);
-
+        ContactUsRepository = new ContactUsRepository(_dbContext);
     }
 
     #region ProductAggRepo
@@ -59,6 +61,11 @@ public class UnitOfWork : IUnitOfWork
 
     #endregion
 
+    #region ContactUsAggRepo
+
+    public IContactUsRepository ContactUsRepository { get; private set; }
+
+    #endregion
 
     public Task<int> CommitAsync()
     {

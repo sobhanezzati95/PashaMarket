@@ -28,12 +28,13 @@
 
         <div class="flex flex-col lg:flex-row items-start gap-x-8">
             <div class="w-full lg:w-3/4">
-                <form class="w-full grid grid-cols-12 gap-4">
-                    <input type="text" placeholder="شماره موبایل" class="tailwind-input col-span-6">
-                    <input type="text" placeholder="عنوان" class="tailwind-input col-span-6">
-                    <input type="text" placeholder="ایمیل" class="tailwind-input col-span-12 ">
-                    <textarea class="tailwind-input col-span-12 h-24" placeholder="متن دیدگاه"></textarea>
-                    <button class="mx-auto rounded-lg col-span-12 w-32 p-2 bg-green-500 hover:bg-green-600 text-white transition-all">
+                <form method="post" asp-page-handler="ContactUs" class="w-full grid grid-cols-12 gap-4">
+                    <input required name="fullName" id="fullName" type="text" placeholder="نام و نام خانوادگی" class="tailwind-input col-span-6">
+                    <input required name="phoneNumber" id="phoneNumber" type="text" placeholder="شماره موبایل" class="tailwind-input col-span-6">
+                    <input required name="title" id="title" type="text" placeholder="عنوان" class="tailwind-input col-span-6">
+                    <input required name="email" id="email" type="text" placeholder="ایمیل" class="tailwind-input col-span-6">
+                    <textarea required name="description" id="description" class="tailwind-input col-span-12 h-24" placeholder="متن دیدگاه"></textarea>
+                    <button type="submit" class="mx-auto rounded-lg col-span-12 w-32 p-2 bg-green-500 hover:bg-green-600 text-white transition-all">
                         ارسال پیام
                     </button>
                 </form>
@@ -76,3 +77,12 @@
         </div>
     </section>
 </main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const errorMessage = '@Html.Raw(Model.Message)';
+        if (errorMessage && errorMessage.trim() === 'عملیات با موفقیت انجام شد') {
+            showAlert('success-submit');
+        }
+    });
+</script>

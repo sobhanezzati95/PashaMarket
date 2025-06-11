@@ -1,4 +1,5 @@
-﻿using Domain.Contracts.Repositories.DiscountAggregate;
+﻿using Domain.Contracts.Repositories.ContactUsAggregate;
+using Domain.Contracts.Repositories.DiscountAggregate;
 using Domain.Contracts.Repositories.OrderAggregate;
 using Domain.Contracts.Repositories.ProductAggregate;
 using Domain.Contracts.Repositories.UserAggregate;
@@ -34,6 +35,12 @@ public interface IUnitOfWork : IDisposable
 
     IOrderRepository OrderRepository { get; }
     IOrderItemRepository OrderItemRepository { get; }
+
+    #endregion
+
+    #region ContactUsAggRepo
+
+    IContactUsRepository ContactUsRepository { get; }
 
     #endregion
 

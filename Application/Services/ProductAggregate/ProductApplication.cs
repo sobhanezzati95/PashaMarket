@@ -65,7 +65,10 @@ namespace Application.Services.ProductAggregate
                 var slug = command.Slug.Slugify();
                 var path = $"{product.Category.Slug}/{slug}";
 
-                var picturePath = await _fileUploader.Upload(command.Picture, path);
+                var picturePath = command.Picture != null
+                    ? await _fileUploader.Upload(command.Picture, path)
+                    : null;
+
                 product.Edit(command.Name, command.Code, command.Brand, command.UnitPrice, command.Count,
                     command.Description, picturePath,
                     command.PictureAlt, command.PictureTitle, command.CategoryId, slug,
@@ -254,7 +257,8 @@ namespace Application.Services.ProductAggregate
                     UnitPrice = x.UnitPrice,
                     IsInStock = x.IsInStock,
                     Brand = x.Brand,
-                    CreationDate = x.CreateDateTime.ToFarsi()
+                    CreationDate = x.CreateDateTime.ToFarsi(),
+                    Count = x.Count
                 }).ToList();
             }
             catch (Exception e)

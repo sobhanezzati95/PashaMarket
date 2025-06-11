@@ -65,7 +65,8 @@
                                     <th>کد</th>
                                     <th>گروه</th>
                                     <th>قیمت</th>
-                                    <th>موجودی</th>
+                                    <th>تعداد انبار</th>
+                                    <th>موجود</th>
                                     <th>تاریخ ایجاد</th>
                                     <th>عملیات</th>
                                 </tr>
@@ -82,6 +83,7 @@
                                         <td>@item.Code</td>
                                         <td>@item.Category</td>
                                         <td>@item.UnitPrice</td>
+                                        <td>@item.Count</td>
                                         <td class="text-center">
                                             @if (item.IsInStock)
                                             {

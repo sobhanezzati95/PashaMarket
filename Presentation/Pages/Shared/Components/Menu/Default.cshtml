@@ -19,7 +19,7 @@
         </a>
         <!-- MENU -->
         <ul class="mt-2 flex items-center gap-x-4 lg:gap-x-10 font-DanaMedium lg:mr-30 xl:mr-32 child:z-30">
-            <li class="nav-item text-green-500">
+            <li class="nav-item">
                 <a asp-page="/Index">صفحه اصلی</a>
             </li>
             <!-- ITEM HASE SUBMENU -->
@@ -195,7 +195,7 @@
             <a href="index.html"
                class="flex items-center gap-x-1 dark:text-brown-300 text-brown-600 font-MorabbaMedium text-xl">
                 <img src="~/Theme/Assets/Images/logo.png" alt="logo" class="w-6 h-6" />
-                <h1>کافئین</h1>
+                <h1>پاشا مارکت</h1>
             </a>
             <svg class="mobile-menu__close-icon w-6 h-6 cursor-pointer">
                 <use href="#close"></use>
@@ -209,7 +209,7 @@
         <!-- MENU  -->
         <ul class="flex flex-col gap-y-6 text-zinc-700 dark:text-white">
             <li>
-                <a href="index.html" class="flex items-center gap-x-2">
+                <a asp-page="/Index" class="flex items-center gap-x-2">
                     <svg class="w-5 h-5">
                         <use href="#home"></use>
                     </svg>
@@ -218,26 +218,25 @@
             </li>
             <li class="">
                 <div class="open-submenu flex w-full items-center justify-between">
-                    <a href="shop.html" class="transition-all flex items-center gap-x-2">
+                    <a class="transition-all flex items-center gap-x-2">
                         <svg class="w-5 h-5">
                             <use href="#shopping-bag"></use>
                         </svg>
-                        فروشگاه
+                        گروه محصولات
                     </a>
                     <svg class="w-3 h-3 arrow-submenu -rotate-90">
                         <use href="#chevron-left"></use>
                     </svg>
                 </div>
                 <div class="submenu hidden flex-col gap-y-3 mt-3 child:text-sm mr-7">
-                    <a href="shop.html">اسپرسو</a>
-                    <a href="shop.html">قهوه ترک</a>
-                    <a href="shop.html">قهوه فرانسه</a>
-                    <a href="shop.html">کپسول اسپرسو</a>
-                    <a href="shop.html">لوازم و تجهیزات</a>
+                    @foreach (var category in Model.ProductCategories)
+                    {
+                        <a asp-page="./Category" asp-route-id="@category.Slug">@category.Name</a>
+                    }
                 </div>
             </li>
             <li>
-                <a href="articles.html" class="flex items-center gap-x-2">
+                <a  class="flex items-center gap-x-2">
                     <svg class="w-5 h-5">
                         <use href="#document"></use>
                     </svg>
@@ -245,7 +244,7 @@
                 </a>
             </li>
             <li>
-                <a href="contact-us.html" class="flex items-center gap-x-2">
+                <a asp-page="./Faq" class="flex items-center gap-x-2">
                     <svg class="w-5 h-5">
                         <use href="#phone"></use>
                     </svg>
@@ -253,7 +252,7 @@
                 </a>
             </li>
             <li>
-                <a href="contact-us.html" class="flex items-center gap-x-2">
+                <a asp-page="./ContactUs" class="flex items-center gap-x-2">
                     <svg class="w-5 h-5">
                         <use href="#phone"></use>
                     </svg>
@@ -261,7 +260,7 @@
                 </a>
             </li>
             <li>
-                <a href="aboute-us.html" class="flex items-center gap-x-2">
+                <a asp-page="./AboutUs" class="flex items-center gap-x-2">
                     <svg class="w-5 h-5">
                         <use href="#check"></use>
                     </svg>
@@ -304,7 +303,7 @@
     <a href="index.html"
        class="flex items-center gap-x-1 dark:text-brown-300 text-brown-600 font-MorabbaMedium text-xl">
         <img src="~/Theme/Assets/Images/logo.png" alt="logo" class="w-6 h-6" />
-        <h1>کافئین</h1>
+        <h1>پاشا مارکت</h1>
     </a>
     <!-- OPEN SHOPPING CART BTN  -->
     <button class="open-shopping-cart__btn">

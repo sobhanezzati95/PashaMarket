@@ -61,7 +61,9 @@ namespace Application.Services.ProductAggregate
                 var slug = command.Slug.Slugify();
 
                 var picturePath = $"{command.Slug}";
-                var fileName = await _fileUploader.Upload(command.Picture, picturePath);
+                var fileName = command.Picture != null
+                    ? await _fileUploader.Upload(command.Picture, picturePath)
+                    : null;
 
                 productCategory.Edit(command.Name, command.Description, fileName, command.PictureAlt, command.PictureTitle, command.Keywords, command.MetaDescription, slug);
 

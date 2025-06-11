@@ -55,7 +55,9 @@ namespace Application.Services.ProductAggregate
                     return OperationResult.Failed(ApplicationMessages.RecordNotFound);
 
                 var path = $"{productPicture.Product.Category.Slug}//{productPicture.Product.Slug}";
-                var picturePath = await _fileUploader.Upload(command.Picture, path);
+                var picturePath = command.Picture != null
+                    ? await _fileUploader.Upload(command.Picture, path)
+                    : null;
 
                 productPicture.Edit(command.ProductId, picturePath, command.PictureAlt, command.PictureTitle);
                 await _unitOfWork.ProductPictureRepository.Update(productPicture);

@@ -136,7 +136,7 @@ function changeCartItemCount(id, totalId, count) {
     $("#TotalDiscountPrice").text(formatPrice(TotalDiscountPrice) + " تومان");
 
     const TotalPayPrice = products.reduce((partialSum, a) => partialSum + (+a.unitPriceAfterDiscount * a.count), 0)
-    $("#TotalPayPrice").text(TotalPayPrice + " تومان");
+    $("#TotalPayPrice").text(formatPrice(TotalPayPrice + " تومان"));
 
     $("#unitPriceAfterDiscount_" + id).text(formatPrice(product.unitPriceAfterDiscount * product.count) + " تومان");
     var UnitPrice_ = $("#UnitPrice_" + id);
