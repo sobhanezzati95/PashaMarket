@@ -325,17 +325,39 @@ namespace Application.Services.ProductAggregate
             }
         }
 
-        public async Task<List<SearchProductsQueryModel>> SearchProduct(string value)
+        public async Task<List<SearchProductsQueryModel>> SearchProduct(ProductSearchQuery query)
         {
             try
             {
                 var products = await _unitOfWork.ProductRepository.GetAllWithIncludesAndThenInCludes(
-                                        predicate: x => x.Name.Contains(value) || x.Brand.Contains(value),
-                                        orderBy: x => x.OrderByDescending(p => p.CreateDateTime),
+                                        predicate: null,
+                                        orderBy: null,
                                         isTracking: false,
                                         ignoreQueryFilters: false,
                                         includeProperties: null,
                                         thenInclude: null);
+
+                if (!string.IsNullOrWhiteSpace(query.SearchKey))
+                    products = products.Where(x => x.Name.Contains(query.SearchKey));
+
+                if (query.MinPrice != null)
+                    products = products.Where(x => x.UnitPrice > query.MinPrice);
+
+                if (query.MaxPrice != null)
+                    products = products.Where(x => x.UnitPrice < query.MaxPrice);
+
+                if (query.Categories != null)
+                    products = products.Where(x => query.Categories.Contains(x.CategoryId));
+
+                if (query.Sort != null)
+                {
+                    if (query.Sort == SortFilterParam.MostPopular || query.Sort == SortFilterParam.BestSelling)
+                        products = products.OrderBy(x => x.CreateDateTime);
+                    if (query.Sort == SortFilterParam.Cheapest)
+                        products = products.OrderBy(x => x.UnitPrice);
+                    if (query.Sort == SortFilterParam.MostExpensive)
+                        products = products.OrderByDescending(x => x.UnitPrice);
+                }
 
                 return products.Select(x => new SearchProductsQueryModel
                 {
@@ -343,18 +365,18 @@ namespace Application.Services.ProductAggregate
                     Slug = x.Slug,
                     PictureAlt = x.PictureAlt,
                     UnitPriceAfterDiscount = x.Discounts.FirstOrDefault() != null &&
-                                         x.Discounts.FirstOrDefault().StartDate <= DateTime.Now &&
-                                         x.Discounts.FirstOrDefault().EndDate >= DateTime.Now ?
-                                         (x.UnitPrice - (x.UnitPrice * x.Discounts.FirstOrDefault().DiscountRate) / 100) : null,
+                                     x.Discounts.FirstOrDefault().StartDate <= DateTime.Now &&
+                                     x.Discounts.FirstOrDefault().EndDate >= DateTime.Now ?
+                                     (x.UnitPrice - (x.UnitPrice * x.Discounts.FirstOrDefault().DiscountRate) / 100) : null,
                     Picture = x.Picture,
                     UnitPrice = x.UnitPrice,
                     DiscountPercentage = x.Discounts.FirstOrDefault() != null &&
-                                         x.Discounts.FirstOrDefault().StartDate <= DateTime.Now &&
-                                         x.Discounts.FirstOrDefault().EndDate >= DateTime.Now ?
-                                         x.Discounts.FirstOrDefault().DiscountRate : null,
+                                     x.Discounts.FirstOrDefault().StartDate <= DateTime.Now &&
+                                     x.Discounts.FirstOrDefault().EndDate >= DateTime.Now ?
+                                     x.Discounts.FirstOrDefault().DiscountRate : null,
                     PictureTitle = x.PictureTitle
                 })
-                .ToList();
+            .ToList();
             }
             catch (Exception e)
             {

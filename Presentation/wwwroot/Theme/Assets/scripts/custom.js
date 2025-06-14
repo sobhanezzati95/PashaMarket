@@ -1,6 +1,8 @@
 ﻿const cookieName = "cart-items";
 const isDarkMode = document.documentElement.classList.contains('dark');
-
+const baseUrl = "https://localhost:7279/";
+const defaultMinPrice = "0";
+const defaultMaxPrice = "35000";
 // تنظیمات پیش‌فرض برای حالت دارک و لایت
 const alertOptions = {
     background: isDarkMode ? '#333' : '#fff',
@@ -269,4 +271,37 @@ function alertRemoveFromMainCart(id) {
             removeFromMainCart(id);
         }
     });
+}
+
+function search(sort) {
+    const minPrice = $('.min-range').val();
+    const maxPrice = $('.max-range').val();
+    const searchKey = $('.searchKey').val();
+    const isExistsChecked = $('.exists').is(':checked');
+
+    const params = new URLSearchParams(); 
+
+    if (searchKey) 
+        params.append('searchKey', searchKey);
+    
+    if (minPrice != defaultMinPrice) 
+        params.append('minPrice', minPrice);
+
+    if (maxPrice != defaultMaxPrice) 
+        params.append('maxPrice', maxPrice);
+
+    if (isExistsChecked) 
+        params.append('exist', 'true');
+
+    $('.categories:checked').each(function () {
+        params.append('categories', this.value);
+    });
+
+    if (sort) 
+        params.append('sort', sort);
+
+    const queryString = params.toString();
+    const url = `Search?${queryString}`;
+
+    window.open(`${baseUrl}${url}`, "_self");
 }

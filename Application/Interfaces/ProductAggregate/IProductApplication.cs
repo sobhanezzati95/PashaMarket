@@ -15,7 +15,7 @@ namespace Application.Interfaces.ProductAggregate
         Task<OperationResult> NotInStock(long productId);
         Task<List<LatestProductsQueryModel>> GetLatestProductsQuery();
         Task<ProductCategoryQueryModel> GetProductCategoriesBy(string slug);
-        Task<List<SearchProductsQueryModel>> SearchProduct(string value);
+        Task<List<SearchProductsQueryModel>> SearchProduct(ProductSearchQuery query);
         Task<ProductDetailQueryModel> GetProductDetails(string slug);
         Task<List<RelatedProductsQueryModel>> GetRelatedProductsQuery(string categorySlug, long currentProductId);
         Task<List<CartItem>> CheckInventoryStatus(List<CartItem> cartItems);
