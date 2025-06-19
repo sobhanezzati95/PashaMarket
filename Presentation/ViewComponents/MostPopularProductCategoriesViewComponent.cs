@@ -1,21 +1,13 @@
 ﻿using Application.Interfaces.ProductAggregate;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Presentation.ViewComponents
+namespace Presentation.ViewComponents;
+public class MostPopularProductCategoriesViewComponent(IProductCategoryApplication productCategoryApplication)
+    : ViewComponent
 {
-    public class MostPopularProductCategoriesViewComponent : ViewComponent
+    public async Task<IViewComponentResult> InvokeAsync(CancellationToken cancellationToken = default)
     {
-        private readonly IProductCategoryApplication _productCategoryApplication;
-
-        public MostPopularProductCategoriesViewComponent(IProductCategoryApplication productCategoryApplication)
-        {
-            _productCategoryApplication = productCategoryApplication;
-        }
-
-        public async Task<IViewComponentResult> InvokeAsync()
-        {
-            var productCategories = await _productCategoryApplication.GetMostPopularProductCategoriesQuery();
-            return View(productCategories);
-        }
+        var productCategories = await productCategoryApplication.GetMostPopularProductCategoriesQuery(cancellationToken);
+        return View(productCategories);
     }
 }

@@ -6,85 +6,73 @@ using Framework.Application;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Services.ProductAggregate
+namespace Application.Services.ProductAggregate;
+public class ProductFeatureApplication(IUnitOfWork unitOfWork, ILogger<ProductFeatureApplication> logger)
+    : IProductFeatureApplication
 {
-    public class ProductFeatureApplication : IProductFeatureApplication
+    public async Task<OperationResult> Create(CreateProductFeature command, CancellationToken cancellationToken = default)
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly ILogger<ProductFeatureApplication> _logger;
-
-        public ProductFeatureApplication(IUnitOfWork unitOfWork, ILogger<ProductFeatureApplication> logger)
+        try
         {
-            _unitOfWork = unitOfWork;
-            _logger = logger;
+            var query = await unitOfWork.ProductFeatureRepository.GetAllWithIncludesAndThenInCludes(
+                    predicate: x => x.ProductId == command.ProductId,
+                    orderBy: null,
+                    isTracking: false,
+                    ignoreQueryFilters: false,
+                    includeProperties: null,
+                    thenInclude: null);
+
+            var existFeature = await query.ToListAsync(cancellationToken);
+            if (existFeature.Count != 0)
+                await unitOfWork.ProductFeatureRepository.RemoveRange(existFeature, cancellationToken);
+
+            var productFeatures = new List<ProductFeature>();
+            foreach (var item in command.Items)
+                productFeatures.Add(ProductFeature.Define(item.DisplayName, item.Value, command.ProductId));
+
+            await unitOfWork.ProductFeatureRepository.AddRange(productFeatures, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+            return OperationResult.Succeeded();
         }
-
-        public async Task<OperationResult> Create(CreateProductFeature command)
+        catch (Exception e)
         {
-            try
-            {
-                var query = await _unitOfWork.ProductFeatureRepository.GetAllWithIncludesAndThenInCludes(
-                        predicate: x => x.ProductId == command.ProductId,
-                        orderBy: null,
-                        isTracking: false,
-                        ignoreQueryFilters: false,
-                        includeProperties: null,
-                        thenInclude: null);
-
-                var existFeature = query.ToList();
-
-                if (existFeature.Any())
-                    await _unitOfWork.ProductFeatureRepository.RemoveRange(existFeature);
-
-                var productFeatures = new List<ProductFeature>();
-                foreach (var item in command.Items)
-                    productFeatures.Add(ProductFeature.Define(item.DisplayName, item.Value, command.ProductId));
-
-
-                await _unitOfWork.ProductFeatureRepository.AddRange(productFeatures);
-                await _unitOfWork.CommitAsync();
-                return OperationResult.Succeeded();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-                "#ProductFeatureApplication.Create.CatchException() >> Exception: " + e.Message +
-                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+            logger.LogError(e,
+            "#ProductFeatureApplication.Create.CatchException() >> Exception: " + e.Message +
+            (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
         }
-
-        public async Task<List<ProductFeatureViewModel>> GetDetails(long productId)
+    }
+    public async Task<List<ProductFeatureViewModel>> GetDetails(long productId, CancellationToken cancellationToken = default)
+    {
+        try
         {
-            try
-            {
-                var query = await _unitOfWork.ProductFeatureRepository.GetAllWithIncludesAndThenInCludes(
-                        predicate: x => x.ProductId == productId,
-                        orderBy: null,
-                        isTracking: false,
-                        ignoreQueryFilters: false,
-                        includeProperties: null,
-                        thenInclude: x => x.Include(p => p.Product));
+            var query = await unitOfWork.ProductFeatureRepository.GetAllWithIncludesAndThenInCludes(
+                    predicate: x => x.ProductId == productId,
+                    orderBy: null,
+                    isTracking: false,
+                    ignoreQueryFilters: false,
+                    includeProperties: null,
+                    thenInclude: x => x.Include(p => p.Product));
 
-                if (!query.Any())
-                    return new();
+            if (!await query.AnyAsync(cancellationToken))
+                return [];
 
-                return query.Select(x => new ProductFeatureViewModel
+            return await query
+                .Select(x => new ProductFeatureViewModel
                 {
                     Id = x.Id,
                     DisplayName = x.DisplayName,
                     Value = x.Value,
                     ProductId = x.ProductId,
                     ProductName = x.Product.Name
-                }).ToList();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-                "#ProductFeatureApplication.GetDetails.CatchException() >> Exception: " + e.Message +
-                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+                }).ToListAsync(cancellationToken);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e,
+            "#ProductFeatureApplication.GetDetails.CatchException() >> Exception: " + e.Message +
+            (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
         }
     }
 }

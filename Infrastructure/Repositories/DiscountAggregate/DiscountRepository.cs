@@ -2,15 +2,7 @@
 using Infrastructure.DbContexts;
 using Infrastructure.Repositories;
 
-namespace Domain.Contracts.Repositories.DiscountAggregate
-{
-    public class DiscountRepository : BaseRepository<Discount>, IDiscountRepository
-    {
-        private readonly ApplicationDbContext _context;
-
-        public DiscountRepository(ApplicationDbContext context) : base(context)
-        {
-            _context = context;
-        }
-    }
-}
+namespace Domain.Contracts.Repositories.DiscountAggregate;
+public class DiscountRepository(ApplicationDbContext context)
+            : BaseRepository<Discount>(context), IDiscountRepository
+{ }

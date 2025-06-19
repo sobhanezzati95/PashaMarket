@@ -10,87 +10,76 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Services.ProductAggregate
 {
-    public class ProductApplication : IProductApplication
+    public class ProductApplication(IUnitOfWork unitOfWork,
+                                    IFileUploader fileUploader,
+                                    ILogger<ProductApplication> logger)
+        : IProductApplication
     {
-        private readonly IFileUploader _fileUploader;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly ILogger<ProductApplication> _logger;
-
-        public ProductApplication(IUnitOfWork unitOfWork, IFileUploader fileUploader, ILogger<ProductApplication> logger)
-        {
-            _fileUploader = fileUploader;
-            _unitOfWork = unitOfWork;
-            _logger = logger;
-        }
-
-        public async Task<OperationResult> Create(CreateProduct command)
+        public async Task<OperationResult> Create(CreateProduct command, CancellationToken cancellationToken = default)
         {
             try
             {
-                if (await _unitOfWork.ProductRepository.Exists(x => x.Name == command.Name))
+                if (await unitOfWork.ProductRepository.Exists(x => x.Name == command.Name, cancellationToken))
                     return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
 
                 var slug = command.Slug.Slugify();
-                var categorySlug = await _unitOfWork.ProductCategoryRepository.GetSlugById(command.CategoryId);
+                var categorySlug = await unitOfWork.ProductCategoryRepository.GetSlugById(command.CategoryId);
                 var path = $"{categorySlug}//{slug}";
-                var picturePath = await _fileUploader.Upload(command.Picture, path);
+                var picturePath = await fileUploader.Upload(command.Picture, path, cancellationToken);
                 var product = Product.Create(command.Name, command.Code, command.Brand, command.UnitPrice, command.Count,
                     command.Description, picturePath,
                     command.PictureAlt, command.PictureTitle, command.CategoryId, slug,
                     command.Keywords, command.MetaDescription);
-                await _unitOfWork.ProductRepository.Add(product);
-                await _unitOfWork.CommitAsync();
+                await unitOfWork.ProductRepository.Add(product, cancellationToken);
+                await unitOfWork.CommitAsync(cancellationToken);
                 return OperationResult.Succeeded();
             }
             catch (Exception e)
             {
-                _logger.LogError(e,
+                logger.LogError(e,
                         "#ProductApplication.Create.CatchException() >> Exception: " + e.Message +
                         (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
                 return OperationResult.Failed(e.Message);
             }
         }
-
-        public async Task<OperationResult> Edit(EditProduct command)
+        public async Task<OperationResult> Edit(EditProduct command, CancellationToken cancellationToken = default)
         {
             try
             {
-                var product = await _unitOfWork.ProductRepository.GetProductWithCategory(command.Id);
+                var product = await unitOfWork.ProductRepository.GetProductWithCategory(command.Id, cancellationToken);
                 if (product == null)
                     return OperationResult.Failed(ApplicationMessages.RecordNotFound);
 
-                if (await _unitOfWork.ProductRepository.Exists(x => x.Name == command.Name && x.Id != command.Id))
+                if (await unitOfWork.ProductRepository.Exists(x => x.Name == command.Name && x.Id != command.Id, cancellationToken))
                     return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
 
                 var slug = command.Slug.Slugify();
                 var path = $"{product.Category.Slug}/{slug}";
-
                 var picturePath = command.Picture != null
-                    ? await _fileUploader.Upload(command.Picture, path)
+                    ? await fileUploader.Upload(command.Picture, path, cancellationToken)
                     : null;
 
                 product.Edit(command.Name, command.Code, command.Brand, command.UnitPrice, command.Count,
                     command.Description, picturePath,
                     command.PictureAlt, command.PictureTitle, command.CategoryId, slug,
                     command.Keywords, command.MetaDescription);
-                await _unitOfWork.ProductRepository.Update(product);
-                await _unitOfWork.CommitAsync();
+                await unitOfWork.ProductRepository.Update(product, cancellationToken);
+                await unitOfWork.CommitAsync(cancellationToken);
                 return OperationResult.Succeeded();
             }
             catch (Exception e)
             {
-                _logger.LogError(e,
+                logger.LogError(e,
                "#ProductApplication.Edit.CatchException() >> Exception: " + e.Message +
                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
                 return OperationResult.Failed(e.Message);
             }
         }
-
-        public async Task<EditProduct> GetDetails(long id)
+        public async Task<EditProduct> GetDetails(long id, CancellationToken cancellationToken = default)
         {
             try
             {
-                var product = await _unitOfWork.ProductRepository.GetById(id);
+                var product = await unitOfWork.ProductRepository.GetById(id, cancellationToken);
                 return new EditProduct
                 {
                     Id = product.Id,
@@ -109,18 +98,17 @@ namespace Application.Services.ProductAggregate
             }
             catch (Exception e)
             {
-                _logger.LogError(e,
+                logger.LogError(e,
                "#ProductApplication.GetDetails.CatchException() >> Exception: " + e.Message +
                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
                 throw;
             }
         }
-
-        public async Task<List<LatestProductsQueryModel>> GetLatestProductsQuery()
+        public async Task<List<LatestProductsQueryModel>> GetLatestProductsQuery(CancellationToken cancellationToken = default)
         {
             try
             {
-                var query = await _unitOfWork.ProductRepository.GetAllWithIncludesAndThenInCludes(
+                var query = await unitOfWork.ProductRepository.GetAllWithIncludesAndThenInCludes(
                                         predicate: null,
                                         orderBy: x => x.OrderByDescending(p => p.CreateDateTime),
                                         isTracking: false,
@@ -128,10 +116,10 @@ namespace Application.Services.ProductAggregate
                                         includeProperties: null,
                                         thenInclude: x => x.Include(z => z.Discounts));
 
-                if (query.Any() == false)
-                    return new();
+                if (await query.AnyAsync() == false)
+                    return [];
 
-                var result = query.Select(x => new LatestProductsQueryModel
+                var result = await query.Select(x => new LatestProductsQueryModel
                 {
                     Name = x.Name,
                     Slug = x.Slug,
@@ -147,86 +135,78 @@ namespace Application.Services.ProductAggregate
                                          x.Discounts.FirstOrDefault().EndDate >= DateTime.Now ?
                                          x.Discounts.FirstOrDefault().DiscountRate : null,
                     IsInStock = x.IsInStock
-                })
-                    .Take(6)
-                    .ToList();
-
+                }).Take(6)
+                  .ToListAsync(cancellationToken);
                 return result;
             }
             catch (Exception e)
             {
-                _logger.LogError(e,
+                logger.LogError(e,
                "#ProductApplication.GetLatestProductsQuery.CatchException() >> Exception: " + e.Message +
                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
                 throw;
             }
         }
-
-        public async Task<List<ProductViewModel>> GetProducts()
+        public async Task<List<ProductViewModel>> GetProducts(CancellationToken cancellationToken = default)
         {
             try
             {
-                var products = await _unitOfWork.ProductRepository.GetAllAsQueryable();
-
-                return products.Select(x => new ProductViewModel
+                var products = await unitOfWork.ProductRepository.GetAllAsQueryable(cancellationToken);
+                return await products.Select(x => new ProductViewModel
                 {
                     Id = x.Id,
                     Name = x.Name
-                }).ToList();
+                }).ToListAsync(cancellationToken);
             }
             catch (Exception e)
             {
-                _logger.LogError(e,
+                logger.LogError(e,
                "#ProductApplication.GetDetails.CatchException() >> Exception: " + e.Message +
                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
                 throw;
             }
         }
-
-        public async Task<OperationResult> InStock(long productId)
+        public async Task<OperationResult> InStock(long productId, CancellationToken cancellationToken = default)
         {
             try
             {
-                var product = await _unitOfWork.ProductRepository.GetById(productId);
+                var product = await unitOfWork.ProductRepository.GetById(productId, cancellationToken);
                 product.InStock();
-                await _unitOfWork.ProductRepository.Update(product);
-                await _unitOfWork.CommitAsync();
+                await unitOfWork.ProductRepository.Update(product, cancellationToken);
+                await unitOfWork.CommitAsync(cancellationToken);
                 return OperationResult.Succeeded();
             }
             catch (Exception e)
             {
-                _logger.LogError(e,
+                logger.LogError(e,
                "#ProductApplication.InStock.CatchException() >> Exception: " + e.Message +
                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
                 throw;
             }
         }
-
-        public async Task<OperationResult> NotInStock(long productId)
+        public async Task<OperationResult> NotInStock(long productId, CancellationToken cancellationToken = default)
         {
             try
             {
-                var product = await _unitOfWork.ProductRepository.GetById(productId);
+                var product = await unitOfWork.ProductRepository.GetById(productId, cancellationToken);
                 product.NotInStock();
-                await _unitOfWork.ProductRepository.Update(product);
-                await _unitOfWork.CommitAsync();
+                await unitOfWork.ProductRepository.Update(product, cancellationToken);
+                await unitOfWork.CommitAsync(cancellationToken);
                 return OperationResult.Succeeded();
-
             }
             catch (Exception e)
             {
-                _logger.LogError(e,
+                logger.LogError(e,
                "#ProductApplication.NotInStock.CatchException() >> Exception: " + e.Message +
                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
                 throw;
             }
         }
-
-        public async Task<List<ProductViewModel>> Search(ProductSearchModel searchModel)
+        public async Task<List<ProductViewModel>> Search(ProductSearchModel searchModel, CancellationToken cancellationToken = default)
         {
             try
             {
-                var query = await _unitOfWork.ProductRepository.GetAllWithIncludesAndThenInCludes(
+                var query = await unitOfWork.ProductRepository.GetAllWithIncludesAndThenInCludes(
                                 predicate: null,
                                 orderBy: x => x.OrderByDescending(p => p.Id),
                                 isTracking: false,
@@ -234,8 +214,8 @@ namespace Application.Services.ProductAggregate
                                 includeProperties: null,
                                 thenInclude: query => query.Include(x => x.Category));
 
-                if (query.Any() == false)
-                    return new();
+                if (await query.AnyAsync() == false)
+                    return [];
 
                 if (!string.IsNullOrWhiteSpace(searchModel.Name))
                     query = query.Where(x => x.Name.Contains(searchModel.Name));
@@ -246,7 +226,7 @@ namespace Application.Services.ProductAggregate
                 if (searchModel.CategoryId != 0)
                     query = query.Where(x => x.CategoryId == searchModel.CategoryId);
 
-                return query.Select(x => new ProductViewModel
+                return await query.Select(x => new ProductViewModel
                 {
                     Id = x.Id,
                     Name = x.Name,
@@ -259,24 +239,22 @@ namespace Application.Services.ProductAggregate
                     Brand = x.Brand,
                     CreationDate = x.CreateDateTime.ToFarsi(),
                     Count = x.Count
-                }).ToList();
+                }).ToListAsync(cancellationToken);
             }
             catch (Exception e)
             {
-                _logger.LogError(e,
+                logger.LogError(e,
                "#ProductApplication.Search.CatchException() >> Exception: " + e.Message +
                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
                 throw;
             }
         }
-
-        public async Task<ProductCategoryQueryModel> GetProductCategoriesBy(string slug)
+        public async Task<ProductCategoryQueryModel> GetProductCategoriesBy(string slug, CancellationToken cancellationToken = default)
         {
             try
             {
-                var category = await _unitOfWork.ProductCategoryRepository.GetBySlug(slug);
-
-                var products = await _unitOfWork.ProductRepository.GetAllWithIncludesAndThenInCludes(
+                var category = await unitOfWork.ProductCategoryRepository.GetBySlug(slug, cancellationToken);
+                var products = await unitOfWork.ProductRepository.GetAllWithIncludesAndThenInCludes(
                                         predicate: x => x.CategoryId == category.Id,
                                         orderBy: x => x.OrderByDescending(p => p.CreateDateTime),
                                         isTracking: false,
@@ -284,7 +262,7 @@ namespace Application.Services.ProductAggregate
                                         includeProperties: null,
                                         thenInclude: x => x.Include(z => z.Discounts));
 
-                if (products.Any() == false)
+                if (await products.AnyAsync() == false)
                     return new();
 
                 var result = new ProductCategoryQueryModel
@@ -294,7 +272,7 @@ namespace Application.Services.ProductAggregate
                     PictureAlt = category.PictureAlt,
                     PictureTitle = category.PictureTitle,
                     Slug = category.Slug,
-                    ProductQueryModels = products.Select(x => new ProductQueryModel
+                    ProductQueryModels = await products.Select(x => new ProductQueryModel
                     {
                         Name = x.Name,
                         Slug = x.Slug,
@@ -310,26 +288,23 @@ namespace Application.Services.ProductAggregate
                                          x.Discounts.FirstOrDefault().StartDate <= DateTime.Now &&
                                          x.Discounts.FirstOrDefault().EndDate >= DateTime.Now ?
                                          x.Discounts.FirstOrDefault().DiscountRate : null
-                    }).ToList()
+                    }).ToListAsync(cancellationToken)
                 };
-
                 return result;
-
             }
             catch (Exception e)
             {
-                _logger.LogError(e,
+                logger.LogError(e,
                "#ProductCategoryApplication.GetProductCategoriesBy.CatchException() >> Exception: " + e.Message +
                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
                 throw;
             }
         }
-
-        public async Task<List<SearchProductsQueryModel>> SearchProduct(ProductSearchQuery query)
+        public async Task<List<SearchProductsQueryModel>> SearchProduct(ProductSearchQuery query, CancellationToken cancellationToken = default)
         {
             try
             {
-                var products = await _unitOfWork.ProductRepository.GetAllWithIncludesAndThenInCludes(
+                var products = await unitOfWork.ProductRepository.GetAllWithIncludesAndThenInCludes(
                                         predicate: null,
                                         orderBy: null,
                                         isTracking: false,
@@ -359,7 +334,7 @@ namespace Application.Services.ProductAggregate
                         products = products.OrderByDescending(x => x.UnitPrice);
                 }
 
-                return products.Select(x => new SearchProductsQueryModel
+                return await products.Select(x => new SearchProductsQueryModel
                 {
                     Name = x.Name,
                     Slug = x.Slug,
@@ -375,23 +350,21 @@ namespace Application.Services.ProductAggregate
                                      x.Discounts.FirstOrDefault().EndDate >= DateTime.Now ?
                                      x.Discounts.FirstOrDefault().DiscountRate : null,
                     PictureTitle = x.PictureTitle
-                })
-            .ToList();
+                }).ToListAsync(cancellationToken);
             }
             catch (Exception e)
             {
-                _logger.LogError(e,
+                logger.LogError(e,
                "#ProductCategoryApplication.SearchProduct.CatchException() >> Exception: " + e.Message +
                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
                 throw;
             }
         }
-
-        public async Task<ProductDetailQueryModel> GetProductDetails(string slug)
+        public async Task<ProductDetailQueryModel> GetProductDetails(string slug, CancellationToken cancellationToken = default)
         {
             try
             {
-                var query = await _unitOfWork.ProductRepository.GetAllWithIncludesAndThenInCludes(
+                var query = await unitOfWork.ProductRepository.GetAllWithIncludesAndThenInCludes(
                                         predicate: x => x.Slug == slug,
                                         orderBy: null,
                                         isTracking: false,
@@ -400,14 +373,12 @@ namespace Application.Services.ProductAggregate
                                         thenInclude: x => x.Include(p => p.Category)
                                                            .Include(p => p.ProductPictures)
                                                            .Include(p => p.Discounts)
-                                                           .Include(p => p.ProductFeatures)
-                                        );
+                                                           .Include(p => p.ProductFeatures));
 
-                if (query.Any() == false)
+                if (await query.AnyAsync(cancellationToken) == false)
                     return new();
 
                 var product = query.FirstOrDefault();
-
                 bool hasDiscount = product.Discounts.FirstOrDefault() != null &&
                                    product.Discounts.FirstOrDefault().StartDate <= DateTime.Now &&
                                    product.Discounts.FirstOrDefault().EndDate >= DateTime.Now;
@@ -448,24 +419,21 @@ namespace Application.Services.ProductAggregate
                     DiscountAmount = hasDiscount ?
                                      (product.UnitPrice * product.Discounts.FirstOrDefault().DiscountRate) / 100 : 0,
                 };
-
             }
             catch (Exception e)
             {
-                _logger.LogError(e,
+                logger.LogError(e,
                "#ProductCategoryApplication.GetProductDetails.CatchException() >> Exception: " + e.Message +
                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
                 throw;
             }
         }
-
-        public async Task<List<RelatedProductsQueryModel>> GetRelatedProductsQuery(string categorySlug, long currentProductId)
+        public async Task<List<RelatedProductsQueryModel>> GetRelatedProductsQuery(string categorySlug, long currentProductId, CancellationToken cancellationToken = default)
         {
             try
             {
-                var category = await _unitOfWork.ProductCategoryRepository.GetBySlug(categorySlug);
-
-                var products = await _unitOfWork.ProductRepository.GetAllWithIncludesAndThenInCludes(
+                var category = await unitOfWork.ProductCategoryRepository.GetBySlug(categorySlug, cancellationToken);
+                var products = await unitOfWork.ProductRepository.GetAllWithIncludesAndThenInCludes(
                                         predicate: x => x.CategoryId == category.Id && x.Id != currentProductId,
                                         orderBy: x => x.OrderByDescending(p => p.CreateDateTime),
                                         isTracking: false,
@@ -473,8 +441,8 @@ namespace Application.Services.ProductAggregate
                                         includeProperties: null,
                                         thenInclude: x => x.Include(z => z.Discounts));
 
-                if (products.Any() == false)
-                    return new();
+                if (await products.AnyAsync(cancellationToken) == false)
+                    return [];
 
                 var result = await products.Select(x => new RelatedProductsQueryModel
                 {
@@ -492,34 +460,27 @@ namespace Application.Services.ProductAggregate
                                          x.Discounts.FirstOrDefault().EndDate >= DateTime.Now ?
                                          x.Discounts.FirstOrDefault().DiscountRate : null,
                     PictureTitle = x.PictureTitle
-                }).ToListAsync();
-
+                }).ToListAsync(cancellationToken);
                 return result;
-
             }
             catch (Exception e)
             {
-                _logger.LogError(e,
+                logger.LogError(e,
                "#ProductCategoryApplication.GetRelatedProductsQuery.CatchException() >> Exception: " + e.Message +
                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
                 throw;
             }
         }
-
-        public async Task<List<CartItem>> CheckInventoryStatus(List<CartItem> cartItems)
+        public async Task<List<CartItem>> CheckInventoryStatus(List<CartItem> cartItems, CancellationToken cancellationToken = default)
         {
-            if (!cartItems.Any())
-                return new();
+            if (cartItems.Count == 0)
+                return [];
 
-            var products = (await _unitOfWork.ProductRepository.GetAllAsQueryable()).ToList();
-
+            var products = (await unitOfWork.ProductRepository.GetAllAsQueryable()).ToList();
             foreach (var item in cartItems)
             {
                 if (products.Any(x => x.Id == item.Id && x.IsInStock && x.Count >= item.Count))
-                {
                     item.IsInStock = true;
-                }
-
             }
             return cartItems;
         }

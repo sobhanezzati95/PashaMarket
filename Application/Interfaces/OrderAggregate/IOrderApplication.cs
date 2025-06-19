@@ -1,14 +1,12 @@
 ﻿using Application.Dtos.OrderAggregate;
 
-namespace Application.Interfaces.OrderAggregate
+namespace Application.Interfaces.OrderAggregate;
+public interface IOrderApplication
 {
-    public interface IOrderApplication
-    {
-        Task<long> PlaceOrder(Cart cart);
-        Task<double> GetAmountBy(long id);
-        Task Cancel(long id);
-        Task<string> PaymentSucceeded(long orderId, long refId);
-        Task<List<OrderItemViewModel>> GetItems(long orderId);
-        Task<List<OrderViewModel>> Search(OrderSearchModel searchModel);
-    }
+    Task<long> PlaceOrder(Cart cart, CancellationToken cancellationToken = default);
+    Task<double> GetAmountBy(long id, CancellationToken cancellationToken = default);
+    Task Cancel(long id, CancellationToken cancellationToken = default);
+    Task<string> PaymentSucceeded(long orderId, long refId, CancellationToken cancellationToken = default);
+    Task<List<OrderItemViewModel>> GetItems(long orderId, CancellationToken cancellationToken = default);
+    Task<List<OrderViewModel>> Search(OrderSearchModel searchModel, CancellationToken cancellationToken = default);
 }

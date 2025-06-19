@@ -6,228 +6,207 @@ using Framework.Application;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Interfaces.UserAggregate
+namespace Application.Interfaces.UserAggregate;
+public class UserApplication(IUnitOfWork unitOfWork,
+                             ILogger<SlideApplication> logger,
+                             IFileUploader fileUploader,
+                             IAuthenticationHelper authenticationHelper,
+                             IPasswordHasher passwordHasher)
+    : IUserApplication
 {
-    public class UserApplication : IUserApplication
+    public async Task<OperationResult> ChangePassword(ChangePassword command, CancellationToken cancellationToken = default)
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly ILogger<SlideApplication> _logger;
-        private readonly IPasswordHasher _passwordHasher;
-        private readonly IFileUploader _fileUploader;
-        private readonly IAuthenticationHelper _authenticationHelper;
-        public UserApplication(IUnitOfWork unitOfWork, ILogger<SlideApplication> logger, IFileUploader fileUploader, IAuthenticationHelper authenticationHelper, IPasswordHasher passwordHasher)
+        try
         {
-            _unitOfWork = unitOfWork;
-            _logger = logger;
-            _fileUploader = fileUploader;
-            _authenticationHelper = authenticationHelper;
-            _passwordHasher = passwordHasher;
+            var user = await unitOfWork.UserRepository.GetById(command.Id, cancellationToken);
+            if (user == null)
+                return OperationResult.Failed(ApplicationMessages.RecordNotFound);
+
+            if (command.Password != command.RePassword)
+                return OperationResult.Failed(ApplicationMessages.PasswordsNotMatch);
+
+            var password = passwordHasher.Hash(command.Password);
+            user.ChangePassword(password);
+            await unitOfWork.UserRepository.Update(user, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+            return OperationResult.Succeeded();
         }
-
-        public async Task<OperationResult> ChangePassword(ChangePassword command)
+        catch (Exception e)
         {
-            try
-            {
-                var user = await _unitOfWork.UserRepository.GetById(command.Id);
-                if (user == null)
-                    return OperationResult.Failed(ApplicationMessages.RecordNotFound);
-
-                if (command.Password != command.RePassword)
-                    return OperationResult.Failed(ApplicationMessages.PasswordsNotMatch);
-
-                var password = _passwordHasher.Hash(command.Password);
-                user.ChangePassword(password);
-                await _unitOfWork.UserRepository.Update(user);
-                await _unitOfWork.CommitAsync();
-                return OperationResult.Succeeded();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-                "#UserApplication.GetDetails.CatchException() >> Exception: " + e.Message +
-                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+            logger.LogError(e,
+            "#UserApplication.GetDetails.CatchException() >> Exception: " + e.Message +
+            (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
         }
-
-        public async Task<OperationResult> Edit(EditUser command)
+    }
+    public async Task<OperationResult> Edit(EditUser command, CancellationToken cancellationToken = default)
+    {
+        try
         {
-            try
-            {
-                var user = await _unitOfWork.UserRepository.GetById(command.Id);
-                if (user == null)
-                    return OperationResult.Failed(ApplicationMessages.RecordNotFound);
+            var user = await unitOfWork.UserRepository.GetById(command.Id, cancellationToken);
+            if (user == null)
+                return OperationResult.Failed(ApplicationMessages.RecordNotFound);
 
-                if (await _unitOfWork.UserRepository.Exists(x =>
-                    (x.Username == command.Username || x.Email == command.Email) && x.Id != command.Id))
-                    return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
+            if (await unitOfWork.UserRepository.Exists(x =>
+                (x.Username == command.Username || x.Email == command.Email) && x.Id != command.Id, cancellationToken))
+                return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
 
-                user.Edit(command.Fullname, command.Username, command.Mobile, command.Email, command.BirthDate);
-                await _unitOfWork.UserRepository.Update(user);
-                await _unitOfWork.CommitAsync();
-                return OperationResult.Succeeded();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-                "#UserApplication.Edit.CatchException() >> Exception: " + e.Message +
-                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+            user.Edit(command.Fullname, command.Username, command.Mobile, command.Email, command.BirthDate);
+            await unitOfWork.UserRepository.Update(user, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+            return OperationResult.Succeeded();
         }
-
-        public async Task<UserViewModel> GetUserBy(long id)
+        catch (Exception e)
         {
-            try
-            {
-                var user = await _unitOfWork.UserRepository.GetById(id);
-                return new UserViewModel()
-                {
-                    Fullname = user.Fullname,
-                    Mobile = user.Email
-                };
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-                "#UserApplication.GetUserBy.CatchException() >> Exception: " + e.Message +
-                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+            logger.LogError(e,
+            "#UserApplication.Edit.CatchException() >> Exception: " + e.Message +
+            (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
         }
-
-        public async Task<List<UserViewModel>> GetUsers()
+    }
+    public async Task<UserViewModel> GetUserBy(long id, CancellationToken cancellationToken = default)
+    {
+        try
         {
-            try
+            var user = await unitOfWork.UserRepository.GetById(id, cancellationToken);
+            return new UserViewModel()
             {
-                var users = await _unitOfWork.UserRepository.GetAllAsQueryable();
-                return users.Select(x => new UserViewModel()
+                Fullname = user.Fullname,
+                Mobile = user.Email
+            };
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e,
+            "#UserApplication.GetUserBy.CatchException() >> Exception: " + e.Message +
+            (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
+        }
+    }
+    public async Task<List<UserViewModel>> GetUsers(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var users = await unitOfWork.UserRepository.GetAllAsQueryable(cancellationToken);
+            return await users
+                .Select(x => new UserViewModel()
                 {
                     Id = x.Id,
                     Fullname = x.Fullname
-                }).ToList();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-                "#UserApplication.GetUsers.CatchException() >> Exception: " + e.Message +
-                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+                }).ToListAsync(cancellationToken);
         }
-
-        public async Task<EditUser> GetDetails(long id)
+        catch (Exception e)
         {
-            try
-            {
-                var user = await _unitOfWork.UserRepository.GetById(id);
-                return new EditUser()
-                {
-                    Id = user.Id,
-                    Fullname = user.Fullname,
-                    Mobile = user.Email,
-                    Username = user.Username,
-                    BirthDate = user.BirthDate,
-                    Email = user.Email,
-                    Password = user.Password
-                };
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-                "#UserApplication.GetDetails.CatchException() >> Exception: " + e.Message +
-                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+            logger.LogError(e,
+            "#UserApplication.GetUsers.CatchException() >> Exception: " + e.Message +
+            (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
         }
-
-        public async Task<OperationResult> Login(Login command)
+    }
+    public async Task<EditUser> GetDetails(long id, CancellationToken cancellationToken = default)
+    {
+        try
         {
-            try
+            var user = await unitOfWork.UserRepository.GetById(id, cancellationToken);
+            return new EditUser()
             {
-                var user = await _unitOfWork.UserRepository.GetByUsername(command.Username);
-                if (user == null)
-                    return OperationResult.Failed(ApplicationMessages.WrongUserPass);
-
-                var hashed = _passwordHasher.Hash(command.Password);
-                var result = _passwordHasher.Check(user.Password, command.Password);
-                if (!result.Verified)
-                    return OperationResult.Failed(ApplicationMessages.WrongUserPass);
-
-                var authViewModel = new AuthenticationViewModel(user.Id, user.RoleId, user.Fullname, user.Username, user.Email);
-
-                await _authenticationHelper.Signin(authViewModel);
-                return OperationResult.Succeeded();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-                "#UserApplication.Login.CatchException() >> Exception: " + e.Message +
-                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+                Id = user.Id,
+                Fullname = user.Fullname,
+                Mobile = user.Email,
+                Username = user.Username,
+                BirthDate = user.BirthDate,
+                Email = user.Email,
+                Password = user.Password
+            };
         }
-
-        public async Task Logout()
+        catch (Exception e)
         {
-            await _authenticationHelper.SignOut();
+            logger.LogError(e,
+            "#UserApplication.GetDetails.CatchException() >> Exception: " + e.Message +
+            (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
         }
-
-        public async Task<OperationResult> Register(RegisterUser command)
+    }
+    public async Task<OperationResult> Login(Login command, CancellationToken cancellationToken = default)
+    {
+        try
         {
-            try
-            {
+            var user = await unitOfWork.UserRepository.GetByUsername(command.Username, cancellationToken);
+            if (user == null)
+                return OperationResult.Failed(ApplicationMessages.WrongUserPass);
 
-                if (await _unitOfWork.UserRepository.Exists(x => x.Username == command.Username || x.Email == command.Email))
-                    return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
+            var hashed = passwordHasher.Hash(command.Password);
+            var result = passwordHasher.Check(user.Password, command.Password);
+            if (!result.Verified)
+                return OperationResult.Failed(ApplicationMessages.WrongUserPass);
 
-                var password = _passwordHasher.Hash(command.Password);
-                var user = User.Register(command.Username, command.Email, password);
-
-                await _unitOfWork.UserRepository.Add(user);
-                await _unitOfWork.CommitAsync();
-
-                var authViewModel = new AuthenticationViewModel(user.Id, user.RoleId, user.Fullname, user.Username, user.Email);
-                await _authenticationHelper.Signin(authViewModel);
-                return OperationResult.Succeeded();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-                "#UserApplication.Register.CatchException() >> Exception: " + e.Message +
-                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+            var authViewModel = new AuthenticationViewModel(user.Id, user.RoleId, user.Fullname, user.Username, user.Email);
+            await authenticationHelper.Signin(authViewModel);
+            return OperationResult.Succeeded();
         }
-
-        public async Task<List<UserViewModel>> Search(UserSearchModel searchModel)
+        catch (Exception e)
         {
-            try
-            {
-                var query = await _unitOfWork.UserRepository.GetAllWithIncludesAndThenInCludes(
-                predicate: null,
-                orderBy: x => x.OrderByDescending(p => p.Id),
-                isTracking: false,
-                ignoreQueryFilters: false,
-                includeProperties: null,
-                thenInclude: query => query.Include(x => x.Role));
+            logger.LogError(e,
+            "#UserApplication.Login.CatchException() >> Exception: " + e.Message +
+            (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
+        }
+    }
+    public async Task Logout()
+       => await authenticationHelper.SignOut();
+    public async Task<OperationResult> Register(RegisterUser command, CancellationToken cancellationToken = default)
+    {
+        try
+        {
 
-                if (query.Any() == false)
-                    return new();
+            if (await unitOfWork.UserRepository.Exists(x => x.Username == command.Username || x.Email == command.Email, cancellationToken))
+                return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
 
-                if (!string.IsNullOrWhiteSpace(searchModel.Fullname))
-                    query = query.Where(x => x.Fullname.Contains(searchModel.Fullname));
+            var password = passwordHasher.Hash(command.Password);
+            var user = User.Register(command.Username, command.Email, password);
+            await unitOfWork.UserRepository.Add(user, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+            var authViewModel = new AuthenticationViewModel(user.Id, user.RoleId, user.Fullname, user.Username, user.Email);
+            await authenticationHelper.Signin(authViewModel);
+            return OperationResult.Succeeded();
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e,
+            "#UserApplication.Register.CatchException() >> Exception: " + e.Message +
+            (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
+        }
+    }
+    public async Task<List<UserViewModel>> Search(UserSearchModel searchModel, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var query = await unitOfWork.UserRepository.GetAllWithIncludesAndThenInCludes(
+            predicate: null,
+            orderBy: x => x.OrderByDescending(p => p.Id),
+            isTracking: false,
+            ignoreQueryFilters: false,
+            includeProperties: null,
+            thenInclude: query => query.Include(x => x.Role));
 
-                if (!string.IsNullOrWhiteSpace(searchModel.Username))
-                    query = query.Where(x => x.Username.Contains(searchModel.Username));
+            if (await query.AnyAsync(cancellationToken) == false)
+                return [];
 
-                if (!string.IsNullOrWhiteSpace(searchModel.Mobile))
-                    query = query.Where(x => x.Email.Contains(searchModel.Mobile));
+            if (!string.IsNullOrWhiteSpace(searchModel.Fullname))
+                query = query.Where(x => x.Fullname.Contains(searchModel.Fullname));
 
-                if (searchModel.RoleId > 0)
-                    query = query.Where(x => x.RoleId == searchModel.RoleId);
+            if (!string.IsNullOrWhiteSpace(searchModel.Username))
+                query = query.Where(x => x.Username.Contains(searchModel.Username));
 
-                return query.Select(x => new UserViewModel
+            if (!string.IsNullOrWhiteSpace(searchModel.Mobile))
+                query = query.Where(x => x.Email.Contains(searchModel.Mobile));
+
+            if (searchModel.RoleId > 0)
+                query = query.Where(x => x.RoleId == searchModel.RoleId);
+
+            return await query
+                .Select(x => new UserViewModel
                 {
                     Id = x.Id,
                     Fullname = x.Fullname,
@@ -236,15 +215,14 @@ namespace Application.Interfaces.UserAggregate
                     RoleId = x.RoleId,
                     Username = x.Username,
                     CreationDate = x.CreateDateTime.ToFarsi()
-                }).ToList();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-                "#UserApplication.Search.CatchException() >> Exception: " + e.Message +
-                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+                }).ToListAsync(cancellationToken);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e,
+            "#UserApplication.Search.CatchException() >> Exception: " + e.Message +
+            (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
         }
     }
 }

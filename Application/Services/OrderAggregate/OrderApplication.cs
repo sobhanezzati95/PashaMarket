@@ -7,196 +7,175 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Services.OrderAggregate
+namespace Application.Services.OrderAggregate;
+public class OrderApplication(IAuthenticationHelper authenticationHelper,
+                              IConfiguration configuration,
+                              IUnitOfWork unitOfWork,
+                              ILogger<OrderApplication> logger)
+    : IOrderApplication
 {
-    public class OrderApplication : IOrderApplication
+    public async Task<long> PlaceOrder(Cart cart, CancellationToken cancellationToken = default)
     {
-        private readonly IAuthenticationHelper _authenticationHelper;
-        private readonly IConfiguration _configuration;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly ILogger<OrderApplication> _logger;
-        public OrderApplication(IAuthenticationHelper authenticationHelper, IConfiguration configuration, IUnitOfWork unitOfWork, ILogger<OrderApplication> logger)
+        try
         {
-            _authenticationHelper = authenticationHelper;
-            _configuration = configuration;
-            _unitOfWork = unitOfWork;
-            _logger = logger;
+            var currentUserId = authenticationHelper.CurrentUserId();
+            var order = Order.PlaceOrder(currentUserId, cart.PaymentMethod, cart.TotalAmount, cart.DiscountAmount,
+                                         cart.PayAmount);
+
+            foreach (var cartItem in cart.Items)
+            {
+                var orderItem = OrderItem.AddItems(cartItem.Id, cartItem.Count, cartItem.UnitPrice, cartItem.DiscountRate);
+                order.AddItem(orderItem);
+            }
+
+            await unitOfWork.OrderRepository.Add(order, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+            return order.Id;
         }
-
-        public async Task<long> PlaceOrder(Cart cart)
+        catch (Exception e)
         {
-            try
-            {
-                var currentUserId = _authenticationHelper.CurrentUserId();
-                var order = Order.PlaceOrder(currentUserId, cart.PaymentMethod, cart.TotalAmount, cart.DiscountAmount,
-                    cart.PayAmount);
-
-                foreach (var cartItem in cart.Items)
-                {
-                    var orderItem = OrderItem.AddItems(cartItem.Id, cartItem.Count, cartItem.UnitPrice, cartItem.DiscountRate);
-                    order.AddItem(orderItem);
-                }
-
-                await _unitOfWork.OrderRepository.Add(order);
-                await _unitOfWork.CommitAsync();
-                return order.Id;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-               "#OrderApplication.PlaceOrder.CatchException() >> Exception: " + e.Message +
-               (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+            logger.LogError(e,
+           "#OrderApplication.PlaceOrder.CatchException() >> Exception: " + e.Message +
+           (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
         }
-
-        public async Task<double> GetAmountBy(long id)
+    }
+    public async Task<double> GetAmountBy(long id, CancellationToken cancellationToken = default)
+    {
+        try
         {
-            try
-            {
-                var order = await _unitOfWork.OrderRepository.GetById(id);
-                if (order != null)
-                    return order.PayAmount;
-                return 0;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-               "#OrderApplication.GetAmountsBy.CatchException() >> Exception: " + e.Message +
-               (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+            var order = await unitOfWork.OrderRepository.GetById(id, cancellationToken);
+            return order != null ? order.PayAmount : 0;
         }
-
-        public async Task Cancel(long id)
+        catch (Exception e)
         {
-            try
-            {
-                var order = await _unitOfWork.OrderRepository.GetById(id);
-                order.Cancel();
-
-                await _unitOfWork.OrderRepository.Update(order);
-                await _unitOfWork.CommitAsync();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-               "#OrderApplication.Cancel.CatchException() >> Exception: " + e.Message +
-               (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+            logger.LogError(e,
+           "#OrderApplication.GetAmountsBy.CatchException() >> Exception: " + e.Message +
+           (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
         }
-
-        public async Task<string> PaymentSucceeded(long orderId, long refId)
+    }
+    public async Task Cancel(long id, CancellationToken cancellationToken = default)
+    {
+        try
         {
-            try
-            {
-                var order = await _unitOfWork.OrderRepository.GetById(orderId);
-                order.PaymentSucceeded(refId);
-                var symbol = _configuration.GetSection("Symbol").Value;
-                var issueTrackingNo = CodeGenerator.Generate(symbol);
-                order.SetIssueTrackingNo(issueTrackingNo);
+            var order = await unitOfWork.OrderRepository.GetById(id, cancellationToken);
+            order.Cancel();
 
-                //if (!_shopInventoryAcl.ReduceFromInventory(order.Items)) return "";
-
-                await _unitOfWork.OrderRepository.Update(order);
-                await _unitOfWork.CommitAsync();
-
-                return issueTrackingNo;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-               "#OrderApplication.PaymentSucceeded.CatchException() >> Exception: " + e.Message +
-               (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+            await unitOfWork.OrderRepository.Update(order, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
         }
-
-        public async Task<List<OrderItemViewModel>> GetItems(long orderId)
+        catch (Exception e)
         {
-            try
-            {
-                var order = await _unitOfWork.OrderRepository.GetAllWithIncludesAndThenInCludes(
-                        predicate: x => x.Id == orderId,
-                        orderBy: null,
-                        isTracking: false,
-                        ignoreQueryFilters: false,
-                        includeProperties: null,
-                        thenInclude: query => query.Include(x => x.Items).ThenInclude(p => p.Product));
-
-                if (order.Any() == false)
-                    return new();
-
-                var items = order.FirstOrDefault()!
-                    .Items
-                    .Select(x => new OrderItemViewModel
-                    {
-                        Id = x.Id,
-                        Count = x.Count,
-                        DiscountRate = x.DiscountRate,
-                        OrderId = x.OrderId,
-                        ProductId = x.ProductId,
-                        UnitPrice = x.UnitPrice,
-                        Product = x.Product.Name,
-                    }).ToList();
-
-                return items;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-               "#OrderApplication.GetItems.CatchException() >> Exception: " + e.Message +
-               (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+            logger.LogError(e,
+           "#OrderApplication.Cancel.CatchException() >> Exception: " + e.Message +
+           (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
         }
-
-        public async Task<List<OrderViewModel>> Search(OrderSearchModel searchModel)
+    }
+    public async Task<string> PaymentSucceeded(long orderId, long refId, CancellationToken cancellationToken = default)
+    {
+        try
         {
-            try
-            {
-                var query = await _unitOfWork.OrderRepository.GetAllWithIncludesAndThenInCludes(
-                                        predicate: null,
-                                        orderBy: x => x.OrderByDescending(x => x.Id),
-                                        isTracking: false,
-                                        ignoreQueryFilters: false,
-                                        includeProperties: null,
-                                        thenInclude: query => query.Include(x => x.User));
+            var order = await unitOfWork.OrderRepository.GetById(orderId, cancellationToken);
+            order.PaymentSucceeded(refId);
+            var symbol = configuration.GetSection("Symbol").Value;
+            var issueTrackingNo = CodeGenerator.Generate(symbol);
+            order.SetIssueTrackingNo(issueTrackingNo);
+            //if (!_shopInventoryAcl.ReduceFromInventory(order.Items)) return "";
+            await unitOfWork.OrderRepository.Update(order, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+            return issueTrackingNo;
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e,
+           "#OrderApplication.PaymentSucceeded.CatchException() >> Exception: " + e.Message +
+           (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
+        }
+    }
+    public async Task<List<OrderItemViewModel>> GetItems(long orderId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var order = await unitOfWork.OrderRepository.GetAllWithIncludesAndThenInCludes(
+                    predicate: x => x.Id == orderId,
+                    orderBy: null,
+                    isTracking: false,
+                    ignoreQueryFilters: false,
+                    includeProperties: null,
+                    thenInclude: query => query.Include(x => x.Items).ThenInclude(p => p.Product));
 
-                if (query.Any() == false)
-                    return new();
+            if (await order.AnyAsync(cancellationToken) == false)
+                return [];
 
-                query = query.Where(x => x.IsCanceled == searchModel.IsCanceled);
-
-                if (searchModel.UserId > 0) query = query.Where(x => x.UserId == searchModel.UserId);
-
-                var orders = query.Select(x => new OrderViewModel
+            var items = order.FirstOrDefault()!
+                .Items
+                .Select(x => new OrderItemViewModel
                 {
                     Id = x.Id,
-                    UserId = x.UserId,
-                    DiscountAmount = x.DiscountAmount,
-                    IsCanceled = x.IsCanceled,
-                    IsPaid = x.IsPaid,
-                    IssueTrackingNo = x.IssueTrackingNo,
-                    PayAmount = x.PayAmount,
-                    PaymentMethodId = x.PaymentMethod,
-                    RefId = x.RefId,
-                    TotalAmount = x.TotalAmount,
-                    CreationDate = x.CreateDateTime.ToFarsi(),
-                    UserFullName = x.User.Fullname,
-                    PaymentMethod = PaymentMethod.GetBy(x.PaymentMethod).Name
+                    Count = x.Count,
+                    DiscountRate = x.DiscountRate,
+                    OrderId = x.OrderId,
+                    ProductId = x.ProductId,
+                    UnitPrice = x.UnitPrice,
+                    Product = x.Product.Name,
                 }).ToList();
+            return items;
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e,
+           "#OrderApplication.GetItems.CatchException() >> Exception: " + e.Message +
+           (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
+        }
+    }
+    public async Task<List<OrderViewModel>> Search(OrderSearchModel searchModel, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var query = await unitOfWork.OrderRepository.GetAllWithIncludesAndThenInCludes(
+                                    predicate: null,
+                                    orderBy: x => x.OrderByDescending(x => x.Id),
+                                    isTracking: false,
+                                    ignoreQueryFilters: false,
+                                    includeProperties: null,
+                                    thenInclude: query => query.Include(x => x.User));
 
-                return orders;
-            }
-            catch (Exception e)
+            if (await query.AnyAsync(cancellationToken) == false)
+                return [];
+
+            query = query.Where(x => x.IsCanceled == searchModel.IsCanceled);
+
+            if (searchModel.UserId > 0)
+                query = query.Where(x => x.UserId == searchModel.UserId);
+
+            var orders = await query.Select(x => new OrderViewModel
             {
-                _logger.LogError(e,
-               "#OrderApplication.Search.CatchException() >> Exception: " + e.Message +
-               (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+                Id = x.Id,
+                UserId = x.UserId,
+                DiscountAmount = x.DiscountAmount,
+                IsCanceled = x.IsCanceled,
+                IsPaid = x.IsPaid,
+                IssueTrackingNo = x.IssueTrackingNo,
+                PayAmount = x.PayAmount,
+                PaymentMethodId = x.PaymentMethod,
+                RefId = x.RefId,
+                TotalAmount = x.TotalAmount,
+                CreationDate = x.CreateDateTime.ToFarsi(),
+                UserFullName = x.User.Fullname,
+                PaymentMethod = PaymentMethod.GetBy(x.PaymentMethod).Name
+            }).ToListAsync();
+            return orders;
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e,
+           "#OrderApplication.Search.CatchException() >> Exception: " + e.Message +
+           (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
         }
     }
 }

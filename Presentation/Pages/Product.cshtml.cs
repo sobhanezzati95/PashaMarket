@@ -17,11 +17,11 @@ namespace Presentation.Pages
         }
 
 
-        public async Task OnGet(string id)
+        public async Task OnGet(string id, CancellationToken cancellationToken = default)
         {
-            Product = await _productApplication.GetProductDetails(id);
+            Product = await _productApplication.GetProductDetails(id, cancellationToken);
             if (Product != null)
-                RelatedProducts = await _productApplication.GetRelatedProductsQuery(Product.CategorySlug, Product.Id);
+                RelatedProducts = await _productApplication.GetRelatedProductsQuery(Product.CategorySlug, Product.Id, cancellationToken);
         }
     }
 }

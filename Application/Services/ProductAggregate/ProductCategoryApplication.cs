@@ -6,187 +6,167 @@ using Framework.Application;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Services.ProductAggregate
+namespace Application.Services.ProductAggregate;
+public class ProductCategoryApplication(IUnitOfWork unitOfWork,
+                                        IFileUploader fileUploader,
+                                        ILogger<ProductCategoryApplication> logger)
+    : IProductCategoryApplication
 {
-    public class ProductCategoryApplication : IProductCategoryApplication
+    public async Task<OperationResult> Create(CreateProductCategory command, CancellationToken cancellationToken = default)
     {
-        private readonly IFileUploader _fileUploader;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly ILogger<ProductCategoryApplication> _logger;
-
-        public ProductCategoryApplication(IUnitOfWork unitOfWork, IFileUploader fileUploader, ILogger<ProductCategoryApplication> logger)
+        try
         {
-            _fileUploader = fileUploader;
-            _unitOfWork = unitOfWork;
-            _logger = logger;
+            if (await unitOfWork.ProductCategoryRepository.Exists(x => x.Name == command.Name, cancellationToken))
+                return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
+
+            var slug = command.Slug.Slugify();
+            var picturePath = $"{command.Slug}";
+            var pictureName = await fileUploader.Upload(command.Picture, picturePath, cancellationToken);
+            var productCategory = ProductCategory.Create(command.Name, command.Description, pictureName, command.PictureAlt, command.PictureTitle, command.Keywords, command.MetaDescription, slug);
+            await unitOfWork.ProductCategoryRepository.Add(productCategory, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+            return OperationResult.Succeeded();
         }
-
-        public async Task<OperationResult> Create(CreateProductCategory command)
+        catch (Exception e)
         {
-            try
-            {
-                if (await _unitOfWork.ProductCategoryRepository.Exists(x => x.Name == command.Name))
-                    return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
-
-                var slug = command.Slug.Slugify();
-                var picturePath = $"{command.Slug}";
-                var pictureName = await _fileUploader.Upload(command.Picture, picturePath);
-
-                var productCategory = ProductCategory.Create(command.Name, command.Description, pictureName, command.PictureAlt, command.PictureTitle, command.Keywords, command.MetaDescription, slug);
-
-                await _unitOfWork.ProductCategoryRepository.Add(productCategory);
-                await _unitOfWork.CommitAsync();
-                return OperationResult.Succeeded();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-                        "#ProductCategoryApplication.Create.CatchException() >> Exception: " + e.Message +
-                        (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                return OperationResult.Failed(e.Message);
-            }
+            logger.LogError(e,
+                    "#ProductCategoryApplication.Create.CatchException() >> Exception: " + e.Message +
+                    (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            return OperationResult.Failed(e.Message);
         }
-
-        public async Task<OperationResult> Edit(EditProductCategory command)
+    }
+    public async Task<OperationResult> Edit(EditProductCategory command, CancellationToken cancellationToken = default)
+    {
+        try
         {
-            try
-            {
-                var productCategory = await _unitOfWork.ProductCategoryRepository.GetById(command.Id);
-                if (productCategory == null)
-                    return OperationResult.Failed(ApplicationMessages.RecordNotFound);
+            var productCategory = await unitOfWork.ProductCategoryRepository.GetById(command.Id, cancellationToken);
+            if (productCategory == null)
+                return OperationResult.Failed(ApplicationMessages.RecordNotFound);
 
-                if (await _unitOfWork.ProductCategoryRepository.Exists(x => x.Name == command.Name && x.Id != command.Id))
-                    return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
+            if (await unitOfWork.ProductCategoryRepository.Exists(x => x.Name == command.Name && x.Id != command.Id, cancellationToken))
+                return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
 
-                var slug = command.Slug.Slugify();
+            var slug = command.Slug.Slugify();
+            var picturePath = $"{command.Slug}";
+            var fileName = command.Picture != null
+                ? await fileUploader.Upload(command.Picture, picturePath, cancellationToken)
+                : null;
 
-                var picturePath = $"{command.Slug}";
-                var fileName = command.Picture != null
-                    ? await _fileUploader.Upload(command.Picture, picturePath)
-                    : null;
-
-                productCategory.Edit(command.Name, command.Description, fileName, command.PictureAlt, command.PictureTitle, command.Keywords, command.MetaDescription, slug);
-
-                await _unitOfWork.ProductCategoryRepository.Update(productCategory);
-                await _unitOfWork.CommitAsync();
-                return OperationResult.Succeeded();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-               "#ProductCategoryApplication.Edit.CatchException() >> Exception: " + e.Message +
-               (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                return OperationResult.Failed(e.Message);
-            }
+            productCategory.Edit(command.Name, command.Description, fileName, command.PictureAlt, command.PictureTitle, command.Keywords, command.MetaDescription, slug);
+            await unitOfWork.ProductCategoryRepository.Update(productCategory, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+            return OperationResult.Succeeded();
         }
-
-        public async Task<EditProductCategory> GetDetails(long id)
+        catch (Exception e)
         {
-            try
-            {
-                var productCategory = await _unitOfWork.ProductCategoryRepository.GetById(id);
-
-                return new EditProductCategory
-                {
-                    Id = productCategory.Id,
-                    Description = productCategory.Description,
-                    Name = productCategory.Name,
-                    Keywords = productCategory.Keywords,
-                    MetaDescription = productCategory.MetaDescription,
-                    Slug = productCategory.Slug
-                };
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-               "#ProductCategoryApplication.GetDetails.CatchException() >> Exception: " + e.Message +
-               (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+            logger.LogError(e,
+           "#ProductCategoryApplication.Edit.CatchException() >> Exception: " + e.Message +
+           (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            return OperationResult.Failed(e.Message);
         }
-
-        public async Task<List<ProductCategoryViewModel>> GetProductCategories()
+    }
+    public async Task<EditProductCategory> GetDetails(long id, CancellationToken cancellationToken = default)
+    {
+        try
         {
-            try
+            var productCategory = await unitOfWork.ProductCategoryRepository.GetById(id, cancellationToken);
+            return new EditProductCategory
             {
-                var productCategories = await _unitOfWork.ProductCategoryRepository.GetAllAsQueryable();
-
-                return productCategories.Select(x => new ProductCategoryViewModel
-                {
-                    Id = x.Id,
-                    Name = x.Name
-                }).ToList();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-               "#ProductCategoryApplication.GetProductCategories.CatchException() >> Exception: " + e.Message +
-               (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+                Id = productCategory.Id,
+                Description = productCategory.Description,
+                Name = productCategory.Name,
+                Keywords = productCategory.Keywords,
+                MetaDescription = productCategory.MetaDescription,
+                Slug = productCategory.Slug
+            };
         }
-
-        public async Task<List<ProductCategoryViewModel>> Search(ProductCategorySearchModel searchModel)
+        catch (Exception e)
         {
-            try
+            logger.LogError(e,
+           "#ProductCategoryApplication.GetDetails.CatchException() >> Exception: " + e.Message +
+           (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
+        }
+    }
+    public async Task<List<ProductCategoryViewModel>> GetProductCategories(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var productCategories = await unitOfWork.ProductCategoryRepository.GetAllAsQueryable();
+            return await productCategories.Select(x => new ProductCategoryViewModel
             {
-                var query = await _unitOfWork.ProductCategoryRepository.GetAllAsQueryable();
+                Id = x.Id,
+                Name = x.Name
+            }).ToListAsync(cancellationToken);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e,
+           "#ProductCategoryApplication.GetProductCategories.CatchException() >> Exception: " + e.Message +
+           (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
+        }
+    }
+    public async Task<List<ProductCategoryViewModel>> Search(ProductCategorySearchModel searchModel, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var query = await unitOfWork.ProductCategoryRepository.GetAllAsQueryable(cancellationToken);
+            if (!string.IsNullOrWhiteSpace(searchModel.Name))
+                query = query.Where(x => x.Name.Contains(searchModel.Name));
 
-                if (!string.IsNullOrWhiteSpace(searchModel.Name))
-                    query = query.Where(x => x.Name.Contains(searchModel.Name));
-
-                return query.Select(x => new ProductCategoryViewModel
+            return await query
+                .Select(x => new ProductCategoryViewModel
                 {
                     Id = x.Id,
                     Name = x.Name,
                     Picture = x.Picture,
                     CreationDate = x.CreateDateTime.ToFarsi(),
                     Ispopular = x.IsPopular
-                }).ToList();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-               "#ProductCategoryApplication.Search.CatchException() >> Exception: " + e.Message +
-               (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+                }).ToListAsync(cancellationToken);
         }
-
-        public async Task<List<MostPopularProductCategoriesQueryModel>> GetMostPopularProductCategoriesQuery()
+        catch (Exception e)
         {
-            try
-            {
-                var productCategories = await _unitOfWork.ProductCategoryRepository.GetAllAsQueryable();
-
-                return productCategories
-                    .Where(x => x.IsPopular)
-                    .Select(x => new MostPopularProductCategoriesQueryModel
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Picture = x.Picture,
-                        PictureAlt = x.PictureAlt,
-                        PictureTitle = x.PictureTitle,
-                        Slug = x.Slug,
-                    }).AsNoTracking().ToList();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-               "#ProductCategoryApplication.GetMostPopularProductCategoriesQuery.CatchException() >> Exception: " + e.Message +
-               (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+            logger.LogError(e,
+           "#ProductCategoryApplication.Search.CatchException() >> Exception: " + e.Message +
+           (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
         }
-
-        public async Task<List<ProductCategoryQueryModel>> GetCategoriesQuery()
+    }
+    public async Task<List<MostPopularProductCategoriesQueryModel>> GetMostPopularProductCategoriesQuery(CancellationToken cancellationToken = default)
+    {
+        try
         {
-            try
-            {
-                var productCategories = await _unitOfWork.ProductCategoryRepository.GetAllAsQueryable();
-
-                return productCategories.Select(x => new ProductCategoryQueryModel
+            var productCategories = await unitOfWork.ProductCategoryRepository.GetAllAsQueryable(cancellationToken);
+            return await productCategories
+                   .Where(x => x.IsPopular)
+                   .Select(x => new MostPopularProductCategoriesQueryModel
+                   {
+                       Id = x.Id,
+                       Name = x.Name,
+                       Picture = x.Picture,
+                       PictureAlt = x.PictureAlt,
+                       PictureTitle = x.PictureTitle,
+                       Slug = x.Slug,
+                   })
+                   .AsNoTracking()
+                   .ToListAsync(cancellationToken);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e,
+           "#ProductCategoryApplication.GetMostPopularProductCategoriesQuery.CatchException() >> Exception: " + e.Message +
+           (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
+        }
+    }
+    public async Task<List<ProductCategoryQueryModel>> GetCategoriesQuery(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var productCategories = await unitOfWork.ProductCategoryRepository.GetAllAsQueryable(cancellationToken);
+            return await productCategories
+                .Select(x => new ProductCategoryQueryModel
                 {
                     Name = x.Name,
                     Description = x.Description,
@@ -196,66 +176,61 @@ namespace Application.Services.ProductAggregate
                     PictureAlt = x.PictureAlt,
                     PictureTitle = x.PictureTitle,
                     Slug = x.Slug
-                }).ToList();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-               "#ProductCategoryApplication.GetCategoriesQuery.CatchException() >> Exception: " + e.Message +
-               (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+                }).ToListAsync(cancellationToken);
         }
-
-        public async Task<OperationResult> NotInStock(long id)
+        catch (Exception e)
         {
-            try
-            {
-                var productCategory = await _unitOfWork.ProductCategoryRepository.GetById(id);
-                if (productCategory == null)
-                    return OperationResult.Failed(ApplicationMessages.RecordNotFound);
-
-                productCategory.MakeItUnpopular();
-
-                await _unitOfWork.ProductCategoryRepository.Update(productCategory);
-                await _unitOfWork.CommitAsync();
-                return OperationResult.Succeeded();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-                "#ProductCategoryApplication.NotInStock.CatchException() >> Exception: " + e.Message +
-                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+            logger.LogError(e,
+           "#ProductCategoryApplication.GetCategoriesQuery.CatchException() >> Exception: " + e.Message +
+           (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
         }
-
-        public async Task<OperationResult> InStock(long id)
+    }
+    public async Task<OperationResult> NotInStock(long id, CancellationToken cancellationToken = default)
+    {
+        try
         {
-            try
-            {
-                var productCategory = await _unitOfWork.ProductCategoryRepository.GetById(id);
-                if (productCategory == null)
-                    return OperationResult.Failed(ApplicationMessages.RecordNotFound);
+            var productCategory = await unitOfWork.ProductCategoryRepository.GetById(id, cancellationToken);
+            if (productCategory == null)
+                return OperationResult.Failed(ApplicationMessages.RecordNotFound);
 
-                var query = await _unitOfWork.ProductCategoryRepository.GetAllAsQueryable();
-                var count = query.Where(x => x.IsPopular).Count();
-                if (count >= 5)
-                    return OperationResult.Failed(ApplicationMessages.InvalidOperation);
+            productCategory.MakeItUnpopular();
+            await unitOfWork.ProductCategoryRepository.Update(productCategory, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+            return OperationResult.Succeeded();
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e,
+            "#ProductCategoryApplication.NotInStock.CatchException() >> Exception: " + e.Message +
+            (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
+        }
+    }
+    public async Task<OperationResult> InStock(long id, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var productCategory = await unitOfWork.ProductCategoryRepository.GetById(id, cancellationToken);
+            if (productCategory == null)
+                return OperationResult.Failed(ApplicationMessages.RecordNotFound);
 
-                productCategory.MakeItPopular();
+            var query = await unitOfWork.ProductCategoryRepository.GetAllAsQueryable(cancellationToken);
+            var count = query.Where(x => x.IsPopular).Count();
+            if (count >= 5)
+                return OperationResult.Failed(ApplicationMessages.InvalidOperation);
 
-                await _unitOfWork.ProductCategoryRepository.Update(productCategory);
-                await _unitOfWork.CommitAsync();
-                return OperationResult.Succeeded();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-               "#ProductCategoryApplication.InStock.CatchException() >> Exception: " + e.Message +
-               (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+            productCategory.MakeItPopular();
+            await unitOfWork.ProductCategoryRepository.Update(productCategory, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+            return OperationResult.Succeeded();
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e,
+           "#ProductCategoryApplication.InStock.CatchException() >> Exception: " + e.Message +
+           (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
         }
     }
 }

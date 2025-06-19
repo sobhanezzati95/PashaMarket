@@ -20,12 +20,12 @@ namespace Presentation.Pages
             _productCategoryApplication = productCategoryApplication;
         }
 
-        public async Task OnGet([FromQuery] ProductSearchQuery query)
+        public async Task OnGet([FromQuery] ProductSearchQuery query, CancellationToken cancellationToken = default)
         {
             Value = query.SearchKey;
-            SearchParameterModel = new(query.SearchKey, query.MinPrice, query.MaxPrice, query.Exist, query.Sort, query.Categories);
-            ProductCategories = await _productCategoryApplication.GetProductCategories();
-            SearchProductsQueryModel = await _productApplication.SearchProduct(query);
+            SearchParameterModel = new ProductSearchQuery(query.SearchKey, query.MinPrice, query.MaxPrice, query.Exist, query.Sort, query.Categories);
+            ProductCategories = await _productCategoryApplication.GetProductCategories(cancellationToken);
+            SearchProductsQueryModel = await _productApplication.SearchProduct(query, cancellationToken);
         }
     }
 }

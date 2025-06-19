@@ -1,13 +1,11 @@
 ﻿using Application.Dtos.UserAggregate.Role;
 using Framework.Application;
 
-namespace Application.Interfaces.UserAggregate
+namespace Application.Interfaces.UserAggregate;
+public interface IRoleApplication
 {
-    public interface IRoleApplication
-    {
-        Task<OperationResult> Create(CreateRole command);
-        Task<OperationResult> Edit(EditRole command);
-        Task<List<RoleViewModel>> List();
-        Task<EditRole> GetDetails(long id);
-    }
+    Task<OperationResult> Create(CreateRole command, CancellationToken cancellationToken = default);
+    Task<OperationResult> Edit(EditRole command, CancellationToken cancellationToken = default);
+    Task<List<RoleViewModel>> List(CancellationToken cancellationToken = default);
+    Task<EditRole> GetDetails(long id, CancellationToken cancellationToken = default);
 }

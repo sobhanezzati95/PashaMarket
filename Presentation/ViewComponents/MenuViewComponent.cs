@@ -2,23 +2,16 @@
 using Application.Interfaces.ProductAggregate;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Presentation.ViewComponents
+namespace Presentation.ViewComponents;
+public class MenuViewComponent(IProductCategoryApplication productCategoryApplication)
+    : ViewComponent
 {
-    public class MenuViewComponent : ViewComponent
+    public async Task<IViewComponentResult> InvokeAsync(CancellationToken cancellationToken = default)
     {
-        private readonly IProductCategoryApplication _productCategoryApplication;
-        public MenuViewComponent(IProductCategoryApplication productCategoryApplication)
+        var result = new MenuModel
         {
-            _productCategoryApplication = productCategoryApplication;
-        }
-
-        public async Task<IViewComponentResult> InvokeAsync()
-        {
-            var result = new MenuModel
-            {
-                ProductCategories = await _productCategoryApplication.GetCategoriesQuery()
-            };
-            return View(result);
-        }
+            ProductCategories = await productCategoryApplication.GetCategoriesQuery(cancellationToken)
+        };
+        return View(result);
     }
 }

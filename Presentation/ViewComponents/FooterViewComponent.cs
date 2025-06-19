@@ -1,13 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Presentation.ViewComponents
+namespace Presentation.ViewComponents;
+public class FooterViewComponent : ViewComponent
 {
-    public class FooterViewComponent : ViewComponent
+    public async Task<IViewComponentResult> InvokeAsync(CancellationToken cancellationToken = default)
     {
-
-        public async Task<IViewComponentResult> InvokeAsync()
-        {
-            return await Task.FromResult(View());
-        }
+        return await Task.FromResult(View());
     }
 }

@@ -19,8 +19,7 @@ namespace Presentation.Pages
             _cartCalculatorService = cartCalculatorService;
             _cartService = cartService;
         }
-
-        public async Task OnGet()
+        public async Task OnGet(CancellationToken cancellationToken = default)
         {
             var serializer = new JavaScriptSerializer();
             var value = Request.Cookies[CookieName];
@@ -28,16 +27,14 @@ namespace Presentation.Pages
             foreach (var item in cartItems)
                 item.CalculateTotalItemPrice();
 
-            Cart = await _cartCalculatorService.ComputeCart(cartItems);
+            Cart = await _cartCalculatorService.ComputeCart(cartItems, cancellationToken);
             //_cartService.Set(Cart);
         }
-
-
-        public IActionResult OnPostPay(int paymentMethod)
+        public IActionResult OnPostPay(int paymentMethod, CancellationToken cancellationToken = default)
         {
             //var cart = _cartService.Get();
             //check inventory and price , ...
-            return RedirectToPage("/Checkout");
+            return RedirectToPage("/Checkout", cancellationToken);
         }
     }
 }

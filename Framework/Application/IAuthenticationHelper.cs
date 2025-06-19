@@ -6,9 +6,7 @@
         bool IsAuthenticated();
         Task Signin(AuthenticationViewModel account);
         string CurrentAccountRole();
-        //AuthenticationViewModel CurrentAccountInfo();
         long CurrentUserId();
-        //string CurrentAccountMobile();
     }
     public class AuthenticationViewModel
     {

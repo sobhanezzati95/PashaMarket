@@ -3,107 +3,94 @@ using Application.Services.ProductAggregate;
 using Domain;
 using Domain.Entities.UserAggregate;
 using Framework.Application;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Interfaces.UserAggregate
+namespace Application.Interfaces.UserAggregate;
+public class RoleApplication(IUnitOfWork unitOfWork, ILogger<SlideApplication> logger)
+    : IRoleApplication
 {
-    public class RoleApplication : IRoleApplication
+    public async Task<OperationResult> Create(CreateRole command, CancellationToken cancellationToken = default)
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly ILogger<SlideApplication> _logger;
-
-        public RoleApplication(IUnitOfWork unitOfWork, ILogger<SlideApplication> logger)
+        try
         {
-            _unitOfWork = unitOfWork;
-            _logger = logger;
+            if (await unitOfWork.RoleRepository.Exists(x => x.Name == command.Name))
+                return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
+
+            var role = Role.Create(command.Name);
+            await unitOfWork.RoleRepository.Add(role, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+            return OperationResult.Succeeded();
         }
-
-        public async Task<OperationResult> Create(CreateRole command)
+        catch (Exception e)
         {
-            try
-            {
-                if (await _unitOfWork.RoleRepository.Exists(x => x.Name == command.Name))
-                    return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
-
-                var role = Role.Create(command.Name);
-
-                await _unitOfWork.RoleRepository.Add(role);
-                await _unitOfWork.CommitAsync();
-                return OperationResult.Succeeded();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-                "#RoleApplication.Create.CatchException() >> Exception: " + e.Message +
-                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+            logger.LogError(e,
+            "#RoleApplication.Create.CatchException() >> Exception: " + e.Message +
+            (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
         }
-
-        public async Task<OperationResult> Edit(EditRole command)
+    }
+    public async Task<OperationResult> Edit(EditRole command, CancellationToken cancellationToken = default)
+    {
+        try
         {
-            try
-            {
-                var role = await _unitOfWork.RoleRepository.GetById(command.Id);
-                if (role == null)
-                    return OperationResult.Failed(ApplicationMessages.RecordNotFound);
+            var role = await unitOfWork.RoleRepository.GetById(command.Id, cancellationToken);
+            if (role == null)
+                return OperationResult.Failed(ApplicationMessages.RecordNotFound);
 
-                if (await _unitOfWork.RoleRepository.Exists(x => x.Name == command.Name && x.Id != command.Id))
-                    return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
+            if (await unitOfWork.RoleRepository.Exists(x => x.Name == command.Name && x.Id != command.Id, cancellationToken))
+                return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
 
-
-                await _unitOfWork.RoleRepository.Update(role);
-                await _unitOfWork.CommitAsync();
-                return OperationResult.Succeeded();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-                "#RoleApplication.Edit.CatchException() >> Exception: " + e.Message +
-                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+            await unitOfWork.RoleRepository.Update(role, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+            return OperationResult.Succeeded();
         }
-
-        public async Task<EditRole> GetDetails(long id)
+        catch (Exception e)
         {
-            try
-            {
-                var role = await _unitOfWork.RoleRepository.GetById(id);
-                return new EditRole
-                {
-                    Id = role.Id,
-                    Name = role.Name,
-                };
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-                "#RoleApplication.GetDetails.CatchException() >> Exception: " + e.Message +
-                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+            logger.LogError(e,
+            "#RoleApplication.Edit.CatchException() >> Exception: " + e.Message +
+            (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
         }
-
-        public async Task<List<RoleViewModel>> List()
+    }
+    public async Task<EditRole> GetDetails(long id, CancellationToken cancellationToken = default)
+    {
+        try
         {
-            try
+            var role = await unitOfWork.RoleRepository.GetById(id, cancellationToken);
+            return new EditRole
             {
-                var roles = await _unitOfWork.RoleRepository.GetAllAsQueryable();
-                return roles.Select(x => new RoleViewModel
+                Id = role.Id,
+                Name = role.Name,
+            };
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e,
+            "#RoleApplication.GetDetails.CatchException() >> Exception: " + e.Message +
+            (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
+        }
+    }
+    public async Task<List<RoleViewModel>> List(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var roles = await unitOfWork.RoleRepository.GetAllAsQueryable(cancellationToken);
+            return await roles
+                .Select(x => new RoleViewModel
                 {
                     Id = x.Id,
                     Name = x.Name,
                     CreationDate = x.CreateDateTime.ToFarsi()
-                }).ToList();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-                "#RoleApplication.List.CatchException() >> Exception: " + e.Message +
-                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+                }).ToListAsync(cancellationToken);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e,
+            "#RoleApplication.List.CatchException() >> Exception: " + e.Message +
+            (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
         }
     }
 }

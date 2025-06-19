@@ -1,21 +1,13 @@
 ﻿using Application.Interfaces.ProductAggregate;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Presentation.ViewComponents
+namespace Presentation.ViewComponents;
+public class SlideViewComponent(ISlideApplication slideApplication)
+    : ViewComponent
 {
-    public class SlideViewComponent : ViewComponent
+    public async Task<IViewComponentResult> InvokeAsync(CancellationToken cancellationToken = default)
     {
-        private readonly ISlideApplication _slideApplication;
-
-        public SlideViewComponent(ISlideApplication slideApplication)
-        {
-            _slideApplication = slideApplication;
-        }
-
-        public async Task<IViewComponentResult> InvokeAsync()
-        {
-            var slides = await _slideApplication.GetSlides();
-            return View(slides);
-        }
+        var slides = await slideApplication.GetSlides(cancellationToken);
+        return View(slides);
     }
 }

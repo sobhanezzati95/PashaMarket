@@ -1,10 +1,9 @@
 ﻿using Domain.Entities.UserAggregate;
 using Framework.Domain;
 
-namespace Domain.Contracts.Repositories.UserAggregate
+namespace Domain.Contracts.Repositories.UserAggregate;
+public interface IUserRepository 
+    : IRepository<User>
 {
-    public interface IUserRepository : IRepository<User>
-    {
-        Task<User> GetByUsername(string username);
-    }
+    Task<User> GetByUsername(string username, CancellationToken cancellationToken = default );
 }

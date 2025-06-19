@@ -18,9 +18,9 @@ namespace Presentation.Pages
         public void OnGet()
         {
         }
-        public async Task<IActionResult> OnPostContactUs(CreateContactUs command)
+        public async Task<IActionResult> OnPostContactUs(CreateContactUs command, CancellationToken cancellationToken = default)
         {
-            var result = await _contactUsApplication.Create(command);
+            var result = await _contactUsApplication.Create(command, cancellationToken);
             //if (!result.IsSucceeded)
             Message = result.Message;
             return Page();

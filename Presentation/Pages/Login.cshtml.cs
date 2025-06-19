@@ -19,11 +19,11 @@ namespace Presentation.Pages
         public void OnGet()
         {
         }
-        public async Task<IActionResult> OnPostLogin(Login command)
+        public async Task<IActionResult> OnPostLogin(Login command, CancellationToken cancellationToken = default)
         {
-            var result = await _userApplication.Login(command);
+            var result = await _userApplication.Login(command, cancellationToken);
             if (result.IsSucceeded)
-                return RedirectToPage("/Index");
+                return RedirectToPage("/Index", cancellationToken);
 
             Message = result.Message;
             return Page();

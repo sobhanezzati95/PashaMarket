@@ -1,10 +1,8 @@
 ﻿using Application.Dtos.OrderAggregate;
 
-namespace Application.Interfaces.OrderAggregate
+namespace Application.Interfaces.OrderAggregate;
+public interface ICartService
 {
-    public interface ICartService
-    {
-        Cart Get();
-        void Set(Cart cart);
-    }
+    Cart Get();
+    void Set(Cart cart);
 }

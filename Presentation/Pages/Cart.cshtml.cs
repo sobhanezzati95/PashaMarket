@@ -18,29 +18,26 @@ namespace Presentation.Pages
 
         }
 
-        public async Task OnGet()
+        public async Task OnGet(CancellationToken cancellationToken = default)
         {
             var serializer = new JavaScriptSerializer();
             var value = Request.Cookies[CookieName];
             var cartItems = serializer.Deserialize<List<CartItem>>(value) ?? new();
-            CartItems = await _productApplication.CheckInventoryStatus(cartItems);
+            CartItems = await _productApplication.CheckInventoryStatus(cartItems, cancellationToken);
             //foreach (var item in cartItems)
             //    item.CalculateTotalItemPrice();
         }
 
-        public async Task<IActionResult> OnGetGoToCheckout()
+        public async Task<IActionResult> OnGetGoToCheckout(CancellationToken cancellationToken = default)
         {
             var serializer = new JavaScriptSerializer();
             var value = Request.Cookies[CookieName];
             var cartItems = serializer.Deserialize<List<CartItem>>(value) ?? new();
             foreach (var item in cartItems)
-            {
                 item.TotalPrice = item.UnitPrice * item.Count;
-            }
 
-            CartItems = await _productApplication.CheckInventoryStatus(cartItems);
-
-            return RedirectToPage(CartItems.Any(x => !x.IsInStock) ? "/Cart" : "/Checkout");
+            CartItems = await _productApplication.CheckInventoryStatus(cartItems, cancellationToken);
+            return RedirectToPage(CartItems.Any(x => !x.IsInStock) ? "/Cart" : "/Checkout", cancellationToken);
         }
     }
 }

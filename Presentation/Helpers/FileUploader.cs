@@ -1,31 +1,22 @@
 ﻿using Framework.Application;
 
-namespace Presentation.Helpers
+namespace Presentation.Helpers;
+public class FileUploader(IWebHostEnvironment webHostEnvironment) : IFileUploader
 {
-    public class FileUploader : IFileUploader
+    public async Task<string> Upload(IFormFile file, string path, CancellationToken cancellationToken = default)
     {
-        private readonly IWebHostEnvironment _webHostEnvironment;
+        if (file == null)
+            return "";
 
-        public FileUploader(IWebHostEnvironment webHostEnvironment)
-        {
-            _webHostEnvironment = webHostEnvironment;
-        }
+        var directoryPath = $"{webHostEnvironment.WebRootPath}//ProductPictures//{path}";
 
-        public async Task<string> Upload(IFormFile file, string path)
-        {
-            if (file == null)
-                return "";
+        if (!Directory.Exists(directoryPath))
+            Directory.CreateDirectory(directoryPath);
 
-            var directoryPath = $"{_webHostEnvironment.WebRootPath}//ProductPictures//{path}";
-
-            if (!Directory.Exists(directoryPath))
-                Directory.CreateDirectory(directoryPath);
-
-            var fileName = $"{DateTime.Now.ToFileName()}-{file.FileName}";
-            var filePath = $"{directoryPath}//{fileName}";
-            using var output = File.Create(filePath);
-            await file.CopyToAsync(output);
-            return $"{path}/{fileName}";
-        }
+        var fileName = $"{DateTime.Now.ToFileName()}-{file.FileName}";
+        var filePath = $"{directoryPath}//{fileName}";
+        using var output = File.Create(filePath);
+        await file.CopyToAsync(output, cancellationToken);
+        return $"{path}/{fileName}";
     }
 }

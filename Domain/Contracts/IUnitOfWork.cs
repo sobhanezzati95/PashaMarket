@@ -44,5 +44,5 @@ public interface IUnitOfWork : IDisposable
 
     #endregion
 
-    Task<int> CommitAsync();
+    Task<int> CommitAsync(CancellationToken cancellationToken = default);
 }

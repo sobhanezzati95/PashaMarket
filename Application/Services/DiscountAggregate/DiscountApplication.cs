@@ -7,147 +7,129 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
 
-namespace Application.Services.DiscountAggregate
+namespace Application.Services.DiscountAggregate;
+public class DiscountApplication(IUnitOfWork unitOfWork, ILogger<DiscountApplication> logger)
+    : IDiscountApplication
 {
-    public class DiscountApplication : IDiscountApplication
+    public async Task<OperationResult> Define(DefineDiscount command, CancellationToken cancellationToken = default)
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly ILogger<DiscountApplication> _logger;
-
-        public DiscountApplication(IUnitOfWork unitOfWork, ILogger<DiscountApplication> logger)
+        try
         {
-            _logger = logger;
-            _unitOfWork = unitOfWork;
+            if (await unitOfWork.DiscountRepository.Exists(x => x.ProductId == command.ProductId
+                                                                && x.DiscountRate == command.DiscountRate, cancellationToken))
+                return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
+
+            var startDate = command.StartDate.ToGeorgianDateTime();
+            var endDate = command.EndDate.ToGeorgianDateTime();
+            var customerDiscount = Discount.Create(command.ProductId, command.DiscountRate, startDate, endDate, command.Reason);
+            await unitOfWork.DiscountRepository.Add(customerDiscount, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+            return OperationResult.Succeeded();
         }
-
-        public async Task<OperationResult> Define(DefineDiscount command)
+        catch (Exception e)
         {
-            try
-            {
-                if (await _unitOfWork.DiscountRepository.Exists(x => x.ProductId == command.ProductId && x.DiscountRate == command.DiscountRate))
-                    return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
-
-                var startDate = command.StartDate.ToGeorgianDateTime();
-                var endDate = command.EndDate.ToGeorgianDateTime();
-                var customerDiscount = Discount.Create(command.ProductId, command.DiscountRate,
-                    startDate, endDate, command.Reason);
-                await _unitOfWork.DiscountRepository.Add(customerDiscount);
-                await _unitOfWork.CommitAsync();
-                return OperationResult.Succeeded();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-                        "#DiscountApplication.Define.CatchException() >> Exception: " + e.Message +
-                        (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                return OperationResult.Failed(e.Message);
-            }
+            logger.LogError(e,
+                    "#DiscountApplication.Define.CatchException() >> Exception: " + e.Message +
+                    (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            return OperationResult.Failed(e.Message);
         }
-
-        public async Task<OperationResult> Edit(EditDiscount command)
+    }
+    public async Task<OperationResult> Edit(EditDiscount command, CancellationToken cancellationToken = default)
+    {
+        try
         {
-            try
-            {
-                var customerDiscount = await _unitOfWork.DiscountRepository.GetById(command.Id);
+            var customerDiscount = await unitOfWork.DiscountRepository.GetById(command.Id, cancellationToken);
+            if (customerDiscount == null)
+                return OperationResult.Failed(ApplicationMessages.RecordNotFound);
 
-                if (customerDiscount == null)
-                    return OperationResult.Failed(ApplicationMessages.RecordNotFound);
+            if (await unitOfWork.DiscountRepository.Exists(x => x.ProductId == command.ProductId
+                                                                && x.DiscountRate == command.DiscountRate
+                                                                && x.Id != command.Id, cancellationToken))
+                return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
 
-                if (await _unitOfWork.DiscountRepository.Exists(x => x.ProductId == command.ProductId
-                && x.DiscountRate == command.DiscountRate && x.Id != command.Id))
-                    return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
-
-                var startDate = command.StartDate.ToGeorgianDateTime();
-                var endDate = command.EndDate.ToGeorgianDateTime();
-                customerDiscount.Edit(command.ProductId, command.DiscountRate, startDate, endDate, command.Reason);
-                await _unitOfWork.DiscountRepository.Update(customerDiscount);
-                await _unitOfWork.CommitAsync();
-                return OperationResult.Succeeded();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-                "#DiscountApplication.Edit.CatchException() >> Exception: " + e.Message +
-                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                return OperationResult.Failed(e.Message);
-            }
+            var startDate = command.StartDate.ToGeorgianDateTime();
+            var endDate = command.EndDate.ToGeorgianDateTime();
+            customerDiscount.Edit(command.ProductId, command.DiscountRate, startDate, endDate, command.Reason);
+            await unitOfWork.DiscountRepository.Update(customerDiscount, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+            return OperationResult.Succeeded();
         }
-
-        public async Task<EditDiscount> GetDetails(long id)
+        catch (Exception e)
         {
-            try
-            {
-                var discount = await _unitOfWork.DiscountRepository.GetById(id);
-                return new EditDiscount
-                {
-                    Id = discount.Id,
-                    ProductId = discount.ProductId,
-                    DiscountRate = discount.DiscountRate,
-                    StartDate = discount.StartDate.ToString(CultureInfo.InvariantCulture),
-                    EndDate = discount.EndDate.ToString(CultureInfo.InvariantCulture),
-                    Reason = discount.Reason
-                };
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-                "#DiscountApplication.GetDetails.CatchException() >> Exception: " + e.Message +
-                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+            logger.LogError(e,
+            "#DiscountApplication.Edit.CatchException() >> Exception: " + e.Message +
+            (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            return OperationResult.Failed(e.Message);
         }
-
-        public async Task<List<DiscountViewModel>> Search(DiscountSearchModel searchModel)
+    }
+    public async Task<EditDiscount> GetDetails(long id, CancellationToken cancellationToken = default)
+    {
+        try
         {
-            try
+            var discount = await unitOfWork.DiscountRepository.GetById(id, cancellationToken);
+            return new EditDiscount
             {
-                var query = (await _unitOfWork.DiscountRepository.GetAllWithIncludesAndThenInCludes(
-                                predicate: null,
-                                orderBy: x => x.OrderByDescending(p => p.Id),
-                                isTracking: false,
-                                ignoreQueryFilters: false,
-                                includeProperties: null,
-                                thenInclude: query => query.Include(x => x.Product)))
-                                .Select(x => new DiscountViewModel
-                                {
-                                    Id = x.Id,
-                                    DiscountRate = x.DiscountRate,
-                                    EndDate = x.EndDate.ToFarsi(),
-                                    EndDateGr = x.EndDate,
-                                    StartDate = x.StartDate.ToFarsi(),
-                                    StartDateGr = x.StartDate,
-                                    ProductId = x.ProductId,
-                                    Reason = x.Reason,
-                                    CreationDate = x.CreateDateTime.ToFarsi(),
-                                    Product = x.Product.Name,
-                                });
+                Id = discount.Id,
+                ProductId = discount.ProductId,
+                DiscountRate = discount.DiscountRate,
+                StartDate = discount.StartDate.ToString(CultureInfo.InvariantCulture),
+                EndDate = discount.EndDate.ToString(CultureInfo.InvariantCulture),
+                Reason = discount.Reason
+            };
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e,
+            "#DiscountApplication.GetDetails.CatchException() >> Exception: " + e.Message +
+            (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
+        }
+    }
+    public async Task<List<DiscountViewModel>> Search(DiscountSearchModel searchModel, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var query = (await unitOfWork.DiscountRepository.GetAllWithIncludesAndThenInCludes(
+                            predicate: null,
+                            orderBy: x => x.OrderByDescending(p => p.Id),
+                            isTracking: false,
+                            ignoreQueryFilters: false,
+                            includeProperties: null,
+                            thenInclude: query => query.Include(x => x.Product)))
+                            .Select(x => new DiscountViewModel
+                            {
+                                Id = x.Id,
+                                DiscountRate = x.DiscountRate,
+                                EndDate = x.EndDate.ToFarsi(),
+                                EndDateGr = x.EndDate,
+                                StartDate = x.StartDate.ToFarsi(),
+                                StartDateGr = x.StartDate,
+                                ProductId = x.ProductId,
+                                Reason = x.Reason,
+                                CreationDate = x.CreateDateTime.ToFarsi(),
+                                Product = x.Product.Name,
+                            });
 
+            if (await query.AnyAsync(cancellationToken) == false)
+                return [];
 
-                if (query.Any() == false)
-                    return new();
+            if (searchModel.ProductId > 0)
+                query = query.Where(x => x.ProductId == searchModel.ProductId);
 
-                if (searchModel.ProductId > 0)
-                    query = query.Where(x => x.ProductId == searchModel.ProductId);
+            if (!string.IsNullOrWhiteSpace(searchModel.StartDate))
+                query = query.Where(x => x.StartDateGr > searchModel.StartDate.ToGeorgianDateTime());
 
-                if (!string.IsNullOrWhiteSpace(searchModel.StartDate))
-                {
-                    query = query.Where(x => x.StartDateGr > searchModel.StartDate.ToGeorgianDateTime());
-                }
+            if (!string.IsNullOrWhiteSpace(searchModel.EndDate))
+                query = query.Where(x => x.EndDateGr < searchModel.EndDate.ToGeorgianDateTime());
 
-                if (!string.IsNullOrWhiteSpace(searchModel.EndDate))
-                {
-                    query = query.Where(x => x.EndDateGr < searchModel.EndDate.ToGeorgianDateTime());
-                }
-
-                return query.ToList();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-                "#DiscountApplication.Search.CatchException() >> Exception: " + e.Message +
-                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                throw;
-            }
+            return await query.ToListAsync(cancellationToken);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e,
+            "#DiscountApplication.Search.CatchException() >> Exception: " + e.Message +
+            (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            throw;
         }
     }
 }

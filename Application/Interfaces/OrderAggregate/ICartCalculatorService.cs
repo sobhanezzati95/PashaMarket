@@ -1,9 +1,7 @@
 ﻿using Application.Dtos.OrderAggregate;
 
-namespace Application.Interfaces.OrderAggregate
+namespace Application.Interfaces.OrderAggregate;
+public interface ICartCalculatorService
 {
-    public interface ICartCalculatorService
-    {
-        Task<Cart> ComputeCart(List<CartItem> cartItems);
-    }
+    Task<Cart> ComputeCart(List<CartItem> cartItems, CancellationToken cancellationToken = default);
 }

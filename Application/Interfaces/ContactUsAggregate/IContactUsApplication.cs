@@ -1,10 +1,8 @@
 ﻿using Application.Dtos.ContactUsAggregate;
 using Framework.Application;
 
-namespace Application.Interfaces.ContactUsAggregate
+namespace Application.Interfaces.ContactUsAggregate;
+public interface IContactUsApplication
 {
-    public interface IContactUsApplication
-    {
-        Task<OperationResult> Create(CreateContactUs command);
-    }
+    Task<OperationResult> Create(CreateContactUs command, CancellationToken cancellationToken = default);
 }

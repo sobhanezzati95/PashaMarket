@@ -1,21 +1,12 @@
 ﻿using Application.Interfaces.ProductAggregate;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Presentation.ViewComponents
+namespace Presentation.ViewComponents;
+public class LatestProductsViewComponent(IProductApplication productApplication) : ViewComponent
 {
-    public class LatestProductsViewComponent : ViewComponent
+    public async Task<IViewComponentResult> InvokeAsync(CancellationToken cancellationToken = default)
     {
-        private readonly IProductApplication _productApplication;
-
-        public LatestProductsViewComponent(IProductApplication productApplication)
-        {
-            _productApplication = productApplication;
-        }
-
-        public async Task<IViewComponentResult> InvokeAsync()
-        {
-            var productCategories = await _productApplication.GetLatestProductsQuery();
-            return View(productCategories);
-        }
+        var productCategories = await productApplication.GetLatestProductsQuery(cancellationToken);
+        return View(productCategories);
     }
 }

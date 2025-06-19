@@ -5,34 +5,26 @@ using Domain.Entities.ContactUsAggregate;
 using Framework.Application;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Services.ContactUsAggregate
+namespace Application.Services.ContactUsAggregate;
+public class ContactUsApplication(IUnitOfWork unitOfWork, ILogger<ContactUsApplication> logger)
+    : IContactUsApplication
 {
-    public class ContactUsApplication : IContactUsApplication
+    public async Task<OperationResult> Create(CreateContactUs command, CancellationToken cancellationToken = default)
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly ILogger<ContactUsApplication> _logger;
-        public ContactUsApplication(IUnitOfWork unitOfWork, ILogger<ContactUsApplication> logger)
+        try
         {
-            _unitOfWork = unitOfWork;
-            _logger = logger;
+            var customerDiscount = ContactUs.Create(command.FullName, command.PhoneNumber, command.Email,
+                    command.Title, command.Description);
+            await unitOfWork.ContactUsRepository.Add(customerDiscount, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+            return OperationResult.Succeeded();
         }
-
-        public async Task<OperationResult> Create(CreateContactUs command)
+        catch (Exception e)
         {
-            try
-            {
-                var customerDiscount = ContactUs.Create(command.FullName, command.PhoneNumber, command.Email, command.Title, command.Description);
-                await _unitOfWork.ContactUsRepository.Add(customerDiscount);
-                await _unitOfWork.CommitAsync();
-                return OperationResult.Succeeded();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e,
-                        "#ContactUsApplication.Create.CatchException() >> Exception: " + e.Message +
-                        (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
-                return OperationResult.Failed(e.Message);
-            }
+            logger.LogError(e,
+                    "#ContactUsApplication.Create.CatchException() >> Exception: " + e.Message +
+                    (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+            return OperationResult.Failed(e.Message);
         }
     }
 }

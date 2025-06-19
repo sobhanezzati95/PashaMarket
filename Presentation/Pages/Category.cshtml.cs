@@ -13,10 +13,9 @@ namespace Presentation.Pages
         {
             _productApplication = productApplication;
         }
-
-        public async Task OnGet(string id)
+        public async Task OnGet(string id, CancellationToken cancellationToken = default)
         {
-            ProductCategories = await _productApplication.GetProductCategoriesBy(id);
+            ProductCategories = await _productApplication.GetProductCategoriesBy(id, cancellationToken);
         }
     }
 }
