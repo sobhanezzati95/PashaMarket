@@ -3,30 +3,21 @@ using Application.Interfaces.UserAggregate;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Presentation.Pages
+namespace Presentation.Pages;
+public class SignUpModel(IUserApplication userApplication) : PageModel
 {
-    public class SignUpModel : PageModel
+    [TempData]
+    public string Message { get; set; }
+    public void OnGet()
     {
-        [TempData]
-        public string Message { get; set; }
-        private readonly IUserApplication _userApplication;
+    }
+    public async Task<IActionResult> OnPostSignUp(RegisterUser command, CancellationToken cancellationToken = default)
+    {
+        var result = await userApplication.Register(command, cancellationToken);
+        if (result.IsSucceeded)
+            return RedirectToPage("/Index", cancellationToken);
 
-        public SignUpModel(IUserApplication userApplication)
-        {
-            _userApplication = userApplication;
-        }
-
-        public void OnGet()
-        {
-        }
-        public async Task<IActionResult> OnPostSignUp(RegisterUser command, CancellationToken cancellationToken = default)
-        {
-            var result = await _userApplication.Register(command, cancellationToken);
-            if (result.IsSucceeded)
-                return RedirectToPage("/Index", cancellationToken);
-
-            Message = result.Message;
-            return Page();
-        }
+        Message = result.Message;
+        return Page();
     }
 }

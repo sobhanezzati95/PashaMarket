@@ -5,36 +5,26 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Nancy.Json;
 
-namespace Presentation.Pages
+namespace Presentation.Pages;
+[Authorize]
+public class CheckoutModel(ICartCalculatorService cartCalculatorService, ICartService cartService) : PageModel
 {
-    [Authorize]
-    public class CheckoutModel : PageModel
+    public Cart Cart;
+    public const string CookieName = "cart-items";
+    public async Task OnGet(CancellationToken cancellationToken = default)
     {
-        public Cart Cart;
-        public const string CookieName = "cart-items";
-        private readonly ICartCalculatorService _cartCalculatorService;
-        private readonly ICartService _cartService;
-        public CheckoutModel(ICartCalculatorService cartCalculatorService, ICartService cartService)
-        {
-            _cartCalculatorService = cartCalculatorService;
-            _cartService = cartService;
-        }
-        public async Task OnGet(CancellationToken cancellationToken = default)
-        {
-            var serializer = new JavaScriptSerializer();
-            var value = Request.Cookies[CookieName];
-            var cartItems = serializer.Deserialize<List<CartItem>>(value) ?? new();
-            foreach (var item in cartItems)
-                item.CalculateTotalItemPrice();
+        var serializer = new JavaScriptSerializer();
+        var value = Request.Cookies[CookieName];
+        var cartItems = serializer.Deserialize<List<CartItem>>(value) ?? new();
+        foreach (var item in cartItems)
+            item.CalculateTotalItemPrice();
 
-            Cart = await _cartCalculatorService.ComputeCart(cartItems, cancellationToken);
-            //_cartService.Set(Cart);
-        }
-        public IActionResult OnPostPay(int paymentMethod, CancellationToken cancellationToken = default)
-        {
-            //var cart = _cartService.Get();
-            //check inventory and price , ...
-            return RedirectToPage("/Checkout", cancellationToken);
-        }
+        Cart = await cartCalculatorService.ComputeCart(cartItems, cancellationToken);
+    }
+    public IActionResult OnPostPay(int paymentMethod, CancellationToken cancellationToken = default)
+    {
+        //var cart = _cartService.Get();
+        //check inventory and price , ...
+        return RedirectToPage("/Checkout", cancellationToken);
     }
 }

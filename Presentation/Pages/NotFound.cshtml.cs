@@ -1,12 +1,9 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Presentation.Pages
+namespace Presentation.Pages;
+public class NotFoundModel : PageModel
 {
-    public class NotFoundModel : PageModel
+    public void OnGet()
     {
-        public void OnGet()
-        {
-        }
     }
 }

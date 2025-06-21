@@ -1,12 +1,16 @@
 ﻿namespace Application.Dtos.ProductAggregate.Product;
-
 public class ProductSearchQuery
 {
     public ProductSearchQuery()
     {
-        
+
     }
-    public ProductSearchQuery(string? searchKey, double? minPrice, double? maxPrice, bool? exist, SortFilterParam? sort, long[]? categories)
+    public ProductSearchQuery(string? searchKey,
+                              double? minPrice,
+                              double? maxPrice,
+                              bool? exist,
+                              SortFilterParam? sort,
+                              long[]? categories)
     {
         SearchKey = searchKey;
         MinPrice = minPrice;
@@ -15,7 +19,6 @@ public class ProductSearchQuery
         Sort = sort;
         Categories = categories;
     }
-
     public string? SearchKey { get; set; }
     public double? MinPrice { get; set; }
     public double? MaxPrice { get; set; }

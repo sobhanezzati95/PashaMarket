@@ -1,11 +1,9 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Presentation.Pages
+namespace Presentation.Pages;
+public class AboutUsModel : PageModel
 {
-    public class AboutUsModel : PageModel
+    public void OnGet()
     {
-        public void OnGet()
-        {
-        }
     }
 }

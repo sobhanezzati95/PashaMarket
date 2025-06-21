@@ -3,8 +3,7 @@ using Application.Interfaces.ProductAggregate;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.ViewComponents;
-public class MenuViewComponent(IProductCategoryApplication productCategoryApplication)
-    : ViewComponent
+public class MenuViewComponent(IProductCategoryApplication productCategoryApplication) : ViewComponent
 {
     public async Task<IViewComponentResult> InvokeAsync(CancellationToken cancellationToken = default)
     {

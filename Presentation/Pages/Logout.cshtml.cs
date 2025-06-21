@@ -2,22 +2,12 @@ using Application.Interfaces.UserAggregate;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Presentation.Pages
+namespace Presentation.Pages;
+public class LogoutModel(IUserApplication userApplication) : PageModel
 {
-    public class LogoutModel : PageModel
+    public async Task<IActionResult> OnGet()
     {
-        private readonly IUserApplication _userApplication;
-
-        public LogoutModel(IUserApplication userApplication)
-        {
-            _userApplication = userApplication;
-        }
-
-        public async Task<IActionResult> OnGet()
-        {
-            await _userApplication.Logout();
-            return RedirectToPage("/Index");
-
-        }
+        await userApplication.Logout();
+        return RedirectToPage("/Index");
     }
 }

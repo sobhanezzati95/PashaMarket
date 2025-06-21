@@ -4,28 +4,19 @@ using Application.Interfaces.ProductAggregate;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Presentation.Pages
+namespace Presentation.Pages;
+public class SearchModel(IProductApplication productApplication, IProductCategoryApplication productCategoryApplication)
+    : PageModel
 {
-    public class SearchModel : PageModel
+    public string? Value = null;
+    public ProductSearchQuery? SearchParameterModel = null;
+    public List<SearchProductsQueryModel> SearchProductsQueryModel;
+    public List<ProductCategoryViewModel> ProductCategories;
+    public async Task OnGet([FromQuery] ProductSearchQuery query, CancellationToken cancellationToken = default)
     {
-        public string? Value = null;
-        public ProductSearchQuery? SearchParameterModel = null;
-        public List<SearchProductsQueryModel> SearchProductsQueryModel;
-        public List<ProductCategoryViewModel> ProductCategories;
-        private readonly IProductApplication _productApplication;
-        private readonly IProductCategoryApplication _productCategoryApplication;
-        public SearchModel(IProductApplication productApplication, IProductCategoryApplication productCategoryApplication)
-        {
-            _productApplication = productApplication;
-            _productCategoryApplication = productCategoryApplication;
-        }
-
-        public async Task OnGet([FromQuery] ProductSearchQuery query, CancellationToken cancellationToken = default)
-        {
-            Value = query.SearchKey;
-            SearchParameterModel = new ProductSearchQuery(query.SearchKey, query.MinPrice, query.MaxPrice, query.Exist, query.Sort, query.Categories);
-            ProductCategories = await _productCategoryApplication.GetProductCategories(cancellationToken);
-            SearchProductsQueryModel = await _productApplication.SearchProduct(query, cancellationToken);
-        }
+        Value = query.SearchKey;
+        SearchParameterModel = new ProductSearchQuery(query.SearchKey, query.MinPrice, query.MaxPrice, query.Exist, query.Sort, query.Categories);
+        ProductCategories = await productCategoryApplication.GetProductCategories(cancellationToken);
+        SearchProductsQueryModel = await productApplication.SearchProduct(query, cancellationToken);
     }
 }
