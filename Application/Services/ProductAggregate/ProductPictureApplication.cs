@@ -1,6 +1,6 @@
 ﻿using Application.Dtos.ProductAggregate.ProductPicture;
 using Application.Interfaces.ProductAggregate;
-using Domain;
+using Domain.Contracts;
 using Domain.Entities.ProductAggregate;
 using Framework.Application;
 using Microsoft.EntityFrameworkCore;
@@ -46,7 +46,7 @@ public class ProductPictureApplication(IFileUploader fileUploader,
                 : null;
 
             productPicture.Edit(command.ProductId, picturePath, command.PictureAlt, command.PictureTitle);
-            await unitOfWork.ProductPictureRepository.Update(productPicture, cancellationToken);
+            await unitOfWork.ProductPictureRepository.Update(productPicture);
             await unitOfWork.CommitAsync(cancellationToken);
             return OperationResult.Succeeded();
         }
@@ -88,7 +88,7 @@ public class ProductPictureApplication(IFileUploader fileUploader,
                 return OperationResult.Failed(ApplicationMessages.RecordNotFound);
 
             productPicture.Remove();
-            await unitOfWork.ProductPictureRepository.Update(productPicture, cancellationToken);
+            await unitOfWork.ProductPictureRepository.Update(productPicture);
             await unitOfWork.CommitAsync(cancellationToken);
             return OperationResult.Succeeded();
         }
@@ -109,7 +109,7 @@ public class ProductPictureApplication(IFileUploader fileUploader,
                 return OperationResult.Failed(ApplicationMessages.RecordNotFound);
 
             productPicture.Restore();
-            await unitOfWork.ProductPictureRepository.Update(productPicture, cancellationToken);
+            await unitOfWork.ProductPictureRepository.Update(productPicture);
             await unitOfWork.CommitAsync(cancellationToken);
             return OperationResult.Succeeded();
         }
@@ -125,7 +125,7 @@ public class ProductPictureApplication(IFileUploader fileUploader,
     {
         try
         {
-            var query = await unitOfWork.ProductPictureRepository.GetAllWithIncludesAndThenInCludes(
+            var query = await unitOfWork.ProductPictureRepository.GetAllWithIncludesAndThenIncludes(
             predicate: null,
             orderBy: x => x.OrderByDescending(p => p.Id),
             isTracking: false,
@@ -147,7 +147,7 @@ public class ProductPictureApplication(IFileUploader fileUploader,
                     CreationDate = x.CreateDateTime.ToString(),
                     Picture = x.Picture,
                     ProductId = x.ProductId,
-                    IsRemoved = x.IsRemoved
+                    IsActive = x.IsActive
                 }).ToListAsync(cancellationToken);
         }
         catch (Exception e)

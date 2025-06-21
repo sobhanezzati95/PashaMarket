@@ -6,18 +6,17 @@ namespace Domain.Entities.UserAggregate
     public class User : BaseEntity<long>
     {
         #region Constructor
-        protected User(string? fullname, string username, string? mobile,
+        protected User(long id, string? fullname, string username, string? mobile,
                     string? email, string password, DateTime? birthDate, long roleId)
         {
+            Id = id;
             Fullname = fullname;
             Username = username;
             Mobile = mobile;
             Email = email;
             Password = password;
             BirthDate = birthDate;
-
-            if (roleId == 0)
-                RoleId = 2;
+            RoleId = roleId;
         }
 
         protected User(string username, string? email, string password)
@@ -51,10 +50,10 @@ namespace Domain.Entities.UserAggregate
 
         #region Behaviors
 
-        public static User Create(string? fullname, string username, string? mobile,
+        public static User Create(long id, string? fullname, string username, string? mobile,
                     string? email, string password, DateTime? birthDate, long roleId)
         {
-            return new User(fullname, username, mobile, email, password, birthDate, roleId);
+            return new User(id, fullname, username, mobile, email, password, birthDate, roleId);
         }
 
         public static User Register(string username, string? email, string password)

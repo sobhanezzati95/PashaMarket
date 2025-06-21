@@ -57,12 +57,12 @@ namespace Domain.Entities.ProductAggregate
 
         public void Remove()
         {
-            IsRemoved = true;
+            IsActive = true;
         }
 
         public void Restore()
         {
-            IsRemoved = false;
+            IsActive = false;
         }
 
         #endregion

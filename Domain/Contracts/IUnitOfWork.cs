@@ -4,10 +4,9 @@ using Domain.Contracts.Repositories.OrderAggregate;
 using Domain.Contracts.Repositories.ProductAggregate;
 using Domain.Contracts.Repositories.UserAggregate;
 
-namespace Domain;
+namespace Domain.Contracts;
 public interface IUnitOfWork : IDisposable
 {
-
     #region ProductAggRepo
 
     IProductRepository ProductRepository { get; }

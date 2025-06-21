@@ -1,6 +1,6 @@
 ﻿using Application.Dtos.ContactUsAggregate;
 using Application.Interfaces.ContactUsAggregate;
-using Domain;
+using Domain.Contracts;
 using Domain.Entities.ContactUsAggregate;
 using Framework.Application;
 using Microsoft.Extensions.Logging;

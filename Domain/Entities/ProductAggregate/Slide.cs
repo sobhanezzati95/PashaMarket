@@ -18,7 +18,7 @@ namespace Domain.Entities.ProductAggregate
             Text = text;
             BtnText = btnText;
             Link = link;
-            IsRemoved = false;
+            IsActive = true;
         }
 
         protected Slide(string picture, string pictureAlt, string pictureTitle, string heading,
@@ -32,7 +32,7 @@ namespace Domain.Entities.ProductAggregate
             Text = text;
             BtnText = btnText;
             Link = link;
-            IsRemoved = false;
+            IsActive = true;
         }
 
         #endregion
@@ -76,12 +76,12 @@ namespace Domain.Entities.ProductAggregate
 
         public void Remove()
         {
-            IsRemoved = true;
+            IsActive = true;
         }
 
         public void Restore()
         {
-            IsRemoved = false;
+            IsActive = false;
         }
 
         #endregion

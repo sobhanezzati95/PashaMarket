@@ -11,31 +11,22 @@ using Application.Services.UserAggregate;
 using Framework.Application;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Application.Configurations
+namespace Application.Configurations;
+public static class ApplicationServicesRegistrations
 {
-    public static class ApplicationServicesRegistrations
+    public static void SetupServices(this IServiceCollection services)
     {
-        public static void SetupServices(this IServiceCollection services)
-        {
-            services.AddScoped<IProductApplication, ProductApplication>();
-            services.AddScoped<IProductCategoryApplication, ProductCategoryApplication>();
-            services.AddScoped<IProductPictureApplication, ProductPictureApplication>();
-            services.AddScoped<IProductFeatureApplication, ProductFeatureApplication>();
-
-            services.AddScoped<IDiscountApplication, DiscountApplication>();
-
-            services.AddScoped<ISlideApplication, SlideApplication>();
-
-            services.AddScoped<IOrderApplication, OrderApplication>();
-
-            services.AddScoped<IAuthenticationHelper, AuthenticationHelper>();
-            services.AddScoped<IUserApplication, UserApplication>();
-
-            services.AddScoped<ICartCalculatorService, CartCalculatorService>();
-
-            services.AddSingleton<ICartService, CartService>();
-
-            services.AddScoped<IContactUsApplication, ContactUsApplication>();
-        }
+        services.AddScoped<IProductApplication, ProductApplication>();
+        services.AddScoped<IProductCategoryApplication, ProductCategoryApplication>();
+        services.AddScoped<IProductPictureApplication, ProductPictureApplication>();
+        services.AddScoped<IProductFeatureApplication, ProductFeatureApplication>();
+        services.AddScoped<IDiscountApplication, DiscountApplication>();
+        services.AddScoped<ISlideApplication, SlideApplication>();
+        services.AddScoped<IOrderApplication, OrderApplication>();
+        services.AddScoped<IAuthenticationHelper, AuthenticationHelper>();
+        services.AddScoped<IUserApplication, UserApplication>();
+        services.AddScoped<ICartCalculatorService, CartCalculatorService>();
+        services.AddSingleton<ICartService, CartService>();
+        services.AddScoped<IContactUsApplication, ContactUsApplication>();
     }
 }

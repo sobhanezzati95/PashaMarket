@@ -1,6 +1,6 @@
 ﻿using Application.Dtos.OrderAggregate;
 using Application.Interfaces.OrderAggregate;
-using Domain;
+using Domain.Contracts;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services.OrderAggregate;

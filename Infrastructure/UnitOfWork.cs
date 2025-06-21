@@ -1,4 +1,4 @@
-﻿using Domain;
+﻿using Domain.Contracts;
 using Domain.Contracts.Repositories.ContactUsAggregate;
 using Domain.Contracts.Repositories.DiscountAggregate;
 using Domain.Contracts.Repositories.OrderAggregate;

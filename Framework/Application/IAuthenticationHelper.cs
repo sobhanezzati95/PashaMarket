@@ -1,33 +1,31 @@
-﻿namespace Framework.Application
+﻿namespace Framework.Application;
+public interface IAuthenticationHelper
 {
-    public interface IAuthenticationHelper
+    Task SignOut();
+    bool IsAuthenticated();
+    Task Signin(AuthenticationViewModel account);
+    string CurrentAccountRole();
+    long CurrentUserId();
+}
+public class AuthenticationViewModel
+{
+    public long Id { get; set; }
+    public long RoleId { get; set; }
+    public string Role { get; set; }
+    public string Fullname { get; set; }
+    public string Username { get; set; }
+    public string Email { get; set; }
+
+    public AuthenticationViewModel()
     {
-        Task SignOut();
-        bool IsAuthenticated();
-        Task Signin(AuthenticationViewModel account);
-        string CurrentAccountRole();
-        long CurrentUserId();
     }
-    public class AuthenticationViewModel
+
+    public AuthenticationViewModel(long id, long roleId, string fullname, string username, string email)
     {
-        public long Id { get; set; }
-        public long RoleId { get; set; }
-        public string Role { get; set; }
-        public string Fullname { get; set; }
-        public string Username { get; set; }
-        public string Email { get; set; }
-
-        public AuthenticationViewModel()
-        {
-        }
-
-        public AuthenticationViewModel(long id, long roleId, string fullname, string username, string email)
-        {
-            Id = id;
-            RoleId = roleId;
-            Fullname = fullname;
-            Username = username;
-            Email = email;
-        }
+        Id = id;
+        RoleId = roleId;
+        Fullname = fullname;
+        Username = username;
+        Email = email;
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Application.Dtos.UserAggregate.User;
 using Application.Services.ProductAggregate;
-using Domain;
+using Domain.Contracts;
 using Domain.Entities.UserAggregate;
 using Framework.Application;
 using Microsoft.EntityFrameworkCore;
@@ -27,7 +27,7 @@ public class UserApplication(IUnitOfWork unitOfWork,
 
             var password = passwordHasher.Hash(command.Password);
             user.ChangePassword(password);
-            await unitOfWork.UserRepository.Update(user, cancellationToken);
+            await unitOfWork.UserRepository.Update(user);
             await unitOfWork.CommitAsync(cancellationToken);
             return OperationResult.Succeeded();
         }
@@ -52,7 +52,7 @@ public class UserApplication(IUnitOfWork unitOfWork,
                 return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
 
             user.Edit(command.Fullname, command.Username, command.Mobile, command.Email, command.BirthDate);
-            await unitOfWork.UserRepository.Update(user, cancellationToken);
+            await unitOfWork.UserRepository.Update(user);
             await unitOfWork.CommitAsync(cancellationToken);
             return OperationResult.Succeeded();
         }
@@ -182,7 +182,7 @@ public class UserApplication(IUnitOfWork unitOfWork,
     {
         try
         {
-            var query = await unitOfWork.UserRepository.GetAllWithIncludesAndThenInCludes(
+            var query = await unitOfWork.UserRepository.GetAllWithIncludesAndThenIncludes(
             predicate: null,
             orderBy: x => x.OrderByDescending(p => p.Id),
             isTracking: false,

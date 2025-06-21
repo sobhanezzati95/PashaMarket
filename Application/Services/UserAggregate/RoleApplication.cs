@@ -1,6 +1,6 @@
 ﻿using Application.Dtos.UserAggregate.Role;
 using Application.Services.ProductAggregate;
-using Domain;
+using Domain.Contracts;
 using Domain.Entities.UserAggregate;
 using Framework.Application;
 using Microsoft.EntityFrameworkCore;
@@ -41,7 +41,7 @@ public class RoleApplication(IUnitOfWork unitOfWork, ILogger<SlideApplication> l
             if (await unitOfWork.RoleRepository.Exists(x => x.Name == command.Name && x.Id != command.Id, cancellationToken))
                 return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
 
-            await unitOfWork.RoleRepository.Update(role, cancellationToken);
+            await unitOfWork.RoleRepository.Update(role);
             await unitOfWork.CommitAsync(cancellationToken);
             return OperationResult.Succeeded();
         }

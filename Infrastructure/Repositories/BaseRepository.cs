@@ -13,27 +13,20 @@ public class BaseRepository<T>
     {
         DbSet = db.Set<T>();
     }
-    public async Task<T> Add(T entity, CancellationToken cancellationToken = default)
-    {
-        entity.CreateDateTime = DateTime.UtcNow;
-        await DbSet.AddAsync(entity);
-        return entity;
-    }
-    public async Task<bool> AddRange(List<T> entities, CancellationToken cancellationToken = default)
-    {
-        await DbSet.AddRangeAsync(entities);
-        return await Task.FromResult(true);
-    }
+    public async Task Add(T entity, CancellationToken cancellationToken = default)
+        => await DbSet.AddAsync(entity);
+    public async Task AddRange(List<T> entities, CancellationToken cancellationToken = default)
+         => await DbSet.AddRangeAsync(entities);
     public async Task<IQueryable<T>> GetAllAsQueryable(CancellationToken cancellationToken = default)
     {
-        return await Task.FromResult(DbSet.Where(t => t.IsRemoved == false && t.IsActive == true).AsQueryable());
+        return await Task.FromResult(DbSet.Where(t => t.IsActive == true).AsQueryable());
 
     }
-    public async Task<IQueryable<T>> GetAllWithIncludesAndThenInCludes(Expression<Func<T, bool>>? predicate = null,
-        Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
-        bool isTracking = false, bool ignoreQueryFilters = false,
-        string? includeProperties = null,
-        Func<IQueryable<T>, IIncludableQueryable<T, object>>? thenInclude = null)
+    public async Task<IQueryable<T>> GetAllWithIncludesAndThenIncludes(Expression<Func<T, bool>>? predicate = null,
+                                                                       Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+                                                                       bool isTracking = false, bool ignoreQueryFilters = false,
+                                                                       string? includeProperties = null,
+                                                                       Func<IQueryable<T>, IIncludableQueryable<T, object>>? thenInclude = null)
     {
 
         IQueryable<T> query = DbSet;
@@ -73,30 +66,16 @@ public class BaseRepository<T>
         return await Task.FromResult((orderBy != null ? orderBy(query) : query));
     }
     public async Task<T?> GetById(long id, CancellationToken cancellationToken = default)
+        => await DbSet.FindAsync(id);
+    public async Task RemoveRange(List<T> entities, CancellationToken cancellationToken = default)
     {
-        return await DbSet.FindAsync(id);
-    }
-    public async Task<bool> RemoveRange(List<T> entities, CancellationToken cancellationToken = default)
-    {
-        var baseEntities = entities.ToList();
-        foreach (var entity in baseEntities.Where(entity => true))
-        {
+        foreach (var entity in entities.Where(entity => true))
             entity.IsActive = false;
-            entity.IsRemoved = true;
-            entity.ModifyDateTime = DateTime.UtcNow;
-        }
-        DbSet.UpdateRange(baseEntities);
-        return await Task.FromResult(true);
+
+        DbSet.UpdateRange(entities);
     }
-    public async Task<T> Update(T entity, CancellationToken cancellationToken = default)
-    {
-        entity.ModifyDateTime = DateTime.UtcNow;
-        entity.IsModified = true;
-        DbSet.Update(entity);
-        return await Task.FromResult(entity);
-    }
+    public async Task Update(T entity)
+         => DbSet.Update(entity);
     public async Task<bool> Exists(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default)
-    {
-        return await DbSet.AnyAsync(expression);
-    }
+         => await DbSet.AnyAsync(expression);
 }

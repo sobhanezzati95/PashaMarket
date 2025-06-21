@@ -1,6 +1,6 @@
 ﻿using Application.Dtos.ProductAggregate.Slide;
 using Application.Interfaces.ProductAggregate;
-using Domain;
+using Domain.Contracts;
 using Domain.Entities.ProductAggregate;
 using Framework.Application;
 using Microsoft.EntityFrameworkCore;
@@ -43,7 +43,7 @@ public class SlideApplication(IFileUploader fileUploader,
             var pictureName = await fileUploader.Upload(command.Picture, "slides", cancellationToken);
             slide.Edit(pictureName, command.PictureAlt, command.PictureTitle,
                        command.Heading, command.Title, command.Text, command.Link, command.BtnText);
-            await unitOfWork.SlideRepository.Update(slide, cancellationToken);
+            await unitOfWork.SlideRepository.Update(slide);
             await unitOfWork.CommitAsync(cancellationToken);
             return OperationResult.Succeeded();
         }
@@ -92,7 +92,7 @@ public class SlideApplication(IFileUploader fileUploader,
                     Heading = x.Heading,
                     Picture = x.Picture,
                     Title = x.Title,
-                    IsRemoved = x.IsRemoved,
+                    IsActive = x.IsActive,
                     CreationDate = x.CreateDateTime.ToFarsi()
                 }).ToListAsync(cancellationToken);
         }
@@ -110,7 +110,7 @@ public class SlideApplication(IFileUploader fileUploader,
         {
             var slides = await unitOfWork.SlideRepository.GetAllAsQueryable(cancellationToken);
             return await slides
-                    .Where(x => x.IsRemoved == false)
+                    .Where(x => x.IsActive)
                     .Select(x => new SlideQueryModel
                     {
                         Picture = x.Picture,
@@ -140,7 +140,7 @@ public class SlideApplication(IFileUploader fileUploader,
                 return OperationResult.Failed(ApplicationMessages.RecordNotFound);
 
             slide.Remove();
-            await unitOfWork.SlideRepository.Update(slide, cancellationToken);
+            await unitOfWork.SlideRepository.Update(slide);
             await unitOfWork.CommitAsync(cancellationToken);
             return OperationResult.Succeeded();
         }
@@ -161,7 +161,7 @@ public class SlideApplication(IFileUploader fileUploader,
                 return OperationResult.Failed(ApplicationMessages.RecordNotFound);
 
             slide.Restore();
-            await unitOfWork.SlideRepository.Update(slide, cancellationToken);
+            await unitOfWork.SlideRepository.Update(slide);
             await unitOfWork.CommitAsync(cancellationToken);
             return OperationResult.Succeeded();
         }

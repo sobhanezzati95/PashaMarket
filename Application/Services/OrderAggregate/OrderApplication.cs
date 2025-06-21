@@ -1,6 +1,6 @@
 ﻿using Application.Dtos.OrderAggregate;
 using Application.Interfaces.OrderAggregate;
-using Domain;
+using Domain.Contracts;
 using Domain.Entities.OrderAggregate;
 using Framework.Application;
 using Microsoft.EntityFrameworkCore;
@@ -62,7 +62,7 @@ public class OrderApplication(IAuthenticationHelper authenticationHelper,
             var order = await unitOfWork.OrderRepository.GetById(id, cancellationToken);
             order.Cancel();
 
-            await unitOfWork.OrderRepository.Update(order, cancellationToken);
+            await unitOfWork.OrderRepository.Update(order);
             await unitOfWork.CommitAsync(cancellationToken);
         }
         catch (Exception e)
@@ -83,7 +83,7 @@ public class OrderApplication(IAuthenticationHelper authenticationHelper,
             var issueTrackingNo = CodeGenerator.Generate(symbol);
             order.SetIssueTrackingNo(issueTrackingNo);
             //if (!_shopInventoryAcl.ReduceFromInventory(order.Items)) return "";
-            await unitOfWork.OrderRepository.Update(order, cancellationToken);
+            await unitOfWork.OrderRepository.Update(order);
             await unitOfWork.CommitAsync(cancellationToken);
             return issueTrackingNo;
         }
@@ -99,7 +99,7 @@ public class OrderApplication(IAuthenticationHelper authenticationHelper,
     {
         try
         {
-            var order = await unitOfWork.OrderRepository.GetAllWithIncludesAndThenInCludes(
+            var order = await unitOfWork.OrderRepository.GetAllWithIncludesAndThenIncludes(
                     predicate: x => x.Id == orderId,
                     orderBy: null,
                     isTracking: false,
@@ -136,7 +136,7 @@ public class OrderApplication(IAuthenticationHelper authenticationHelper,
     {
         try
         {
-            var query = await unitOfWork.OrderRepository.GetAllWithIncludesAndThenInCludes(
+            var query = await unitOfWork.OrderRepository.GetAllWithIncludesAndThenIncludes(
                                     predicate: null,
                                     orderBy: x => x.OrderByDescending(x => x.Id),
                                     isTracking: false,

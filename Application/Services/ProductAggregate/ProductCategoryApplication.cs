@@ -1,6 +1,6 @@
 ﻿using Application.Dtos.ProductAggregate.ProductCategory;
 using Application.Interfaces.ProductAggregate;
-using Domain;
+using Domain.Contracts;
 using Domain.Entities.ProductAggregate;
 using Framework.Application;
 using Microsoft.EntityFrameworkCore;
@@ -53,7 +53,7 @@ public class ProductCategoryApplication(IUnitOfWork unitOfWork,
                 : null;
 
             productCategory.Edit(command.Name, command.Description, fileName, command.PictureAlt, command.PictureTitle, command.Keywords, command.MetaDescription, slug);
-            await unitOfWork.ProductCategoryRepository.Update(productCategory, cancellationToken);
+            await unitOfWork.ProductCategoryRepository.Update(productCategory);
             await unitOfWork.CommitAsync(cancellationToken);
             return OperationResult.Succeeded();
         }
@@ -195,7 +195,7 @@ public class ProductCategoryApplication(IUnitOfWork unitOfWork,
                 return OperationResult.Failed(ApplicationMessages.RecordNotFound);
 
             productCategory.MakeItUnpopular();
-            await unitOfWork.ProductCategoryRepository.Update(productCategory, cancellationToken);
+            await unitOfWork.ProductCategoryRepository.Update(productCategory);
             await unitOfWork.CommitAsync(cancellationToken);
             return OperationResult.Succeeded();
         }
@@ -221,7 +221,7 @@ public class ProductCategoryApplication(IUnitOfWork unitOfWork,
                 return OperationResult.Failed(ApplicationMessages.InvalidOperation);
 
             productCategory.MakeItPopular();
-            await unitOfWork.ProductCategoryRepository.Update(productCategory, cancellationToken);
+            await unitOfWork.ProductCategoryRepository.Update(productCategory);
             await unitOfWork.CommitAsync(cancellationToken);
             return OperationResult.Succeeded();
         }

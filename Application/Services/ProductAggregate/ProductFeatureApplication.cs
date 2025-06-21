@@ -1,6 +1,6 @@
 ﻿using Application.Dtos.ProductAggregate.ProductFeature;
 using Application.Interfaces.ProductAggregate;
-using Domain;
+using Domain.Contracts;
 using Domain.Entities.ProductAggregate;
 using Framework.Application;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +14,7 @@ public class ProductFeatureApplication(IUnitOfWork unitOfWork, ILogger<ProductFe
     {
         try
         {
-            var query = await unitOfWork.ProductFeatureRepository.GetAllWithIncludesAndThenInCludes(
+            var query = await unitOfWork.ProductFeatureRepository.GetAllWithIncludesAndThenIncludes(
                     predicate: x => x.ProductId == command.ProductId,
                     orderBy: null,
                     isTracking: false,
@@ -46,7 +46,7 @@ public class ProductFeatureApplication(IUnitOfWork unitOfWork, ILogger<ProductFe
     {
         try
         {
-            var query = await unitOfWork.ProductFeatureRepository.GetAllWithIncludesAndThenInCludes(
+            var query = await unitOfWork.ProductFeatureRepository.GetAllWithIncludesAndThenIncludes(
                     predicate: x => x.ProductId == productId,
                     orderBy: null,
                     isTracking: false,

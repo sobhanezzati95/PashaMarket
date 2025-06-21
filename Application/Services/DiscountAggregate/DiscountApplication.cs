@@ -1,6 +1,6 @@
 ﻿using Application.Dtos.DiscountAggregate;
 using Application.Interfaces.DiscountAggregate;
-using Domain;
+using Domain.Contracts;
 using Domain.Entities.DiscountAggregate;
 using Framework.Application;
 using Microsoft.EntityFrameworkCore;
@@ -50,7 +50,7 @@ public class DiscountApplication(IUnitOfWork unitOfWork, ILogger<DiscountApplica
             var startDate = command.StartDate.ToGeorgianDateTime();
             var endDate = command.EndDate.ToGeorgianDateTime();
             customerDiscount.Edit(command.ProductId, command.DiscountRate, startDate, endDate, command.Reason);
-            await unitOfWork.DiscountRepository.Update(customerDiscount, cancellationToken);
+            await unitOfWork.DiscountRepository.Update(customerDiscount);
             await unitOfWork.CommitAsync(cancellationToken);
             return OperationResult.Succeeded();
         }
@@ -89,7 +89,7 @@ public class DiscountApplication(IUnitOfWork unitOfWork, ILogger<DiscountApplica
     {
         try
         {
-            var query = (await unitOfWork.DiscountRepository.GetAllWithIncludesAndThenInCludes(
+            var query = (await unitOfWork.DiscountRepository.GetAllWithIncludesAndThenIncludes(
                             predicate: null,
                             orderBy: x => x.OrderByDescending(p => p.Id),
                             isTracking: false,
