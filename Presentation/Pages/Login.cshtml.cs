@@ -15,7 +15,7 @@ public class LoginModel(IUserApplication userApplication) : PageModel
     {
         var result = await userApplication.Login(command, cancellationToken);
         if (result.IsSucceeded)
-            return RedirectToPage("/Index", cancellationToken);
+            return RedirectToPage("/Index");
 
         Message = result.Message;
         return Page();

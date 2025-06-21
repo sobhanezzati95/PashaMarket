@@ -25,6 +25,6 @@ public class CartModel(IProductApplication productApplication) : PageModel
             item.TotalPrice = item.UnitPrice * item.Count;
 
         CartItems = await productApplication.CheckInventoryStatus(cartItems, cancellationToken);
-        return RedirectToPage(CartItems.Any(x => !x.IsInStock) ? "/Cart" : "/Checkout", cancellationToken);
+        return RedirectToPage(CartItems.Any(x => !x.IsInStock) ? "/Cart" : "/Checkout");
     }
 }

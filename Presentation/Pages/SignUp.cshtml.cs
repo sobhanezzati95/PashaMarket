@@ -15,7 +15,7 @@ public class SignUpModel(IUserApplication userApplication) : PageModel
     {
         var result = await userApplication.Register(command, cancellationToken);
         if (result.IsSucceeded)
-            return RedirectToPage("/Index", cancellationToken);
+            return RedirectToPage("/Index");
 
         Message = result.Message;
         return Page();

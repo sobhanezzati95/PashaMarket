@@ -21,10 +21,10 @@ public class CheckoutModel(ICartCalculatorService cartCalculatorService, ICartSe
 
         Cart = await cartCalculatorService.ComputeCart(cartItems, cancellationToken);
     }
-    public IActionResult OnPostPay(int paymentMethod, CancellationToken cancellationToken = default)
+    public IActionResult OnPostPay(int paymentMethod)
     {
         //var cart = _cartService.Get();
         //check inventory and price , ...
-        return RedirectToPage("/Checkout", cancellationToken);
+        return RedirectToPage("/Checkout");
     }
 }
