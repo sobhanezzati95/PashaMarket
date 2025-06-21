@@ -478,5 +478,25 @@ namespace Application.Services.ProductAggregate
             }
             return cartItems;
         }
+        public async Task UpdateProductViewCount(long productId, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var product = await unitOfWork.ProductRepository.GetById(productId);
+                if (product != null)
+                {
+                    product.UpdateViewCount();
+                    await unitOfWork.ProductRepository.Update(product);
+                    await unitOfWork.CommitAsync(cancellationToken);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e,
+                "#ProductCategoryApplication.UpdateProductViewCount.CatchException() >> Exception: " + e.Message +
+                (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
+                throw;
+            }
+        }
     }
 }

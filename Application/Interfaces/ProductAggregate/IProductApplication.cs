@@ -18,4 +18,5 @@ public interface IProductApplication
     Task<ProductDetailQueryModel> GetProductDetails(string slug, CancellationToken cancellationToken = default);
     Task<List<RelatedProductsQueryModel>> GetRelatedProductsQuery(string categorySlug, long currentProductId, CancellationToken cancellationToken = default);
     Task<List<CartItem>> CheckInventoryStatus(List<CartItem> cartItems, CancellationToken cancellationToken = default);
+    Task UpdateProductViewCount(long productId, CancellationToken cancellationToken = default);
 }

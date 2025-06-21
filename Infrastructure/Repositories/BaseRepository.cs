@@ -18,10 +18,7 @@ public class BaseRepository<T>
     public async Task AddRange(List<T> entities, CancellationToken cancellationToken = default)
          => await DbSet.AddRangeAsync(entities);
     public async Task<IQueryable<T>> GetAllAsQueryable(CancellationToken cancellationToken = default)
-    {
-        return await Task.FromResult(DbSet.Where(t => t.IsActive == true).AsQueryable());
-
-    }
+        => await Task.FromResult(DbSet.Where(t => t.IsActive == true).AsQueryable());
     public async Task<IQueryable<T>> GetAllWithIncludesAndThenIncludes(Expression<Func<T, bool>>? predicate = null,
                                                                        Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
                                                                        bool isTracking = false, bool ignoreQueryFilters = false,
@@ -77,5 +74,5 @@ public class BaseRepository<T>
     public async Task Update(T entity)
          => DbSet.Update(entity);
     public async Task<bool> Exists(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default)
-         => await DbSet.AnyAsync(expression);
+         => await DbSet.AnyAsync(expression, cancellationToken);
 }

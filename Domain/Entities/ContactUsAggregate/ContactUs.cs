@@ -3,10 +3,13 @@
 namespace Domain.Entities.ContactUsAggregate;
 public class ContactUs : BaseEntity<long>
 {
-
     #region Constructor
 
-    public ContactUs(string fullName, string phoneNumber, string email, string title, string description)
+    private ContactUs(string fullName,
+                     string phoneNumber,
+                     string email,
+                     string title,
+                     string description)
     {
         FullName = fullName;
         PhoneNumber = phoneNumber;
@@ -29,12 +32,21 @@ public class ContactUs : BaseEntity<long>
 
     #region Behaviors
 
-    public static ContactUs Create(string fullName, string phoneNumber, string email, string title, string description)
-    {
-        return new ContactUs(fullName, phoneNumber, email, title, description);
-    }
-
-    public void Edit(string fullName, string phoneNumber, string email, string title, string description)
+    public static ContactUs Create(string fullName,
+                                   string phoneNumber,
+                                   string email,
+                                   string title,
+                                   string description)
+        => new(fullName,
+               phoneNumber,
+               email,
+               title,
+               description);
+    public void Edit(string fullName,
+                     string phoneNumber,
+                     string email,
+                     string title,
+                     string description)
     {
         FullName = fullName;
         PhoneNumber = phoneNumber;
@@ -42,10 +54,6 @@ public class ContactUs : BaseEntity<long>
         Title = title;
         Description = description;
     }
-
-    #endregion
-
-    #region Relations
 
     #endregion
 }
