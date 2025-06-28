@@ -45,7 +45,7 @@ public class UserApplication(IUnitOfWork unitOfWork,
                 return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
 
             var user = await unitOfWork.UserRepository.GetById(command.Id, cancellationToken);
-            user.Edit(command.Fullname, command.Username, command.Mobile, command.Email, command.BirthDate);
+            user.Edit(command.Fullname, command.Username, command.Mobile, command.NationalCode, command.Email, command.BirthDate);
             await unitOfWork.UserRepository.Update(user);
             await unitOfWork.CommitAsync(cancellationToken);
             return OperationResult.Succeeded();
@@ -66,7 +66,11 @@ public class UserApplication(IUnitOfWork unitOfWork,
             return new UserViewModel()
             {
                 Fullname = user.Fullname,
-                Mobile = user.Email
+                Mobile = user.Mobile,
+                Username = user.Username,
+                Email = user.Email,
+                BirthDate = user.BirthDate.HasValue ? user.BirthDate.Value.ToString() : null,
+                NationalCode = user.NationalCode
             };
         }
         catch (Exception e)
@@ -126,6 +130,9 @@ public class UserApplication(IUnitOfWork unitOfWork,
         try
         {
             var user = await unitOfWork.UserRepository.GetByUsername(command.Username, cancellationToken);
+            if (user == null)
+                return OperationResult.Failed(ApplicationMessages.WrongUserPass);
+
             var hashed = passwordHasher.Hash(command.Password);
             if (!passwordHasher.Check(user.Password, command.Password).Verified)
                 return OperationResult.Failed(ApplicationMessages.WrongUserPass);
@@ -214,5 +221,20 @@ public class UserApplication(IUnitOfWork unitOfWork,
             (e.InnerException != null ? $"InnerException: {e.InnerException.Message}" : string.Empty));
             throw;
         }
+    }
+    public async Task<EditUser> GetUserInfo(CancellationToken cancellationToken = default)
+    {
+        long userId = authenticationHelper.CurrentUserId();
+        var user = await unitOfWork.UserRepository.GetById(userId, cancellationToken);
+        return new EditUser
+        {
+            BirthDate = user.BirthDate,
+            Mobile = user.Mobile,
+            Email = user.Email,
+            Fullname = user.Fullname,
+            NationalCode = user.NationalCode,
+            Username = user.Username,
+            Id = user.Id,
+        };
     }
 }

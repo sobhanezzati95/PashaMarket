@@ -5,5 +5,5 @@ namespace Domain.Contracts.Repositories.UserAggregate;
 public interface IUserRepository 
     : IRepository<User>
 {
-    Task<User> GetByUsername(string username, CancellationToken cancellationToken = default );
+    Task<User?> GetByUsername(string username, CancellationToken cancellationToken = default );
 }

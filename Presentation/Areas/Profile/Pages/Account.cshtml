@@ -1,0 +1,45 @@
+﻿@page
+@model Areas.Profile.Pages.AccountModel
+@{
+    ViewData["Title"] = "اطلاعات حساب";
+}
+
+<div class="m-5 lg:m-0">
+    <p class="font-DanaMedium block lg:hidden"> @Model.editUser.Fullname عزیز؛ خوش اومدی 🙌 </p>
+    <div class="grid grid-cols-12 gap-6 mt-6">
+        <div class="col-span-12">
+            <p class="text-lg"> جزییات حساب کاربری :</p>
+            <form method="post" asp-page-handler="Account" class="grid grid-cols-12 child:col-span-12 md:child:col-span-6 gap-5 bg-white shadow child:flex child:flex-col child:gap-x-2 mt-4 p-4 dark:bg-zinc-700 rounded-lg ">
+                <div>
+                    <label class="mb-2"> نام , نام خانوادگی :</label>
+                    <input type="text" name="Fullname" id="Fullname" placeholder="نام , نام خانوادگی " value="@Model.editUser.Fullname" class="tailwind-input">
+                </div>
+                <div>
+                    <label for="" class="mb-2"> نام کاربری :</label>
+                    <input type="text" name="Username" id="Username" placeholder="نام کاربری " value="@Model.editUser.Username" class="tailwind-input">
+                </div>
+                <div>
+                    <label for="" class="mb-2">شماره موبایل :</label>
+                    <input type="text" name="Mobile" id="Mobile" placeholder="شماره موبایل " value="@Model.editUser.Mobile" class="tailwind-input">
+                </div>
+                <div>
+                    <label for="" class="mb-2"> ایمیل :</label>
+                    <input type="text" name="Email" id="Email" placeholder="ایمیل " value="@Model.editUser.Email" class="tailwind-input">
+                </div>
+                <div>
+                    <label for="" class="mb-2"> کد ملی :</label>
+                    <input type="text" name="NationalCode" id="NationalCode" placeholder="کد ملی " value="@Model.editUser.NationalCode" class="tailwind-input">
+                </div>
+                <div>
+                    <label for="" class="mb-2"> تاریخ تولد :</label>
+                    <input type="text" name="BirthDate" id="BirthDate" placeholder="تاریخ تولد " value="@Model.editUser.BirthDate" class="tailwind-input">
+                </div>
+                <button type="submit" class="main-btn w-[40%] py-2">ثبت اطلاعات</button>
+                <div>
+                    <input type="hidden" name="Id" id="Id" value="@Model.editUser.Id" class="tailwind-input">
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>

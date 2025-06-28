@@ -185,7 +185,7 @@ public class ApplicationDbContext : DbContext
                 title:"یک طعم باورنکردنی !",
                 text:"قطعا نام آشنای جیورنو را شنیده اید، جیورنو یکی از گونه های قهوه است که در نواحی مختلف کمربند قهوه کشت می شود.",
                 link:"تست",
-                btnText:"مشاهده قروشگاه"),
+                btnText:"مشاهده فروشگاه"),
             new(id:2,
                 picture:"slides/slide-2.png",
                 pictureAlt:"دانه قهوه اسپرسو جیورنو",
@@ -194,7 +194,7 @@ public class ApplicationDbContext : DbContext
                 title:"یک طعم باورنکردنی !",
                 text:"قطعا نام آشنای جیورنو را شنیده اید، جیورنو یکی از گونه های قهوه است که در نواحی مختلف کمربند قهوه کشت می شود.",
                 link:"تست",
-                btnText:"مشاهده قروشگاه"),
+                btnText:"مشاهده فروشگاه"),
         });
 
         modelBuilder.Entity<ProductPicture>().HasData(new List<ProductPicture>()
@@ -257,7 +257,8 @@ public class ApplicationDbContext : DbContext
             User.Create(id:1,
                         fullname:"test",
                         username:"test",
-                        mobile:"test",
+                        mobile:"09123456789",
+                        nationalCode:"123456789",
                         email:"test@gmail.com",
                         password:"10000.UJdStpoXiNqh1QLmQlLLVg==.VapUTtlJx8y8scGTsTkWdwIncix3biPefIYJD3tFeXM=",
                         birthDate:null,

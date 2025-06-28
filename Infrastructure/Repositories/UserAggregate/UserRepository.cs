@@ -7,7 +7,6 @@ namespace Infrastructure.Repositories.UserAggregate;
 public class UserRepository(ApplicationDbContext context)
     : BaseRepository<User>(context), IUserRepository
 {
-    public async Task<User> GetByUsername(string username, CancellationToken cancellationToken = default)
-        => await context.Users.FirstOrDefaultAsync(x => x.Username == username, cancellationToken)
-            ?? throw new Exception();
+    public async Task<User?> GetByUsername(string username, CancellationToken cancellationToken = default)
+        => await context.Users.FirstOrDefaultAsync(x => x.Username == username, cancellationToken);
 }

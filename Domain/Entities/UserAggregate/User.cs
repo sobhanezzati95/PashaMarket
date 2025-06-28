@@ -10,6 +10,7 @@ public class User : BaseEntity<long>
                    string? fullname,
                    string username,
                    string? mobile,
+                   string? nationalCode,
                    string? email,
                    string password,
                    DateTime? birthDate,
@@ -19,12 +20,12 @@ public class User : BaseEntity<long>
         Fullname = fullname;
         Username = username;
         Mobile = mobile;
+        NationalCode = nationalCode;
         Email = email;
         Password = password;
         BirthDate = birthDate;
         RoleId = roleId;
     }
-
     protected User(string username, string? email, string password)
     {
         Username = username;
@@ -40,6 +41,7 @@ public class User : BaseEntity<long>
     public string? Fullname { get; private set; }
     public string Username { get; private set; }
     public string? Mobile { get; private set; }
+    public string? NationalCode { get; private set; }
     public string? Email { get; private set; }
     public string Password { get; private set; }
     public DateTime? BirthDate { get; private set; }
@@ -60,6 +62,7 @@ public class User : BaseEntity<long>
                               string? fullname,
                               string username,
                               string? mobile,
+                              string? nationalCode,
                               string? email,
                               string password,
                               DateTime? birthDate,
@@ -68,27 +71,27 @@ public class User : BaseEntity<long>
                fullname,
                username,
                mobile,
+               nationalCode,
                email,
                password,
                birthDate,
                roleId);
-
     public static User Register(string username, string? email, string password)
         => new(username, email, password);
-
     public void Edit(string? fullname,
                      string username,
                      string? mobile,
+                     string? nationalCode,
                      string? email,
                      DateTime? birthDate)
     {
         Fullname = fullname;
         Username = username;
         Mobile = mobile;
+        NationalCode = nationalCode;
         Email = email;
         BirthDate = birthDate;
     }
-
     public void ChangePassword(string password)
         => Password = password;
 
