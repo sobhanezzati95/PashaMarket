@@ -4,5 +4,5 @@ using Infrastructure.Repositories;
 
 namespace Domain.Contracts.Repositories.DiscountAggregate;
 public class DiscountRepository(ApplicationDbContext context)
-            : BaseRepository<Discount>(context), IDiscountRepository
+    : BaseRepository<Discount>(context), IDiscountRepository
 { }

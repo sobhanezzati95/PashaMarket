@@ -23,13 +23,11 @@ namespace Application.Services.ProductAggregate
                     return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
 
                 var slug = command.Slug.Slugify();
-                var categorySlug = await unitOfWork.ProductCategoryRepository.GetSlugById(command.CategoryId);
+                var categorySlug = await unitOfWork.ProductCategoryRepository.GetSlugById(command.CategoryId, cancellationToken);
                 var path = $"{categorySlug}//{slug}";
                 var picturePath = await fileUploader.Upload(command.Picture, path, cancellationToken);
-                var product = Product.Create(command.Name, command.Code, command.Brand, command.UnitPrice, command.Count,
-                    command.Description, picturePath,
-                    command.PictureAlt, command.PictureTitle, command.CategoryId, slug,
-                    command.Keywords, command.MetaDescription);
+                var product = Product.Create(command.Name, command.Code, command.Brand, command.UnitPrice, command.Count, command.Description, picturePath,
+                                             command.PictureAlt, command.PictureTitle, command.CategoryId, slug, command.Keywords, command.MetaDescription);
                 await unitOfWork.ProductRepository.Add(product, cancellationToken);
                 await unitOfWork.CommitAsync(cancellationToken);
                 return OperationResult.Succeeded();
@@ -59,10 +57,8 @@ namespace Application.Services.ProductAggregate
                     ? await fileUploader.Upload(command.Picture, path, cancellationToken)
                     : null;
 
-                product.Edit(command.Name, command.Code, command.Brand, command.UnitPrice, command.Count,
-                    command.Description, picturePath,
-                    command.PictureAlt, command.PictureTitle, command.CategoryId, slug,
-                    command.Keywords, command.MetaDescription);
+                product.Edit(command.Name, command.Code, command.Brand, command.UnitPrice, command.Count, command.Description, picturePath,
+                             command.PictureAlt, command.PictureTitle, command.CategoryId, slug, command.Keywords, command.MetaDescription);
                 await unitOfWork.ProductRepository.Update(product);
                 await unitOfWork.CommitAsync(cancellationToken);
                 return OperationResult.Succeeded();
@@ -116,7 +112,7 @@ namespace Application.Services.ProductAggregate
                                         includeProperties: null,
                                         thenInclude: x => x.Include(z => z.Discounts));
 
-                if (await query.AnyAsync() == false)
+                if (!await query.AnyAsync(cancellationToken))
                     return [];
 
                 var result = await query.Select(x => new LatestProductsQueryModel
@@ -170,7 +166,7 @@ namespace Application.Services.ProductAggregate
         {
             try
             {
-                var product = await unitOfWork.ProductRepository.GetById(productId, cancellationToken);
+                Product product = await unitOfWork.ProductRepository.GetById(productId, cancellationToken);
                 product.InStock();
                 await unitOfWork.ProductRepository.Update(product);
                 await unitOfWork.CommitAsync(cancellationToken);
@@ -188,7 +184,7 @@ namespace Application.Services.ProductAggregate
         {
             try
             {
-                var product = await unitOfWork.ProductRepository.GetById(productId, cancellationToken);
+                Product product = await unitOfWork.ProductRepository.GetById(productId, cancellationToken);
                 product.NotInStock();
                 await unitOfWork.ProductRepository.Update(product);
                 await unitOfWork.CommitAsync(cancellationToken);
@@ -214,7 +210,7 @@ namespace Application.Services.ProductAggregate
                                 includeProperties: null,
                                 thenInclude: query => query.Include(x => x.Category));
 
-                if (await query.AnyAsync() == false)
+                if (!await query.AnyAsync(cancellationToken))
                     return [];
                 if (!string.IsNullOrWhiteSpace(searchModel.Name))
                     query = query.Where(x => x.Name.Contains(searchModel.Name));
@@ -247,7 +243,7 @@ namespace Application.Services.ProductAggregate
         {
             try
             {
-                var category = await unitOfWork.ProductCategoryRepository.GetBySlug(slug, cancellationToken);
+                ProductCategory category = await unitOfWork.ProductCategoryRepository.GetBySlug(slug, cancellationToken);
                 var products = await unitOfWork.ProductRepository.GetAllWithIncludesAndThenIncludes(
                                         predicate: x => x.CategoryId == category.Id,
                                         orderBy: x => x.OrderByDescending(p => p.CreateDateTime),
@@ -256,7 +252,7 @@ namespace Application.Services.ProductAggregate
                                         includeProperties: null,
                                         thenInclude: x => x.Include(z => z.Discounts));
 
-                if (await products.AnyAsync() == false)
+                if (!await products.AnyAsync(cancellationToken))
                     return new();
 
                 var result = new ProductCategoryQueryModel
@@ -369,10 +365,10 @@ namespace Application.Services.ProductAggregate
                                                            .Include(p => p.Discounts)
                                                            .Include(p => p.ProductFeatures));
 
-                if (await query.AnyAsync(cancellationToken) == false)
+                if (!await query.AnyAsync(cancellationToken))
                     return new();
 
-                var product = query.FirstOrDefault();
+                Product product = await query.FirstOrDefaultAsync(cancellationToken) ?? throw new Exception();
                 bool hasDiscount = product.Discounts.FirstOrDefault() != null &&
                                    product.Discounts.FirstOrDefault().StartDate <= DateTime.Now &&
                                    product.Discounts.FirstOrDefault().EndDate >= DateTime.Now;
@@ -426,7 +422,7 @@ namespace Application.Services.ProductAggregate
         {
             try
             {
-                var category = await unitOfWork.ProductCategoryRepository.GetBySlug(categorySlug, cancellationToken);
+                ProductCategory category = await unitOfWork.ProductCategoryRepository.GetBySlug(categorySlug, cancellationToken);
                 var products = await unitOfWork.ProductRepository.GetAllWithIncludesAndThenIncludes(
                                         predicate: x => x.CategoryId == category.Id && x.Id != currentProductId,
                                         orderBy: x => x.OrderByDescending(p => p.CreateDateTime),
@@ -435,7 +431,7 @@ namespace Application.Services.ProductAggregate
                                         includeProperties: null,
                                         thenInclude: x => x.Include(z => z.Discounts));
 
-                if (await products.AnyAsync(cancellationToken) == false)
+                if (!await products.AnyAsync(cancellationToken))
                     return [];
 
                 var result = await products.Select(x => new RelatedProductsQueryModel
@@ -470,7 +466,7 @@ namespace Application.Services.ProductAggregate
             if (cartItems.Count == 0)
                 return [];
 
-            var products = (await unitOfWork.ProductRepository.GetAllAsQueryable()).ToList();
+            var products = (await unitOfWork.ProductRepository.GetAllAsQueryable(cancellationToken)).ToList();
             foreach (var item in cartItems)
             {
                 if (products.Any(x => x.Id == item.Id && x.IsInStock && x.Count >= item.Count))
@@ -482,13 +478,10 @@ namespace Application.Services.ProductAggregate
         {
             try
             {
-                var product = await unitOfWork.ProductRepository.GetById(productId);
-                if (product != null)
-                {
-                    product.UpdateViewCount();
-                    await unitOfWork.ProductRepository.Update(product);
-                    await unitOfWork.CommitAsync(cancellationToken);
-                }
+                var product = await unitOfWork.ProductRepository.GetById(productId, cancellationToken);
+                product.UpdateViewCount();
+                await unitOfWork.ProductRepository.Update(product);
+                await unitOfWork.CommitAsync(cancellationToken);
             }
             catch (Exception e)
             {

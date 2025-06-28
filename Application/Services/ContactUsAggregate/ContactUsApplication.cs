@@ -13,8 +13,7 @@ public class ContactUsApplication(IUnitOfWork unitOfWork, ILogger<ContactUsAppli
     {
         try
         {
-            var customerDiscount = ContactUs.Create(command.FullName, command.PhoneNumber, command.Email,
-                    command.Title, command.Description);
+            var customerDiscount = ContactUs.Create(command.FullName, command.PhoneNumber, command.Email, command.Title, command.Description);
             await unitOfWork.ContactUsRepository.Add(customerDiscount, cancellationToken);
             await unitOfWork.CommitAsync(cancellationToken);
             return OperationResult.Succeeded();

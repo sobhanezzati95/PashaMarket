@@ -20,7 +20,6 @@ public class FileExtentionLimitationAttribute : ValidationAttribute, IClientMode
     }
     public void AddValidation(ClientModelValidationContext context)
     {
-        //context.Attributes.Add("data-val", "true");
         context.Attributes.Add("data-val-fileExtentionLimit", ErrorMessage);
     }
 }

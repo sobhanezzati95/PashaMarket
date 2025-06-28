@@ -40,8 +40,6 @@ public class ProductCategoryApplication(IUnitOfWork unitOfWork,
         try
         {
             var productCategory = await unitOfWork.ProductCategoryRepository.GetById(command.Id, cancellationToken);
-            if (productCategory == null)
-                return OperationResult.Failed(ApplicationMessages.RecordNotFound);
 
             if (await unitOfWork.ProductCategoryRepository.Exists(x => x.Name == command.Name && x.Id != command.Id, cancellationToken))
                 return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
@@ -92,7 +90,7 @@ public class ProductCategoryApplication(IUnitOfWork unitOfWork,
     {
         try
         {
-            var productCategories = await unitOfWork.ProductCategoryRepository.GetAllAsQueryable();
+            var productCategories = await unitOfWork.ProductCategoryRepository.GetAllAsQueryable(cancellationToken);
             return await productCategories.Select(x => new ProductCategoryViewModel
             {
                 Id = x.Id,
@@ -190,10 +188,7 @@ public class ProductCategoryApplication(IUnitOfWork unitOfWork,
     {
         try
         {
-            var productCategory = await unitOfWork.ProductCategoryRepository.GetById(id, cancellationToken);
-            if (productCategory == null)
-                return OperationResult.Failed(ApplicationMessages.RecordNotFound);
-
+            ProductCategory productCategory = await unitOfWork.ProductCategoryRepository.GetById(id, cancellationToken);
             productCategory.MakeItUnpopular();
             await unitOfWork.ProductCategoryRepository.Update(productCategory);
             await unitOfWork.CommitAsync(cancellationToken);
@@ -211,10 +206,7 @@ public class ProductCategoryApplication(IUnitOfWork unitOfWork,
     {
         try
         {
-            var productCategory = await unitOfWork.ProductCategoryRepository.GetById(id, cancellationToken);
-            if (productCategory == null)
-                return OperationResult.Failed(ApplicationMessages.RecordNotFound);
-
+            ProductCategory productCategory = await unitOfWork.ProductCategoryRepository.GetById(id, cancellationToken);
             var query = await unitOfWork.ProductCategoryRepository.GetAllAsQueryable(cancellationToken);
             var count = query.Where(x => x.IsPopular).Count();
             if (count >= 5)
