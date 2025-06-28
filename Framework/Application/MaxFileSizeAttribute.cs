@@ -7,9 +7,7 @@ public class MaxFileSizeAttribute : ValidationAttribute, IClientModelValidator
 {
     private readonly int _maxFileSize;
     public MaxFileSizeAttribute(int maxFileSize)
-    {
-        _maxFileSize = maxFileSize;
-    }
+        => _maxFileSize = maxFileSize;
 
     public override bool IsValid(object value)
     {

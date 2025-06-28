@@ -18,8 +18,8 @@ public class SlideApplication(IFileUploader fileUploader,
         {
             var pictureName = await fileUploader.Upload(command.Picture, "slides", cancellationToken);
 
-            var slide = Slide.Create(pictureName, command.PictureAlt, command.PictureTitle,
-                command.Heading, command.Title, command.Text, command.Link, command.BtnText);
+            var slide = Slide.Create(pictureName, command.PictureAlt, command.PictureTitle, command.Heading, command.Title,
+                                     command.Text, command.Link, command.BtnText);
             await unitOfWork.SlideRepository.Add(slide, cancellationToken);
             await unitOfWork.CommitAsync(cancellationToken);
             return OperationResult.Succeeded();
@@ -37,12 +37,9 @@ public class SlideApplication(IFileUploader fileUploader,
         try
         {
             var slide = await unitOfWork.SlideRepository.GetById(command.Id, cancellationToken);
-            if (slide == null)
-                return OperationResult.Failed(ApplicationMessages.RecordNotFound);
-
             var pictureName = await fileUploader.Upload(command.Picture, "slides", cancellationToken);
-            slide.Edit(pictureName, command.PictureAlt, command.PictureTitle,
-                       command.Heading, command.Title, command.Text, command.Link, command.BtnText);
+            slide.Edit(pictureName, command.PictureAlt, command.PictureTitle, command.Heading, command.Title,
+                       command.Text, command.Link, command.BtnText);
             await unitOfWork.SlideRepository.Update(slide);
             await unitOfWork.CommitAsync(cancellationToken);
             return OperationResult.Succeeded();
@@ -136,9 +133,6 @@ public class SlideApplication(IFileUploader fileUploader,
         try
         {
             var slide = await unitOfWork.SlideRepository.GetById(id, cancellationToken);
-            if (slide == null)
-                return OperationResult.Failed(ApplicationMessages.RecordNotFound);
-
             slide.Remove();
             await unitOfWork.SlideRepository.Update(slide);
             await unitOfWork.CommitAsync(cancellationToken);
@@ -157,9 +151,6 @@ public class SlideApplication(IFileUploader fileUploader,
         try
         {
             var slide = await unitOfWork.SlideRepository.GetById(id, cancellationToken);
-            if (slide == null)
-                return OperationResult.Failed(ApplicationMessages.RecordNotFound);
-
             slide.Restore();
             await unitOfWork.SlideRepository.Update(slide);
             await unitOfWork.CommitAsync(cancellationToken);

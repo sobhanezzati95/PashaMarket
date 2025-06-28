@@ -19,8 +19,7 @@ public class OrderApplication(IAuthenticationHelper authenticationHelper,
         try
         {
             var currentUserId = authenticationHelper.CurrentUserId();
-            var order = Order.PlaceOrder(currentUserId, cart.PaymentMethod, cart.TotalAmount, cart.DiscountAmount,
-                                         cart.PayAmount);
+            var order = Order.PlaceOrder(currentUserId, cart.PaymentMethod, cart.TotalAmount, cart.DiscountAmount, cart.PayAmount);
 
             foreach (var cartItem in cart.Items)
             {
@@ -45,7 +44,7 @@ public class OrderApplication(IAuthenticationHelper authenticationHelper,
         try
         {
             var order = await unitOfWork.OrderRepository.GetById(id, cancellationToken);
-            return order != null ? order.PayAmount : 0;
+            return order.PayAmount;
         }
         catch (Exception e)
         {
@@ -107,10 +106,10 @@ public class OrderApplication(IAuthenticationHelper authenticationHelper,
                     includeProperties: null,
                     thenInclude: query => query.Include(x => x.Items).ThenInclude(p => p.Product));
 
-            if (await order.AnyAsync(cancellationToken) == false)
+            if (!await order.AnyAsync(cancellationToken))
                 return [];
 
-            var items = order.FirstOrDefault()!
+            var items = (await order.FirstOrDefaultAsync(cancellationToken))!
                 .Items
                 .Select(x => new OrderItemViewModel
                 {
@@ -144,7 +143,7 @@ public class OrderApplication(IAuthenticationHelper authenticationHelper,
                                     includeProperties: null,
                                     thenInclude: query => query.Include(x => x.User));
 
-            if (await query.AnyAsync(cancellationToken) == false)
+            if (!await query.AnyAsync(cancellationToken))
                 return [];
 
             query = query.Where(x => x.IsCanceled == searchModel.IsCanceled);
@@ -167,7 +166,7 @@ public class OrderApplication(IAuthenticationHelper authenticationHelper,
                 CreationDate = x.CreateDateTime.ToFarsi(),
                 UserFullName = x.User.Fullname,
                 PaymentMethod = PaymentMethod.GetBy(x.PaymentMethod).Name
-            }).ToListAsync();
+            }).ToListAsync(cancellationToken);
             return orders;
         }
         catch (Exception e)

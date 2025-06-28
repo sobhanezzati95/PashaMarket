@@ -19,8 +19,8 @@ public class DiscountApplication(IUnitOfWork unitOfWork, ILogger<DiscountApplica
                                                                 && x.DiscountRate == command.DiscountRate, cancellationToken))
                 return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
 
-            var startDate = command.StartDate.ToGeorgianDateTime();
-            var endDate = command.EndDate.ToGeorgianDateTime();
+            var startDate = command.StartDate.ToGregorianDateTime();
+            var endDate = command.EndDate.ToGregorianDateTime();
             var customerDiscount = Discount.Create(command.ProductId, command.DiscountRate, startDate, endDate, command.Reason);
             await unitOfWork.DiscountRepository.Add(customerDiscount, cancellationToken);
             await unitOfWork.CommitAsync(cancellationToken);
@@ -39,16 +39,14 @@ public class DiscountApplication(IUnitOfWork unitOfWork, ILogger<DiscountApplica
         try
         {
             var customerDiscount = await unitOfWork.DiscountRepository.GetById(command.Id, cancellationToken);
-            if (customerDiscount == null)
-                return OperationResult.Failed(ApplicationMessages.RecordNotFound);
 
             if (await unitOfWork.DiscountRepository.Exists(x => x.ProductId == command.ProductId
                                                                 && x.DiscountRate == command.DiscountRate
                                                                 && x.Id != command.Id, cancellationToken))
                 return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
 
-            var startDate = command.StartDate.ToGeorgianDateTime();
-            var endDate = command.EndDate.ToGeorgianDateTime();
+            var startDate = command.StartDate.ToGregorianDateTime();
+            var endDate = command.EndDate.ToGregorianDateTime();
             customerDiscount.Edit(command.ProductId, command.DiscountRate, startDate, endDate, command.Reason);
             await unitOfWork.DiscountRepository.Update(customerDiscount);
             await unitOfWork.CommitAsync(cancellationToken);
@@ -110,17 +108,17 @@ public class DiscountApplication(IUnitOfWork unitOfWork, ILogger<DiscountApplica
                                 Product = x.Product.Name,
                             });
 
-            if (await query.AnyAsync(cancellationToken) == false)
+            if (!await query.AnyAsync(cancellationToken))
                 return [];
 
             if (searchModel.ProductId > 0)
                 query = query.Where(x => x.ProductId == searchModel.ProductId);
 
             if (!string.IsNullOrWhiteSpace(searchModel.StartDate))
-                query = query.Where(x => x.StartDateGr > searchModel.StartDate.ToGeorgianDateTime());
+                query = query.Where(x => x.StartDateGr > searchModel.StartDate.ToGregorianDateTime());
 
             if (!string.IsNullOrWhiteSpace(searchModel.EndDate))
-                query = query.Where(x => x.EndDateGr < searchModel.EndDate.ToGeorgianDateTime());
+                query = query.Where(x => x.EndDateGr < searchModel.EndDate.ToGregorianDateTime());
 
             return await query.ToListAsync(cancellationToken);
         }

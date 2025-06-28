@@ -18,13 +18,10 @@ public class UserApplication(IUnitOfWork unitOfWork,
     {
         try
         {
-            var user = await unitOfWork.UserRepository.GetById(command.Id, cancellationToken);
-            if (user == null)
-                return OperationResult.Failed(ApplicationMessages.RecordNotFound);
-
             if (command.Password != command.RePassword)
                 return OperationResult.Failed(ApplicationMessages.PasswordsNotMatch);
 
+            User user = await unitOfWork.UserRepository.GetById(command.Id, cancellationToken);
             var password = passwordHasher.Hash(command.Password);
             user.ChangePassword(password);
             await unitOfWork.UserRepository.Update(user);
@@ -43,14 +40,11 @@ public class UserApplication(IUnitOfWork unitOfWork,
     {
         try
         {
-            var user = await unitOfWork.UserRepository.GetById(command.Id, cancellationToken);
-            if (user == null)
-                return OperationResult.Failed(ApplicationMessages.RecordNotFound);
-
             if (await unitOfWork.UserRepository.Exists(x =>
                 (x.Username == command.Username || x.Email == command.Email) && x.Id != command.Id, cancellationToken))
                 return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
 
+            var user = await unitOfWork.UserRepository.GetById(command.Id, cancellationToken);
             user.Edit(command.Fullname, command.Username, command.Mobile, command.Email, command.BirthDate);
             await unitOfWork.UserRepository.Update(user);
             await unitOfWork.CommitAsync(cancellationToken);
@@ -132,12 +126,8 @@ public class UserApplication(IUnitOfWork unitOfWork,
         try
         {
             var user = await unitOfWork.UserRepository.GetByUsername(command.Username, cancellationToken);
-            if (user == null)
-                return OperationResult.Failed(ApplicationMessages.WrongUserPass);
-
             var hashed = passwordHasher.Hash(command.Password);
-            var result = passwordHasher.Check(user.Password, command.Password);
-            if (!result.Verified)
+            if (!passwordHasher.Check(user.Password, command.Password).Verified)
                 return OperationResult.Failed(ApplicationMessages.WrongUserPass);
 
             var authViewModel = new AuthenticationViewModel(user.Id, user.RoleId, user.Fullname, user.Username, user.Email);
@@ -190,7 +180,7 @@ public class UserApplication(IUnitOfWork unitOfWork,
             includeProperties: null,
             thenInclude: query => query.Include(x => x.Role));
 
-            if (await query.AnyAsync(cancellationToken) == false)
+            if (!await query.AnyAsync(cancellationToken))
                 return [];
 
             if (!string.IsNullOrWhiteSpace(searchModel.Fullname))

@@ -68,9 +68,7 @@ public class UnitOfWork : IUnitOfWork
     #endregion
 
     public Task<int> CommitAsync(CancellationToken cancellationToken = default)
-    {
-        return _dbContext.SaveChangesAsync(cancellationToken);
-    }
+        => _dbContext.SaveChangesAsync(cancellationToken);
 
     public void Dispose()
     {

@@ -8,5 +8,7 @@ public class ProductRepository(ApplicationDbContext context)
     : BaseRepository<Product>(context), IProductRepository
 {
     public async Task<Product> GetProductWithCategory(long id, CancellationToken cancellationToken = default)
-         => await context.Products.Include(x => x.Category).FirstOrDefaultAsync(x => x.Id == id);
+         => await context.Products.Include(x => x.Category)
+                                  .FirstOrDefaultAsync(x => x.Id == id, cancellationToken)
+            ?? throw new Exception();
 }

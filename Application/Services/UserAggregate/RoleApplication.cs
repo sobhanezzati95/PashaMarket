@@ -35,9 +35,6 @@ public class RoleApplication(IUnitOfWork unitOfWork, ILogger<SlideApplication> l
         try
         {
             var role = await unitOfWork.RoleRepository.GetById(command.Id, cancellationToken);
-            if (role == null)
-                return OperationResult.Failed(ApplicationMessages.RecordNotFound);
-
             if (await unitOfWork.RoleRepository.Exists(x => x.Name == command.Name && x.Id != command.Id, cancellationToken))
                 return OperationResult.Failed(ApplicationMessages.DuplicatedRecord);
 

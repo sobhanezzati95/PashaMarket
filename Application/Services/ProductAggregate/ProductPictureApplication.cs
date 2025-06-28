@@ -16,7 +16,7 @@ public class ProductPictureApplication(IFileUploader fileUploader,
     {
         try
         {
-            var product = await unitOfWork.ProductRepository.GetProductWithCategory(command.ProductId);
+            var product = await unitOfWork.ProductRepository.GetProductWithCategory(command.ProductId, cancellationToken);
             var path = $"{product.Category.Slug}//{product.Slug}";
             var picturePath = await fileUploader.Upload(command.Picture, path, cancellationToken);
             var productPicture = ProductPicture.Create(command.ProductId, picturePath, command.PictureAlt, command.PictureTitle);
@@ -37,9 +37,6 @@ public class ProductPictureApplication(IFileUploader fileUploader,
         try
         {
             var productPicture = await unitOfWork.ProductPictureRepository.GetWithProductAndCategory(command.Id, cancellationToken);
-            if (productPicture == null)
-                return OperationResult.Failed(ApplicationMessages.RecordNotFound);
-
             var path = $"{productPicture.Product.Category.Slug}//{productPicture.Product.Slug}";
             var picturePath = command.Picture != null
                 ? await fileUploader.Upload(command.Picture, path, cancellationToken)
@@ -84,9 +81,6 @@ public class ProductPictureApplication(IFileUploader fileUploader,
         try
         {
             var productPicture = await unitOfWork.ProductPictureRepository.GetById(id, cancellationToken);
-            if (productPicture == null)
-                return OperationResult.Failed(ApplicationMessages.RecordNotFound);
-
             productPicture.Remove();
             await unitOfWork.ProductPictureRepository.Update(productPicture);
             await unitOfWork.CommitAsync(cancellationToken);
@@ -105,9 +99,6 @@ public class ProductPictureApplication(IFileUploader fileUploader,
         try
         {
             var productPicture = await unitOfWork.ProductPictureRepository.GetById(id, cancellationToken);
-            if (productPicture == null)
-                return OperationResult.Failed(ApplicationMessages.RecordNotFound);
-
             productPicture.Restore();
             await unitOfWork.ProductPictureRepository.Update(productPicture);
             await unitOfWork.CommitAsync(cancellationToken);
@@ -133,7 +124,7 @@ public class ProductPictureApplication(IFileUploader fileUploader,
             includeProperties: null,
             thenInclude: query => query.Include(x => x.Product));
 
-            if (await query.AnyAsync(cancellationToken) == false)
+            if (!await query.AnyAsync(cancellationToken))
                 return [];
 
             if (searchModel.ProductId != 0)
