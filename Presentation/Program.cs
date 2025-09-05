@@ -1,9 +1,13 @@
 using Application.Configurations;
+using Domain.Entities.UserAggregate;
 using Framework.Application;
 using Framework.Infrastructure;
+using Infrastructure;
 using Infrastructure.Configurations;
 using Infrastructure.DbContexts;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using Presentation.Helpers;
 
@@ -15,17 +19,37 @@ builder.Services.SetupServices();
 builder.Services.SetupInfrastructureServices();
 builder.Services.AddTransient<IFileUploader, FileUploader>();
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
-
+builder.Services.AddSingleton<IEmailService, EmailService>();
+builder.Services.AddEntityFramework(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<IUrlHelperFactory, UrlHelperFactory>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
     options.CheckConsentNeeded = context => true;
     options.MinimumSameSitePolicy = SameSiteMode.Lax;
+});
+
+builder.Services.AddIdentity<User, IdentityRole<long>>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders()
+                .AddErrorDescriber<CustomIdentityError>();
+builder.Services.Configure<IdentityOptions>(option =>
+{
+    option.User.RequireUniqueEmail = true;
+    option.SignIn.RequireConfirmedEmail = true;
+
+});
+builder.Services.ConfigureApplicationCookie(option =>
+{
+    option.ExpireTimeSpan = TimeSpan.FromDays(7);
+    option.LoginPath = "/Login";
+    option.AccessDeniedPath = "/AccessDenied";
+    option.SlidingExpiration = true;
+
 });
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -55,11 +79,8 @@ var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
 var context = services.GetService<ApplicationDbContext>();
 
-
 if (context != null)
-{
     await context.Database.EnsureCreatedAsync();
-}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

@@ -13,6 +13,8 @@ public class LoginModel(IUserApplication userApplication) : PageModel
     }
     public async Task<IActionResult> OnPostLogin(Login command, CancellationToken cancellationToken = default)
     {
+        if (!ModelState.IsValid)
+            return Page();
         var result = await userApplication.Login(command, cancellationToken);
         if (result.IsSucceeded)
             return RedirectToPage("/Index");

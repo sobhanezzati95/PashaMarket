@@ -1,10 +1,9 @@
 ﻿using Application.Dtos.OrderAggregate;
 using Application.Interfaces.OrderAggregate;
 using Domain.Contracts;
-using Microsoft.Extensions.Logging;
 
 namespace Application.Services.OrderAggregate;
-public class CartCalculatorService(IUnitOfWork unitOfWork, ILogger<CartCalculatorService> _logger)
+public class CartCalculatorService(IUnitOfWork unitOfWork)
     : ICartCalculatorService
 {
     public async Task<Cart> ComputeCart(List<CartItem> cartItems, CancellationToken cancellationToken = default)

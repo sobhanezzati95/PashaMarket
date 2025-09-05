@@ -1,8 +1,12 @@
-﻿namespace Application.Dtos.UserAggregate.User
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Application.Dtos.UserAggregate.User;
+public class Login
 {
-    public class Login
-    {
-        public string Username { get; set; }
-        public string Password { get; set; }
-    }
+    [Required]
+    public string Username { get; set; }
+    [Required]
+    [DataType(DataType.Password)]
+    public string Password { get; set; }
+    public bool RememberMe { get; set; } = false;
 }

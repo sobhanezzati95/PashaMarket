@@ -19,8 +19,4 @@ public class OperationResult
             Message = message,
         };
     }
-    public static OperationResult Failed(object passwordsNotMatch)
-    {
-        throw new NotImplementedException();
-    }
 }

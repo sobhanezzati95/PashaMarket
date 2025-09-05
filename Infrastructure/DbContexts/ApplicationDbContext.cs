@@ -3,14 +3,14 @@ using Domain.Entities.OrderAggregate;
 using Domain.Entities.ProductAggregate;
 using Domain.Entities.UserAggregate;
 using Infrastructure.Configurations.ProductAggregate;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DbContexts;
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+    : IdentityDbContext<User, IdentityRole<long>, long>(options)
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-    {
-    }
 
     #region ProductAggregate
 
@@ -20,7 +20,6 @@ public class ApplicationDbContext : DbContext
     public DbSet<Slide> Slides { get; set; }
     public DbSet<ProductFeature> ProductFeatures { get; set; }
 
-
     #endregion
 
     #region DiscountAggregate
@@ -28,15 +27,12 @@ public class ApplicationDbContext : DbContext
 
     #endregion
 
-    #region UserAggregate
-
-    public DbSet<User> Users { get; set; }
-    public DbSet<Role> Roles { get; set; }
-
-    #endregion
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<IdentityUserLogin<string>>().HasKey(x => new { x.ProviderKey, x.LoginProvider });
+        modelBuilder.Entity<IdentityUserRole<string>>().HasKey(x => new { x.UserId, x.RoleId });
+        modelBuilder.Entity<IdentityUserToken<string>>().HasKey(x => new { x.UserId, x.LoginProvider });
+
         #region SeedData
         modelBuilder.Entity<ProductCategory>().HasData(new List<ProductCategory>()
         {
@@ -199,70 +195,56 @@ public class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<ProductPicture>().HasData(new List<ProductPicture>()
         {
-            new ProductPicture(id:1,
-                               productId:1,
-                               picture: "خشکبار//زعفران/2025-04-17-20-17-37-2025-04-17-18-40-35-220590f810820bce5d224bec3fbe1bf7c0c73b2d_1597927042.webp",
-                               pictureAlt:"تست",
-                               pictureTitle:  "تست"),
+            new (id:1,
+                 productId:1,
+                 picture: "خشکبار//زعفران/2025-04-17-20-17-37-2025-04-17-18-40-35-220590f810820bce5d224bec3fbe1bf7c0c73b2d_1597927042.webp",
+                 pictureAlt:"تست",
+                 pictureTitle:  "تست"),
+            new (id:2,
+                 productId:1,
+                 picture: "خشکبار//زعفران/2025-04-17-20-17-43-2025-04-17-18-40-48-d7430fdc7ec9a61ae3cd2b98e168249a93d05d19_1597926894.webp",
+                 pictureAlt:"تست",
+                 pictureTitle:  "تست"),
 
-            new ProductPicture(id:2,
-                               productId:1,
-                               picture: "خشکبار//زعفران/2025-04-17-20-17-43-2025-04-17-18-40-48-d7430fdc7ec9a61ae3cd2b98e168249a93d05d19_1597926894.webp",
-                               pictureAlt:"تست",
-                               pictureTitle:  "تست"),
-
-            new ProductPicture(id:3,
-                               productId:1,
-                               picture: "خشکبار//زعفران/2025-04-17-20-17-47-2025-04-17-18-41-00-bdb4bbe6644db924fa87941c2655af23a618f9c6_1597926969.webp",
-                               pictureAlt:"تست",
-                               pictureTitle:  "تست"),
+            new (id:3,
+                 productId:1,
+                 picture: "خشکبار//زعفران/2025-04-17-20-17-47-2025-04-17-18-41-00-bdb4bbe6644db924fa87941c2655af23a618f9c6_1597926969.webp",
+                 pictureAlt:"تست",
+                 pictureTitle:  "تست"),
 
         });
 
         modelBuilder.Entity<ProductFeature>().HasData(new List<ProductFeature>()
         {
 
-            new ProductFeature(id:1,
-                               displayName:"وزن بسته‌بندی",
-                               value:"۱ گرم",
-                               productId:1),
+            new(id:1,
+                displayName:"وزن بسته‌بندی",
+                value:"۱ گرم",
+                productId:1),
 
 
-            new ProductFeature(id:2,
-                               displayName:"ابعاد بسته‌بندی",
-                               value:"۴x۳x۸ سانتی‌متر",
-                               productId:1),
+            new(id:2,
+                displayName:"ابعاد بسته‌بندی",
+                value:"۴x۳x۸ سانتی‌متر",
+                productId:1),
 
 
-            new ProductFeature(id:3,
-                               displayName:"شماره پروانه بهداشت",
-                               value:"۵۰/۱۶۲۶-۱",
-                               productId:1),
+            new(id:3,
+                displayName:"شماره پروانه بهداشت",
+                value:"۵۰/۱۶۲۶-۱",
+                productId:1),
 
-            new ProductFeature(id:4,
-                               displayName:"نوع زعفران",
-                               value:"سرگل",
-                               productId:1),
+            new (id:4,
+                 displayName:"نوع زعفران",
+                 value:"سرگل",
+                 productId:1),
 
         });
 
-        modelBuilder.Entity<Role>().HasData(new List<Role>()
+        modelBuilder.Entity<IdentityRole>().HasData(new List<IdentityRole>()
         {
-            new(id:1,name:"Admin"),
-            new(id:2,name:"SystemUser"),
-        });
-
-        modelBuilder.Entity<User>().HasData(new List<User>()
-        {
-            User.Create(id:1,
-                        fullname:"test",
-                        username:"test",
-                        mobile:"09123456789",
-                        nationalCode:"123456789",
-                        email:"test@gmail.com",
-                        password:"10000.UJdStpoXiNqh1QLmQlLLVg==.VapUTtlJx8y8scGTsTkWdwIncix3biPefIYJD3tFeXM=",
-                        birthDate:null,
-                        roleId:1),
+            new() {Id = "1",Name = "Admin",NormalizedName = "ADMIN" },
+            new() {Id = "2",Name = "SystemUser",NormalizedName = "SYSTEMUSER" },
         });
         #endregion
 
@@ -272,7 +254,6 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<ProductCategory>().HasQueryFilter(x => x.IsActive);
         modelBuilder.Entity<ProductPicture>().HasQueryFilter(x => x.IsActive);
         modelBuilder.Entity<ProductFeature>().HasQueryFilter(x => x.IsActive);
-        modelBuilder.Entity<Role>().HasQueryFilter(x => x.IsActive);
         modelBuilder.Entity<Order>().HasQueryFilter(x => x.IsActive);
         modelBuilder.Entity<OrderItem>().HasQueryFilter(x => x.IsActive);
         modelBuilder.Entity<Discount>().HasQueryFilter(x => x.IsActive);
